@@ -1,0 +1,44 @@
+{
+    "name": "cooltronicpl/document-helpers",
+    "description": "Document Helpers",
+    "type": "craft-plugin",
+    "version": "0.0.2",
+    "keywords": [
+        "craft",
+        "cms",
+        "craftcms",
+        "craft-plugin",
+        "Document helpers",
+        "PDF Genrator"
+    ],
+    "support": {
+        "docs": "https://github.com/cooltronicpl/Craft-document-helpers/blob/master/README.md",
+        "issues": "https://github.com/cooltronicpl/Craft-document-helpers/issues"
+    },
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Paweł Potacki",
+            "email": "craft@cooltronic.pl",
+            "homepage": "http://cooltronic.pl",
+            "role": "Developer"
+        }
+    ],
+    "require": {
+        "craftcms/cms": "^3.0.0-RC1",
+        "mpdf/mpdf": "^8.0"
+    },
+    "autoload": {
+        "psr-4": {
+          "cooltronicpl\\documenthelpers\\": "src/"
+        }
+    },
+    "extra": {
+        "name": "Craft Document Generator",
+        "handle": "document-helpers",
+        "hasCpSettings": false,
+        "hasCpSection": false,
+        "changelogUrl": "???",
+        "class": "cooltronicpl\\documenthelpers\\DocumentHelper"
+    }
+}
