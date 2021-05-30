@@ -1,8 +1,7 @@
-# Document helpers plugin for Craft CMS 3.x
+# Document helpers plugin for Craft CMS 3.x. 
+This plugin can generate PDF documents from entry with Twig template to an PDF file or String output. 
 
 ![Icon](resources/document.png)
-
-THIS PLUGIN IS IN BETA AND SHOULD NOT BE USED IN PRODUCTION
 
 ## Installation
 
@@ -10,24 +9,37 @@ THIS PLUGIN IS IN BETA AND SHOULD NOT BE USED IN PRODUCTION
 composer require cooltronicpl/document-helper
 ```
 
+## Usage
 ```
-craft.documentHelpers.pdf(template_string, destination, filename (folder in /web), data of entry, pdfOptions)
+craft.documentHelpers.pdf(template_string, destination, filename, entry, pdfOptions)
 ```
+## Variab
 
-## Example
+* template_string - the location of template file for PDF file
+
+* destionation - where the file will be ganerated, the "file" option is excessively debbuged 
+
+* filename - name of genarated file 
+
+* entry - data inserted to generated template
+## Simple example
+```
+{{craft.documentHelper.pdf("template.twig", "file", "document.pdf", entry, options)}} 
+```
+## Advanced example
 ```
 <a href="{{alias('@web')}}/
-{{craft.documentHelper.pdf("_pdf/document.twig", "file",  'pdf/' ~ entry.id ~ '.pdf' ,entry, pdfOptions)}}"
+{{craft.documentHelper.pdf("_pdf/document.twig", "file",  'pdf/' ~ entry.id ~ '.pdf' ,entry, pdfOptions)}}"}} 
 download>
 </a>
 ```
-## Variables
+## Entry variables inserted to temlate
 
-All variables is in template is in entry array
+All variables of entry in generated template is in entry array
 ```
 {{entry.VAR}}
 ```
-The title is avaible at variable:
+The title of current entry avaible at variable:
 ```
 {{title}}
 ```
@@ -42,6 +54,9 @@ The title is avaible at variable:
 	date: entry.dateUpdated|date('U'),
 } %}
 ```
+
+## Custom default options overriding
+
 * pdfOptions like above:
    * date (in timestamp) default disabled, if date is provided in this parameter was smaller than file date, the file was overwwritten  
    * header (header twig template) default disabled
@@ -72,7 +87,7 @@ The title is avaible at variable:
 	</a>
 {% endfor %}
 ```		
-### Twig template
+## Twig template example
 ```
 <h1>
 {{title}}
