@@ -34,7 +34,7 @@
         }
     },
     "extra": {
-        "name": "Craft Document Generator",
+        "name": "Document Generator",
         "handle": "document-helpers",
         "hasCpSettings": false,
         "hasCpSection": false,
