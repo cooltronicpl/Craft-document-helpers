@@ -29,7 +29,7 @@ craft.documentHelpers.pdf(template_string, destination, filename, entry, pdfOpti
 ## Advanced example
 ```
 <a href="{{alias('@web')}}/
-{{craft.documentHelper.pdf("_pdf/document.twig", "file",  'pdf/' ~ entry.id ~ '.pdf' ,entry, pdfOptions)}}"}} 
+{{craft.documentHelper.pdf("_pdf/document.twig", "file",  'pdf/' ~ entry.id ~ '.pdf' ,entry, pdfOptions)}}" 
 download>
 </a>
 ```
