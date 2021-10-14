@@ -1,14 +1,16 @@
 <?php
 /**
- * Document helpers plugin for Craft CMS 3.x
+ * Document helpers plugin for Craft CMS 3.x.
  *
  * Document helpers
  *
- * @link      https://cooltronic.pl
+ * @see      https://cooltronic.pl
+ * @see      https://potacki.com
+ *
  * @copyright Copyright (c) 2021 Paweł Potacki
  */
 
-/**
+/*
  * @author    Paweł Potacki
  * @package   DocumentHelpers
  * @since     1.0.0

@@ -1,35 +1,34 @@
 <?php
 /**
- * Document helpers plugin for Craft CMS 3.x
+ * Document helpers plugin for Craft CMS 3.x.
  *
  * Document helpers
  *
- * @link      https://cooltronic.pl
+ * @see      https://cooltronic.pl
+ * @see      https://potacki.com
+
+ *
  * @copyright Copyright (c) 2021 Paweł Potacki
  */
 
 namespace cooltronicpl\documenthelpers;
 
+use cooltronicpl\documenthelpers\models\Settings;
 use cooltronicpl\documenthelpers\services\DocumentHelperService as DocumentHelperServiceService;
 use cooltronicpl\documenthelpers\variables\DocumentHelperVariable;
-use cooltronicpl\documenthelpers\models\Settings;
-
 use Craft;
 use craft\base\Plugin;
-use craft\services\Plugins;
-use craft\events\PluginEvent;
 use craft\web\twig\variables\CraftVariable;
-
 use yii\base\Event;
 
 /**
- * Class DocumentHelpers
+ * Class DocumentHelpers.
  *
  * @author    Paweł Potacki
- * @package   DocumentHelpers
+ *
  * @since     0.0.1
  *
- * @property  DocumentHelperServiceService $documentHelpersService
+ * @property DocumentHelperServiceService $documentHelpersService
  */
 class DocumentHelper extends Plugin
 {
@@ -53,7 +52,7 @@ class DocumentHelper extends Plugin
     // =========================================================================
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function init()
     {
@@ -84,12 +83,10 @@ class DocumentHelper extends Plugin
     // =========================================================================
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     protected function createSettingsModel()
     {
         return new Settings();
     }
-
-
 }

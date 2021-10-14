@@ -13,7 +13,7 @@ composer require cooltronicpl/document-helper
 ```
 craft.documentHelpers.pdf(template_string, destination, filename, entry, pdfOptions)
 ```
-## Variab
+## Variables
 
 * template_string - the location of template file for PDF file
 
@@ -22,6 +22,7 @@ craft.documentHelpers.pdf(template_string, destination, filename, entry, pdfOpti
 * filename - name of genarated file 
 
 * entry - data inserted to generated template
+
 ## Simple example
 ```
 {{craft.documentHelper.pdf("template.twig", "file", "document.pdf", entry, options)}} 
@@ -67,6 +68,8 @@ The title of current entry avaible at variable:
    * margin_right default 15
    * mirrorMargins default 0 (possible 1)
    * pageNumbers adds page number in footer
+   * title replaces default title of generated PDF document
+   * custom adds custom variable or variables
 
 ## Returened values
 
@@ -96,4 +99,67 @@ The title of current entry avaible at variable:
 {{entry.variables}}
 </p>
 ...
+```
+
+## Images in PDF
+
+Trick to render images in the PDF template.
+It is possible when using this plugin: https://plugins.craftcms.com/image-toolbox 
+
+```
+{% set image = entry.photoFromCMS.one() %}
+{% set transformSettings = {
+    width: 100,
+    height: 200,
+    mode: 'stretch'
+} %}
+{% set options = {
+  class: '',
+  alt: '', 
+} %}
+...
+{{craft.images.picture(image, transformSettings, options)}}
+```
+
+## Custom title
+
+```
+{% set pdfOptions = {
+	...,
+	title: "My awesome Title"
+} %}
+```
+
+## Custom variables
+### String or number
+
+```
+{% set pdfOptions = {
+	...,
+	custom: variable
+} %}
+```
+
+In PDF template
+
+```
+{{custom}}
+```
+
+### Arrays
+
+```
+{% set pdfOptions = {
+	...,
+		custom: {
+       slug: entry.slug,
+       created: entry.dateCreated,
+       ...
+    }
+} %}
+```
+
+```
+{{custom.slug}}
+{{custom.created.format('d/m/Y')}}
 ```

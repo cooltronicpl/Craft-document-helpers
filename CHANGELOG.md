@@ -1,5 +1,10 @@
 # Document helpers Changelog
 
+## 0.0.6 - 2021-10-14
+- Added custom title to attributes
+- Added custom variables to attributes
+- Update README.MD
+
 ## 0.0.5 - 2021-06-21
 - Updated README.MD
 - Rename the plugin

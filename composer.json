@@ -2,7 +2,7 @@
     "name": "cooltronicpl/document-helpers",
     "description": "Document Helpers",
     "type": "craft-plugin",
-    "version": "0.0.5",
+    "version": "0.0.6",
     "keywords": [
         "craft",
         "cms",
@@ -18,9 +18,14 @@
     "license": "MIT",
     "authors": [
         {
-            "name": "Paweł Potacki",
+            "name": "cooltronic.pl",
             "email": "craft@cooltronic.pl",
             "homepage": "http://cooltronic.pl",
+            "role": "Maintainer"
+        },
+        {
+            "name": "Paweł Potacki",
+            "homepage": "http://potacki.com",
             "role": "Developer"
         }
     ],
@@ -38,7 +43,7 @@
         "handle": "document-helpers",
         "hasCpSettings": false,
         "hasCpSection": false,
-        "changelogUrl": "???",
+        "changelogUrl": "https://github.com/cooltronicpl/Craft-document-helpers/blob/master/CHANGELOG.md",
         "class": "cooltronicpl\\documenthelpers\\DocumentHelper"
     }
 }
