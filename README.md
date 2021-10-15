@@ -103,7 +103,8 @@ The title of current entry avaible at variable:
 
 ## Images in PDF
 
-Trick to render images in the PDF template.
+There are two tricks to render images in the PDF template.
+
 It is possible when using this plugin: https://plugins.craftcms.com/image-toolbox 
 
 ```
@@ -119,6 +120,15 @@ It is possible when using this plugin: https://plugins.craftcms.com/image-toolbo
 } %}
 ...
 {{craft.images.picture(image, transformSettings, options)}}
+```
+
+Example to include img as tag into PDF document. without plugin.
+
+```
+{% set image = entry.photoFromCMS.first() %}
+	{% if image is not null %}
+		<img src="{{image.url}}" alt="">
+	{% endif %}
 ```
 
 ## Custom title
