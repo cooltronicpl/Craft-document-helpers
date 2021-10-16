@@ -122,7 +122,7 @@ It is possible when using this plugin: https://plugins.craftcms.com/image-toolbo
 {{craft.images.picture(image, transformSettings, options)}}
 ```
 
-Example to include img as tag into PDF document. without plugin.
+Example to include img as tag into PDF document without plugin.
 
 ```
 {% set image = entry.photoFromCMS.first() %}
@@ -172,4 +172,18 @@ In PDF template
 ```
 {{custom.slug}}
 {{custom.created.format('d/m/Y')}}
+```
+
+## Page and all pages numbers
+
+Actual page number
+
+```
+{PAGENO}
+```
+
+All pages of generated document
+
+```
+{nbpg}
 ```
