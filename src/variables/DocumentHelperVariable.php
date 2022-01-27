@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Document helpers plugin for Craft CMS 3.x.
  *
@@ -29,6 +30,9 @@ class DocumentHelperVariable
      */
     public function pdf($template, $destination, $filename, $variables, $attributes)
     {
+        $defaultConfig = (new \Mpdf\Config\ConfigVariables())->getDefaults();
+        $defaultFontConfig = (new \Mpdf\Config\FontVariables())->getDefaults();
+
         if (file_exists($filename) && isset($attributes['date'])) {
             if (filemtime($filename) > $attributes['date']) {
                 return $filename;
@@ -74,12 +78,27 @@ class DocumentHelperVariable
         } else {
             $mirrorMargins = 0;
         }
+        if (isset($attributes['fontDirs'])) {
+            $fontDirs = $attributes['fontDirs'];
+        } else {
+            $fontDirs = $defaultConfig['fontDir'];
+        }
+        if (isset($attributes['fontdata'])) {
+            $fontData = $attributes['fontdata'];
+        } else {
+            $fontData = $defaultFontConfig['fontdata'];
+        }
+
+
         $pdf = new \Mpdf\Mpdf([
             'margin_top' => $margin_top,
             'margin_left' => $margin_left,
             'margin_right' => $margin_right,
             'margin_bottom' => $margin_bottom,
             'mirrorMargins' => $mirrorMargins,
+            'fontDir' => $fontDirs,
+            'fontdata' => $fontData,
+
         ]);
 
         if (isset($attributes['header'])) {
@@ -99,11 +118,21 @@ class DocumentHelperVariable
         }
 
         switch ($destination) {
-            case 'file': $output = \Mpdf\Output\Destination::FILE; break;
-            case 'inline': $output = \Mpdf\Output\Destination::INLINE; break;
-            case 'download': $output = \Mpdf\Output\Destination::DOWNLOAD; break;
-            case 'string': $output = \Mpdf\Output\Destination::STRING_RETURN; break;
-            default: $output = \Mpdf\Output\Destination::FILE; break;
+            case 'file':
+                $output = \Mpdf\Output\Destination::FILE;
+                break;
+            case 'inline':
+                $output = \Mpdf\Output\Destination::INLINE;
+                break;
+            case 'download':
+                $output = \Mpdf\Output\Destination::DOWNLOAD;
+                break;
+            case 'string':
+                $output = \Mpdf\Output\Destination::STRING_RETURN;
+                break;
+            default:
+                $output = \Mpdf\Output\Destination::FILE;
+                break;
         }
         $return = $pdf->Output($filename, $output);
         if ($destination == 'file') {
