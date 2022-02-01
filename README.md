@@ -10,9 +10,11 @@ composer require cooltronicpl/document-helper
 ```
 
 ## Usage
+
 ```
 craft.documentHelpers.pdf(template_string, destination, filename, entry, pdfOptions)
 ```
+
 ## Variables
 
 * template_string - the location of template file for PDF file
@@ -24,32 +26,40 @@ craft.documentHelpers.pdf(template_string, destination, filename, entry, pdfOpti
 * entry - data inserted to generated template
 
 ## Simple example
+
 ```
 {{craft.documentHelper.pdf("template.twig", "file", "document.pdf", entry, options)}} 
 ```
+
 ## Advanced example
+
 ```
 <a href="{{alias('@web')}}/
 {{craft.documentHelper.pdf("_pdf/document.twig", "file",  'pdf/' ~ entry.id ~ '.pdf' ,entry, pdfOptions)}}" 
 download>
 </a>
 ```
+
 ## Entry variables inserted to temlate
 
 All variables of entry in generated template is in entry array
 ```
 {{entry.VAR}}
 ```
+
 The title of current entry avaible at variable:
+
 ```
 {{title}}
 ```
+
 ## Parameters
 
 * template (in /templates folder) required
 * destination (file, inline, download, string) required
 * filename required
 * variables (like entry) required
+
 ```
 {% set pdfOptions = {
 	date: entry.dateUpdated|date('U'),
@@ -70,6 +80,21 @@ The title of current entry avaible at variable:
    * pageNumbers adds page number in footer
    * title replaces default title of generated PDF document
    * custom adds custom variable or variables
+   * custom fonts:
+      * fontdata
+      * fontDir
+   
+## Custom fonts
+
+Custom fonts example for Roboto-Regular.ttf and Roboto-Italic.ttf placed in config folder:
+```
+fontdata: { 'roboto' : {
+            'R' : 'Roboto-Regular.ttf',
+            'I' : 'Roboto-Italic.ttf'
+        }},
+		fontDir: "{{craft.app.path.configPath}}/",
+```
+Thanks to: https://github.com/mokopan
 
 ## Returened values
 
@@ -77,6 +102,7 @@ The title of current entry avaible at variable:
 * If destination is 'download' or 'file' it returns filename in /web folder
 
 ## Example in loop
+
 ```
 {% for item in craft.entries.section('xxx').orderBy('title asc').all() %}
 	{% set pdfOptions = {
@@ -90,7 +116,9 @@ The title of current entry avaible at variable:
 	</a>
 {% endfor %}
 ```		
+
 ## Twig template example
+
 ```
 <h1>
 {{title}}
@@ -141,6 +169,7 @@ Example to include img as tag into PDF document without plugin.
 ```
 
 ## Custom variables
+
 ### String or number
 
 ```
