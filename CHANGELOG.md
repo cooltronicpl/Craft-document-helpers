@@ -1,6 +1,6 @@
 # Document helpers Changelog
 
-## 0.0.7 - 2021-02-01
+## 0.0.7 - 2022-02-01
 - Add custom fonts to include in template
 
 ## 0.0.6 - 2021-10-14
