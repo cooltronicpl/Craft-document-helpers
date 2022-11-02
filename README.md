@@ -1,7 +1,7 @@
 # PDF Generator for Craft CMS 3.x and 4.x. 
 This plugin can generate PDF documents from an entry with a Twig template to a PDF file. We can generate, or download multiple PDFs from channel section entries on our website with CraftCMS 3 or 4. Some examples are in this README file. 
 
-MPDF for PHP8.x needs a GD extension.
+MPDF for PHP8.x and Craft 4 needs a GD extension.
 
 ![Icon](resources/pdf-black.png#gh-light-mode-only)
 ![Icon](resources/pdf-light.png#gh-dark-mode-only)
