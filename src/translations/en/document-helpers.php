@@ -1,13 +1,13 @@
 <?php
 /**
- * Document helpers plugin for Craft CMS 3.x.
+ * PDF Generator plugin for Craft CMS 4.x.
  *
  * Document helpers
  *
  * @see      https://cooltronic.pl
  * @see      https://potacki.com
  *
- * @copyright Copyright (c) 2021 Paweł Potacki
+ * @copyright Copyright (c) 2022 CoolTRONIC.pl sp. z o.o. by Paweł Potacki
  */
 
 /*

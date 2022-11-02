@@ -1,6 +1,6 @@
 The MIT License (MIT)
 
-Copyright (c) 2021 Pawe≈Ç Potacki https://cooltronic.pl
+Copyright (c) 2022 CoolTRONIC.pl sp. z o.o. https://cooltronic.pl by Pawe≥ Potacki https://potacki.com
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
 documentation files (the "Software"), to deal in the Software without restriction, including without limitation the

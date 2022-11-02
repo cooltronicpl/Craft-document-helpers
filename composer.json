@@ -1,8 +1,8 @@
 {
     "name": "cooltronicpl/document-helpers",
-    "description": "Document Helpers",
+    "description": "PDF Generator",
     "type": "craft-plugin",
-    "version": "0.0.7",
+    "version": "1.0.0",
     "keywords": [
         "craft",
         "cms",
@@ -18,7 +18,7 @@
     "license": "MIT",
     "authors": [
         {
-            "name": "cooltronic.pl",
+            "name": "CoolTRONIC.pl sp. z o.o.",
             "email": "craft@cooltronic.pl",
             "homepage": "http://cooltronic.pl",
             "role": "Maintainer"
@@ -30,8 +30,8 @@
         }
     ],
     "require": {
-        "craftcms/cms": "^3.0.0-RC1",
-        "mpdf/mpdf": "^8.0"
+        "craftcms/cms": "^4.0.0",
+        "mpdf/mpdf": "^8.0.10"
     },
     "autoload": {
         "psr-4": {
@@ -39,7 +39,7 @@
         }
     },
     "extra": {
-        "name": "Document Generator",
+        "name": "PDF Generator",
         "handle": "document-helpers",
         "hasCpSettings": false,
         "hasCpSection": false,
