@@ -8,7 +8,7 @@
  * @see      https://potacki.com
 
  *
- * @copyright Copyright (c) 2022 CoolTRONIC.pl sp. z o.o. by Paweł Potacki
+ * @copyright Copyright (c) 2022 CoolTRONIC.pl sp. z o.o. by Pawel Potacki
  */
 
 namespace cooltronicpl\documenthelpers;
@@ -24,7 +24,7 @@ use yii\base\Event;
 /**
  * Class DocumentHelpers.
  *
- * @author    Paweł Potacki
+ * @author    Pawel Potacki
  *
  * @since     0.0.1
  *

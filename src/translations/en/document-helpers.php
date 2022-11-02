@@ -7,11 +7,11 @@
  * @see      https://cooltronic.pl
  * @see      https://potacki.com
  *
- * @copyright Copyright (c) 2022 CoolTRONIC.pl sp. z o.o. by Paweł Potacki
+ * @copyright Copyright (c) 2022 CoolTRONIC.pl sp. z o.o. by Pawel Potacki
  */
 
 /*
- * @author    Paweł Potacki
+ * @author    Pawel Potacki
  * @package   DocumentHelpers
  * @since     1.0.0
  */
