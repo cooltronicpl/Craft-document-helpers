@@ -13,7 +13,7 @@
 /*
  * @author    Pawel Potacki
  * @package   DocumentHelpers
- * @since     1.0.0
+ * @since     0.0.2
  */
 return [
     'Document helpers plugin loaded' => 'Document helpers plugin loaded',

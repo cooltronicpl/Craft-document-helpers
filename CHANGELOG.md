@@ -1,8 +1,10 @@
-
 # PDF Generator for Craft 4
 
-## 1.0.0 - Update for Craft 4 
+## 1.0.1 - 2022-11-02 Minor changes
+- fix some typos in README.md
+- fixed encoding issues and minor mislead of comments in non-latin extended systems in files
 
+## 1.0.0 - 2022-11-02 Update for Craft 4 
 - update to Craft 4
 - now autoupdate of files works properly with PHP8.0.x like on examples
 
