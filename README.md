@@ -237,7 +237,7 @@ All pages of the generated document
 
 ## About filename characters
 
-When you chose your PDF filename, you must use safe characters. In the example this is forbidden characters in Windows filename ":", "/", "?", "|", "<", ">" or "\".
+When you chose your PDF filename, you must use safe characters. In the example this is forbidden characters in Windows filename ":", "/", "?", "|", "<", ">" or "\/".
 
 ## Multiple PDF files downloading with JavaScript on some page
 
