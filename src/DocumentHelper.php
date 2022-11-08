@@ -46,7 +46,7 @@ class DocumentHelper extends Plugin
     /**
      * @var string
      */
-    public string  $schemaVersion = '1.0.1';
+    public string  $schemaVersion = '1.0.2';
 
     // Public Methods
     // =========================================================================
@@ -69,14 +69,6 @@ class DocumentHelper extends Plugin
             }
         );
 
-        Craft::info(
-            Craft::t(
-                'document-helpers',
-                '{name} plugin loaded',
-                ['name' => $this->name]
-            ),
-            __METHOD__
-        );
     }
 
 }
