@@ -47,10 +47,10 @@ class DocumentHelperVariable
         }
         $html = Craft::$app->getView()->renderTemplate($template, $vars);
         if (isset($attributes['header'])) {
-            $html_header = Craft::$app->getView()->renderTemplate($attributes['header']);
+            $html_header = Craft::$app->getView()->renderTemplate($attributes['header'], $vars);
         }
         if (isset($attributes['footer'])) {
-            $html_footer = Craft::$app->getView()->renderTemplate($attributes['footer']);
+            $html_footer = Craft::$app->getView()->renderTemplate($attributes['footer'], $vars);
         }
 
         if (isset($attributes['margin_top'])) {
