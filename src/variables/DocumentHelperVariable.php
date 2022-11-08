@@ -78,10 +78,10 @@ class DocumentHelperVariable
         } else {
             $mirrorMargins = 0;
         }
-        if (isset($attributes['fontDirs'])) {
-            $fontDirs = $attributes['fontDirs'];
+        if (isset($attributes['fontDir'])) {
+            $fontDir = $attributes['fontDir'];
         } else {
-            $fontDirs = $defaultConfig['fontDir'];
+            $fontDir = $defaultConfig['fontDir'];
         }
         if (isset($attributes['fontdata'])) {
             $fontData = $attributes['fontdata'];
@@ -95,7 +95,7 @@ class DocumentHelperVariable
             'margin_right' => $margin_right,
             'margin_bottom' => $margin_bottom,
             'mirrorMargins' => $mirrorMargins,
-            'fontDir' => $fontDirs,
+            'fontDir' => $fontDir,
             'fontdata' => $fontData,
         ]);
 
