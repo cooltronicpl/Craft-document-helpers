@@ -1,4 +1,5 @@
 # PDF Generator for Craft 4
+
 ## 1.0.2 - 2022-11-10 Merged with @AramLoosman & remove unused function
 - add variables to footer and header
 
