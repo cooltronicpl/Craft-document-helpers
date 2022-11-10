@@ -1,7 +1,8 @@
-# Document helpers plugin for Craft CMS 3.x. 
-This plugin can generate PDF documents from entry with Twig template to an PDF file or String output. 
+# PDF Generator for Craft CMS 3.x
+This plugin can generate PDF documents from an entry with a Twig template to a PDF file. We can generate, or download multiple PDFs from channel section entries on our website with CraftCMS 3 or 4. Some examples are in this README file. 
 
-![Icon](resources/document.png)
+![Icon](resources/pdf-black.png#gh-light-mode-only)
+![Icon](resources/pdf-light.png#gh-dark-mode-only)
 
 ## Installation
 
@@ -17,11 +18,11 @@ craft.documentHelpers.pdf(template_string, destination, filename, entry, pdfOpti
 
 ## Variables
 
-* template_string - the location of template file for PDF file
+* template_string - the location of the template file for the PDF file
 
-* destionation - where the file will be ganerated, the "file" option is excessively debbuged 
+* destionation - where the file will be generated, the "file" and "download" option is excessively debugged, but you can pass only one download file, when you want to download multiple files, there is a JavaScript example in bottom of README.md 
 
-* filename - name of genarated file 
+* filename - the name of a generated file 
 
 * entry - data inserted to generated template
 
@@ -40,14 +41,14 @@ download>
 </a>
 ```
 
-## Entry variables inserted to temlate
+## Entry variables inserted into a template
 
 All variables of entry in generated template is in entry array
 ```
 {{entry.VAR}}
 ```
 
-The title of current entry avaible at variable:
+The title of the current entry is available at variable:
 
 ```
 {{title}}
@@ -69,7 +70,7 @@ The title of current entry avaible at variable:
 ## Custom default options overriding
 
 * pdfOptions like above:
-   * date (in timestamp) default disabled, if date is provided in this parameter was smaller than file date, the file was overwwritten  
+   * date (in timestamp) default disabled, if a date is provided in this parameter was smaller than a file created date, the file was overwritten  
    * header (header twig template) default disabled
    * footer (footer twig template) default disabled
    * margin_top default 30
@@ -77,8 +78,8 @@ The title of current entry avaible at variable:
    * margin_left default 15
    * margin_right default 15
    * mirrorMargins default 0 (possible 1)
-   * pageNumbers adds page number in footer
-   * title replaces default title of generated PDF document
+   * pageNumbers add page numbers in the footer
+   * title replaces default title of a generated PDF document
    * custom adds custom variable or variables
    * custom fonts:
       * fontdata
@@ -96,12 +97,12 @@ fontdata: { 'roboto' : {
 ```
 Thanks to: https://github.com/mokopan
 
-## Returened values
+## Returned values
 
-* If destination is 'inline' or 'string' the plugin returns string
-* If destination is 'download' or 'file' it returns filename in /web folder
+* If the destination is 'inline' or 'string' the plugin returns a string
+* If the destination is 'download' or 'file' it returns the filename in /web folder
 
-## Example in loop
+## Example in a loop
 
 ```
 {% for item in craft.entries.section('xxx').orderBy('title asc').all() %}
@@ -150,7 +151,7 @@ It is possible when using this plugin: https://plugins.craftcms.com/image-toolbo
 {{craft.images.picture(image, transformSettings, options)}}
 ```
 
-Example to include img as tag into PDF document without plugin.
+For example, include an image as a tag in a PDF document without a plugin.
 
 ```
 {% set image = entry.photoFromCMS.first() %}
@@ -202,6 +203,13 @@ In PDF template
 {{custom.slug}}
 {{custom.created.format('d/m/Y')}}
 ```
+## Custom page break
+
+You can add tags of MPDF in HTML content. This is a page break;
+
+```
+<pagebreak>
+```
 
 ## Page and all pages numbers
 
@@ -211,8 +219,66 @@ Actual page number
 {PAGENO}
 ```
 
-All pages of generated document
+All pages of the generated document
 
 ```
 {nbpg}
+```
+
+## Generate PDF file only when data of entry is changed
+
+```
+{% set pdfOptions = {
+		date: entry.dateUpdated|date('U'),
+	} %}
+```
+
+## About filename characters
+
+When you chose your PDF filename, you must use safe characters. In the example this is forbidden characters in Windows filename ":", "/", "?", "|", "<", ">" or "\/".
+
+## Multiple PDF files downloading with JavaScript on some page
+
+A browser may ask for permission to download multiple files to the end user. Simple example for some static files:
+
+```
+<script>
+{% set pdfOptions = {
+		date: entry.dateUpdated|date('U')
+	} %}
+    var files = ["{{ alias('@web') }}/{{craft.documentHelper.pdf('_pdf/document.twig', 'file', 'pdf/' ~ entry.dateCreated|date("Y-m-d") ~ random(10) ~ '.pdf'  ,entry, pdfOptions)}}", "{{ alias('@web') }}/{{craft.documentHelper.pdf('_pdf/document.twig', 'file', 'pdf/' ~ entry.dateCreated|date("Y-m-d") ~ random(10) ~ '.pdf' , entry, pdfOptions)}}"];
+    for (var i = files.length - 1; i >= 0; i--) {
+        var a = document.createElement("a");
+        a.target = "_blank";
+        a.download = "download";
+        a.href = files[i];
+        a.click();
+    };
+</script>
+```
+
+Simple example with loop:
+
+```
+{% set pdfOptions = {
+		date: entry.dateUpdated|date('U')
+	} %}
+<script>
+    var files = [
+     {% for item in craft.entries.section('xxx').orderBy('title asc').all() %}
+	
+	    "{{alias('@web')}}/
+	    {{craft.documentHelper.pdf("_pdf/document.twig", "file",  'pdf/' ~ item.id ~ '.pdf', item, pdfOptions)}}"
+	
+        {% if loop.last %}{% else %}, {% endif %}
+    {% endfor %}
+        ];
+    for (var i = files.length - 1; i >= 0; i--) {
+        var a = document.createElement("a");
+        a.target = "_blank";
+        a.download = "download";
+        a.href = files[i];
+        a.click();
+    };
+</script>
 ```

@@ -47,10 +47,10 @@ class DocumentHelperVariable
         }
         $html = Craft::$app->getView()->renderTemplate($template, $vars);
         if (isset($attributes['header'])) {
-            $html_header = Craft::$app->getView()->renderTemplate($attributes['header']);
+            $html_header = Craft::$app->getView()->renderTemplate($attributes['header'], $vars);
         }
         if (isset($attributes['footer'])) {
-            $html_footer = Craft::$app->getView()->renderTemplate($attributes['footer']);
+            $html_footer = Craft::$app->getView()->renderTemplate($attributes['footer'], $vars);
         }
 
         if (isset($attributes['margin_top'])) {
@@ -78,10 +78,10 @@ class DocumentHelperVariable
         } else {
             $mirrorMargins = 0;
         }
-        if (isset($attributes['fontDirs'])) {
-            $fontDirs = $attributes['fontDirs'];
+        if (isset($attributes['fontDir'])) {
+            $fontDir = $attributes['fontDir'];
         } else {
-            $fontDirs = $defaultConfig['fontDir'];
+            $fontDir = $defaultConfig['fontDir'];
         }
         if (isset($attributes['fontdata'])) {
             $fontData = $attributes['fontdata'];

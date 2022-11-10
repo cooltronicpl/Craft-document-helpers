@@ -1,5 +1,9 @@
 # Document helpers Changelog
 
+## 0.0.8 - 2021-11-10 Merged with @AramLoosman
+- remove unused function
+- add variables to footer and header
+
 ## 0.0.7 - 2021-02-01
 - Add custom fonts to include in template
 

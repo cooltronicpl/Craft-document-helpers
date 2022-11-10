@@ -68,15 +68,6 @@ class DocumentHelper extends Plugin
                 $variable->set('documentHelper', DocumentHelperVariable::class);
             }
         );
-
-        Craft::info(
-            Craft::t(
-                'document-helpers',
-                '{name} plugin loaded',
-                ['name' => $this->name]
-            ),
-            __METHOD__
-        );
     }
 
     // Protected Methods
