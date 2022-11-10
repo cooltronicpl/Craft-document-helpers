@@ -1,7 +1,9 @@
 # PDF Generator for Craft 4
 
-## 1.0.2 - 2022-11-10 Merged with @AramLoosman & remove unused function
+## 1.0.2 - 2022-11-10 Merged with @AramLoosman & 
 - add variables to footer and header
+- remove unused function
+- changed fontDirs in plugin code to fontDir as in README.md
 
 ## 1.0.1 - 2022-11-02 Minor changes
 - fix some typos in README.md
@@ -12,6 +14,11 @@
 - now autoupdate of files works properly with PHP8.0.x like on examples
 
 # Document helpers Changelog for Craft 3
+
+## 0.0.8 - 2021-11-10 Merged with @AramLoosman
+- remove unused function
+- add variables to footer and header
+- changed fontDirs in plugin code to fontDir
 
 ## 0.0.7 - 2022-02-01
 - Add custom fonts to include in template
