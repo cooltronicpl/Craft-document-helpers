@@ -1,4 +1,4 @@
-# Document helpers Changelog
+# PDF Generator for Craft 3 Changelog
 
 ## 0.0.8 - 2021-11-10 Merged with @AramLoosman
 - remove unused function
