@@ -1,6 +1,12 @@
 The MIT License (MIT)
 
-Copyright (c) 2021 Paweł Potacki https://cooltronic.pl
+Copyright (c) 2022 CoolTRONIC.pl sp. z o.o. by Pawel Potacki
+
+More about CoolTRONIC.pl sp. z o.o. Interactive Agency https://cooltronic.pl/
+
+More about main developer Pawel Potacki https://potacki.com/
+
+CoolTRONIC.pl sp. z o.o., hereby disclaims all copyright interest in the program “PDF Generator” written by Pawel Potacki.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
 documentation files (the "Software"), to deal in the Software without restriction, including without limitation the
