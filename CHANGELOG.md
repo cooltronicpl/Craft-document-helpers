@@ -15,7 +15,7 @@
 - update for Craft 4
 - now autoupdate of files works properly with PHP8.0.x like on examples
 
-## 0.0.9 - 2021-11-10 [CRITICAL]
+## 0.0.9 - 2021-11-11 [CRITICAL]
 - Fix of fontDir bug, thanks to @iwi-hi
 
 ## 0.0.8 - 2021-11-10
