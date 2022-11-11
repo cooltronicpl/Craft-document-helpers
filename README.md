@@ -284,3 +284,19 @@ Simple example with loop:
     };
 </script>
 ```
+
+With ❤ by [CoolTRONIC.pl sp. z o.o.](https://cooltronic.pl) by [Pawel Potacki](https://potacki.com)
+
+## License
+
+The MIT License (MIT)
+
+Copyright (c) 2022 CoolTRONIC.pl sp. z o.o. by Pawel Potacki
+
+More about CoolTRONIC.pl sp. z o.o. Interactive Agency https://cooltronic.pl/
+
+More about main developer Pawel Potacki https://potacki.com/
+
+CoolTRONIC.pl sp. z o.o., hereby disclaims all copyright interest in the program “PDF Generator” written by Pawel Potacki.
+
+LICENSE.md file contains full License notices.
