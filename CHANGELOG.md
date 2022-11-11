@@ -1,11 +1,12 @@
 # PDF Generator for Craft 3
 
-## 0.0.8 - 2021-11-10 Merged with @AramLoosman
+## 0.0.8 - 2021-11-10
+- merged with @AramLoosman
 - remove unused function
 - add variables to footer and header
 - changed fontDirs in plugin code to fontDir as in README.md
 
-## 0.0.7 - 2021-02-01
+## 0.0.7 - 2022-02-01
 - Add custom fonts to include in template
 
 ## 0.0.6 - 2021-10-14
@@ -18,5 +19,5 @@
 - Rename the plugin
 
 ## 0.0.2 - 2021-03-21
-### Added
 - Initial release
+- PDF Generator for Craft 3
