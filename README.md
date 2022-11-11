@@ -311,6 +311,6 @@ More about CoolTRONIC.pl sp. z o.o. Interactive Agency https://cooltronic.pl/
 
 More about main developer Pawel Potacki https://potacki.com/
 
-CoolTRONIC.pl sp. z o.o., hereby disclaims all copyright interest in the program “PDF Generator” written by Pawel Potacki.
+CoolTRONIC.pl sp. z o.o., hereby holds all copyright interest in the program “PDF Generator” written by Pawel Potacki.
 
 LICENSE.md file contains full License notices.
