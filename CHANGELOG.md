@@ -1,5 +1,8 @@
 # PDF Generator for Craft 3
 
+## 0.0.9 - 2021-11-10 [CRITICAL]
+- Fix of fontDir bug, thanks to @iwi-hi
+
 ## 0.0.8 - 2021-11-10
 - merged with @AramLoosman
 - remove unused function

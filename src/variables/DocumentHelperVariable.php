@@ -95,7 +95,7 @@ class DocumentHelperVariable
             'margin_right' => $margin_right,
             'margin_bottom' => $margin_bottom,
             'mirrorMargins' => $mirrorMargins,
-            'fontDir' => $fontDirs,
+            'fontDir' => $fontDir,
             'fontdata' => $fontData,
         ]);
 
