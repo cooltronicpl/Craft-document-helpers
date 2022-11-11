@@ -237,6 +237,20 @@ All pages of the generated document
 
 When you chose your PDF filename, you must use safe characters. In the example this is forbidden characters in Windows filename ":", "/", "?", "|", "<", ">" or "\/".
 
+## Browser caching problems of PDF files in some servers and hosting
+
+Also you can use another plugin with [Static Files Autoversioning](https://github.com/cooltronicpl/craft-files-autoversioning) when your hosting or server is caching PDF files.
+
+```
+<a href="{{alias('@web')}}{{version("/" ~ craft.documentHelper.pdf('_pdf/document.twig', 'file', 'pdf/book'  ~ '.pdf'  ,entry, pdfOptions))}}">LINK </a>
+```
+
+This generate PDF with timestamp and caching policy problems of your hosting is gone.
+
+```
+<a href="http://some-domain.com/pdf/book.pdf?v=1668157143">LINK </a>
+```
+
 ## Multiple PDF files downloading with JavaScript on some page
 
 A browser may ask for permission to download multiple files to the end user. Simple example for some static files:
