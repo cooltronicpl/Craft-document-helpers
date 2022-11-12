@@ -1,13 +1,13 @@
 <?php
-
 /**
- * PDF Generator plugin for Craft CMS 4.x.
  *
- * Document helpers
+ * Class DocumentHelpersVariable
  *
- * @see      https://cooltronic.pl
- * @see      https://potacki.com
+ * PDF Generator plugin for Craft CMS 3 or Craft CMS 4.
  *
+ * @link      https://cooltronic.pl
+ * @link      https://potacki.com
+ * @license   https://github.com/cooltronicpl/Craft-document-helpers/blob/master/LICENSE.md
  * @copyright Copyright (c) 2022 CoolTRONIC.pl sp. z o.o. by Pawel Potacki
  */
 
@@ -16,18 +16,22 @@ namespace cooltronicpl\documenthelpers\variables;
 use Craft;
 
 /**
+ * @author    CoolTRONIC.pl sp. z o.o. <github@cooltronic.pl>
  * @author    Pawel Potacki
- *
  * @since     0.0.2
  */
 class DocumentHelperVariable
 {
-    // Public Methods
-    // =========================================================================
-
     /**
-     * @return string
-     */
+    * Fuction generates PDF with settings
+    * @param string $template twig template.
+    * @param string $destination type of generated document.
+    * @param string $filename the filename.
+    * @param array $variables Craft vars to parse.
+    * @param array $attributes optional atts passed to funtcion
+    *
+    * @return string
+    */
     public function pdf($template, $destination, $filename, $variables, $attributes)
     {
         $defaultConfig = (new \Mpdf\Config\ConfigVariables())->getDefaults();
@@ -88,17 +92,28 @@ class DocumentHelperVariable
         } else {
             $fontData = $defaultFontConfig['fontdata'];
         }
-
-        $pdf = new \Mpdf\Mpdf([
-            'margin_top' => $margin_top,
-            'margin_left' => $margin_left,
-            'margin_right' => $margin_right,
-            'margin_bottom' => $margin_bottom,
-            'mirrorMargins' => $mirrorMargins,
-            'fontDir' => $fontDir,
-            'fontdata' => $fontData,
-        ]);
-
+        if(isset($attributes["no_auto_page_break"])){
+            $pdf = new \Mpdf\Mpdf([
+                'margin_top' => $margin_top,
+                'margin_left' => $margin_left,
+                'margin_right' => $margin_right,
+                'margin_bottom' => $margin_bottom,
+                'mirrorMargins' => $mirrorMargins,
+                'fontDir' => $fontDir,
+                'fontdata' => $fontData,
+                'autoPageBreak' => false
+            ]);
+        } else{
+            $pdf = new \Mpdf\Mpdf([
+                'margin_top' => $margin_top,
+                'margin_left' => $margin_left,
+                'margin_right' => $margin_right,
+                'margin_bottom' => $margin_bottom,
+                'mirrorMargins' => $mirrorMargins,
+                'fontDir' => $fontDir,
+                'fontdata' => $fontData,
+            ]);
+        }
         if (isset($attributes['header'])) {
             $pdf_string = $pdf->SetHTMLHeader($html_header);
         }
@@ -114,7 +129,20 @@ class DocumentHelperVariable
         } elseif (isset($variables['title'])) {
             $pdf->SetTitle($variables['title']);
         }
-
+        if (isset($attributes['author'])) {
+            $pdf->SetAuthor($attributes['author']);
+        } else {
+            $pdf->SetAuthor("Made by CoolTRONIC.pl PDF Generator https://cooltronic.pl");
+        }
+        $pdf->SetCreator("Made by CoolTRONIC.pl PDF Generator https://cooltronic.pl");
+        if (isset($attributes['keywords'])) {
+            $pdf->SetKeywords($attributes['keywords'] . ", PDF Generator, CoolTRONIC.pl, https://cooltronic.pl");
+        } else {
+            $pdf->SetKeywords("PDF Generator, CoolTRONIC.pl, https://cooltronic.pl");
+        }
+        if (isset($attributes['password'])){
+            $pdf->SetProtection(array(), 'UserPassword', $attributes['password']);
+        }
         switch ($destination) {
             case 'file':
                 $output = \Mpdf\Output\Destination::FILE;

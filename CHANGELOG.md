@@ -1,19 +1,33 @@
 # PDF Generator for Craft 3 or 4
 
+## 1.0.3 - 2022-11-12
+- Feature update for Craft CMS 4
+- Add author option
+- Add keywords option
+- Enable manual page break mode (no_auto_page_break) option
+- Add option to password protect of PDF
+
 ## 1.0.2 - 2022-11-10
-- merged with @AramLoosman 
-- remove unused function
-- add custom variables to footer and header
-- changed fontDirs variable in plugin code to fontDir as in README.md
+- Merged with @AramLoosman 
+- Remove unused function
+- Add custom variables to footer and header
+- Changed fontDirs variable in plugin code to fontDir as in README.md
 
 ## 1.0.1 - 2022-11-02
-- minor changes
-- fix some typos in README.md
-- fixed encoding issues and minor mislead of comments in non-latin extended systems in files
+- Minor changes
+- Fix some typos in README.md
+- Fixed encoding issues and minor mislead of comments in non-latin extended systems in files
 
 ## 1.0.0 - 2022-11-02
-- update for Craft 4
-- now autoupdate of files works properly with PHP8.0.x like on examples
+- Update for Craft 4
+- Now autoupdate of files works properly with PHP8.0.x like on examples
+
+## 0.1.0 - 2022-11-12
+- Feature update for Craft CMS 3
+- Add author option
+- Add keywords option
+- Enable manual page break mode (no_auto_page_break) option
+- Add option to password protect of PDF
 
 ## 0.0.9 - 2021-11-11 [CRITICAL]
 - Fix of fontDir bug, thanks to @iwi-hi
