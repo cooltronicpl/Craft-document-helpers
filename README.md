@@ -315,7 +315,7 @@ Special thanks to contributors and bug checkers:
 
 * [@mokopan](https://github.com/mokopan)
 * [@AramLoosman](https://github.com/AramLoosman)
-* [@iwi-hi](https://github.com/iwi-hi)
+* [@iwe-hi](https://github.com/iwe-hi)
 
 ## License
 
