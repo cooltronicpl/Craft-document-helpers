@@ -1,5 +1,7 @@
-# PDF Generator for Craft CMS 3.x
+# PDF Generator for Craft CMS 3.x and 4.x. 
 This plugin can generate PDF documents from an entry with a Twig template to a PDF file. We can generate, or download multiple PDFs from channel section entries on our website with CraftCMS 3 or 4. Some examples are in this README file. 
+
+MPDF for PHP8.x and Craft 4 needs a GD extension.
 
 ![Icon](resources/pdf-black.png#gh-light-mode-only)
 ![Icon](resources/pdf-light.png#gh-dark-mode-only)
@@ -24,7 +26,7 @@ craft.documentHelpers.pdf(template_string, destination, filename, entry, pdfOpti
 
 * filename - the name of a generated file 
 
-* entry - data inserted to generated template
+* entry - data inserted to generated template, which contains 'entry' array
 
 ## Simple example
 
@@ -70,24 +72,29 @@ The title of the current entry is available at variable:
 ## Custom default options overriding
 
 * pdfOptions like above:
-   * date (in timestamp) default disabled, if a date is provided in this parameter was smaller than a file created date, the file was overwritten  
-   * header (header twig template) default disabled
-   * footer (footer twig template) default disabled
-   * margin_top default 30
-   * margin_bottom default 30
-   * margin_left default 15
-   * margin_right default 15
-   * mirrorMargins default 0 (possible 1)
-   * pageNumbers add page numbers in the footer
-   * title replaces default title of a generated PDF document
-   * custom adds custom variable or variables
-   * custom fonts:
-      * fontdata
-      * fontDir
+  * date (in timestamp) default disabled, if a date is provided in this parameter was smaller than a file created date, the file was overwritten  
+  * header (header twig template) default disabled
+  * footer (footer twig template) default disabled
+  * margin_top default 30
+  * margin_bottom default 30
+  * margin_left default 15
+  * margin_right default 15
+  * mirrorMargins default 0 (possible 1)
+  * pageNumbers add page numbers in the footer
+  * title replaces default title of a generated PDF document
+  * custom adds custom variable or variables
+  * password as string to password to auto protect your PDF, it can be text variable
+  * no_auto_page_break which disables system automatic page breaks, this is useful when you need to manually, you must add add manual custom page to documents with more than 1 pages break ie. ```<pagebreak>``` and size of margins to fit content, it may fix page braeks problems but not in all cases
+  * author sets an author meta, it can be text variable
+  * keywords sets keyword meta, insert as string: ```"keyword1, longer keyword2, keyword3"``` (seperated by comma), it can be text variable in this schema
+  * custom fonts:
+    * fontdata
+    * fontDir
    
 ## Custom fonts
 
 Custom fonts example for Roboto-Regular.ttf and Roboto-Italic.ttf placed in config folder:
+
 ```
 fontdata: { 'roboto' : {
             'R' : 'Roboto-Regular.ttf',
@@ -95,7 +102,6 @@ fontdata: { 'roboto' : {
         }},
 		fontDir: "{{craft.app.path.configPath}}/",
 ```
-Thanks to: https://github.com/mokopan
 
 ## Returned values
 
@@ -116,7 +122,7 @@ Thanks to: https://github.com/mokopan
 		DOWNLOAD {{item.title}}
 	</a>
 {% endfor %}
-```		
+```  
 
 ## Twig template example
 
@@ -297,7 +303,15 @@ Simple example with loop:
 </script>
 ```
 
-With ❤ by [CoolTRONIC.pl sp. z o.o.](https://cooltronic.pl) by [Pawel Potacki](https://potacki.com)
+With ❤ by [CoolTRONIC.pl sp. z o.o.](https://cooltronic.pl) coded by [Pawel Potacki](https://potacki.com)
+
+## Special thanks to
+
+Special thanks to contributors and bug checkers:
+
+* [@mokopan](https://github.com/mokopan)
+* [@AramLoosman](https://github.com/AramLoosman)
+* [@iwi-hi](ihttps://github.com/iwi-hi)
 
 ## License
 
@@ -305,9 +319,9 @@ The MIT License (MIT)
 
 Copyright (c) 2022 CoolTRONIC.pl sp. z o.o. by Pawel Potacki
 
-More about CoolTRONIC.pl sp. z o.o. Interactive Agency https://cooltronic.pl/
+More about [CoolTRONIC.pl sp. z o.o. Interactive Agency](https://cooltronic.pl/)
 
-More about main developer Pawel Potacki https://potacki.com/
+More about [main developer Pawel Potacki](https://potacki.com/)
 
 CoolTRONIC.pl sp. z o.o., hereby holds all copyright interest in the program “PDF Generator” written by Pawel Potacki.
 

@@ -1,35 +1,30 @@
 <?php
 /**
- * Document helpers plugin for Craft CMS 3.x.
+ * PDF Generator plugin for Craft CMS 3 4.
  *
- * Document helpers
+ * Class DocumentHelpersVariable
  *
- * @see      https://cooltronic.pl
- * @see      https://potacki.com
-
- *
- * @copyright Copyright (c) 2021 Paweł Potacki
+ * @link      https://cooltronic.pl
+ * @link      https://potacki.com
+ * @license   https://github.com/cooltronicpl/Craft-document-helpers/blob/master/LICENSE.md
+ * @copyright Copyright (c) 2022 CoolTRONIC.pl sp. z o.o. by Pawel Potacki
  */
 
 namespace cooltronicpl\documenthelpers;
 
-use cooltronicpl\documenthelpers\models\Settings;
-use cooltronicpl\documenthelpers\services\DocumentHelperService as DocumentHelperServiceService;
 use cooltronicpl\documenthelpers\variables\DocumentHelperVariable;
-use Craft;
 use craft\base\Plugin;
 use craft\web\twig\variables\CraftVariable;
 use yii\base\Event;
 
 /**
  * Class DocumentHelpers.
- *
- * @author    Paweł Potacki
- *
- * @since     0.0.1
- *
- * @property DocumentHelperServiceService $documentHelpersService
+
+ * @author    CoolTRONIC.pl sp. z o.o. <github@cooltronic.pl>
+ * @author    Pawel Potacki
+ * @since     0.0.2
  */
+
 class DocumentHelper extends Plugin
 {
     // Static Properties
