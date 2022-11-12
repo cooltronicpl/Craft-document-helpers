@@ -65,14 +65,4 @@ class DocumentHelper extends Plugin
         );
     }
 
-    // Protected Methods
-    // =========================================================================
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function createSettingsModel()
-    {
-        return new Settings();
-    }
 }
