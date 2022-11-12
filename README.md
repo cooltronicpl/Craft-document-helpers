@@ -256,6 +256,10 @@ This generate PDF with timestamp and caching policy problems of your hosting is 
 ```
 <a href="http://some-domain.com/pdf/book.pdf?v=1668157143">LINK </a>
 ```
+## Requirements
+
+* Craft CMS >= 3.0.0 in 0.x branch
+* Craft CMS >= 4.0.0 in 1.x branch
 
 ## Multiple PDF files downloading with JavaScript on some page
 
