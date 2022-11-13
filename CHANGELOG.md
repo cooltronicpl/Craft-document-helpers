@@ -19,7 +19,7 @@
 - Add variables to footer and header
 - Changed fontDirs in plugin code to fontDir as in README.md
 
-## 0.0.7 - 2022-02-01
+## 0.0.7 - 2022-11-01
 
 - Add custom fonts to include in template
 
