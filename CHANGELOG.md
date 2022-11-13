@@ -18,7 +18,7 @@
 - Fix some typos in README.md
 - Fixed encoding issues and minor mislead of comments in non-latin extended systems in files
 
-## 1.0.0 - 2022-10-31
+## 1.0.0 - 2022-11-01
 - Update for Craft 4
 - Now autoupdate of files works properly with PHP8.0.x like on examples
 
@@ -38,7 +38,7 @@
 - add custom variables to footer and header
 - changed fontDirs variable in plugin code to fontDir as in README.md
 
-## 0.0.7 - 2022-10-31
+## 0.0.7 - 2022-11-01
 - Add custom fonts to include in template
 
 ## 0.0.6 - 2021-10-14
