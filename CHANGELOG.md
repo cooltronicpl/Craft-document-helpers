@@ -18,7 +18,7 @@
 - Fix some typos in README.md
 - Fixed encoding issues and minor mislead of comments in non-latin extended systems in files
 
-## 1.0.0 - 2022-11-02
+## 1.0.0 - 2022-11-12
 - Update for Craft 4
 - Now autoupdate of files works properly with PHP8.0.x like on examples
 
