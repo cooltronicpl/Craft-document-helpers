@@ -30,7 +30,7 @@
 - Add option to password protect of PDF
 
 ## 0.0.9 - 2021-11-11 [CRITICAL]
-- Fix of fontDir bug, thanks to @iwi-hi
+- Fix of fontDir bug, thanks to @iwe-hi
 
 ## 0.0.8 - 2021-11-10
 - Merged with @AramLoosman
