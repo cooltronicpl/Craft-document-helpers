@@ -1,4 +1,7 @@
 # PDF Generator for Craft CMS 3.x and 4.x. 
+
+With ❤ by [CoolTRONIC.pl sp. z o.o.](https://cooltronic.pl) coded by [Pawel Potacki](https://potacki.com)
+
 This plugin can generate PDF documents from an entry with a Twig template to a PDF file. We can generate, or download multiple PDFs from channel section entries on our website with CraftCMS 3 or 4. Some examples are in this README file. 
 
 MPDF for PHP8.x and Craft 4 needs a GD extension.
@@ -307,8 +310,6 @@ Simple example with loop:
     };
 </script>
 ```
-
-With ❤ by [CoolTRONIC.pl sp. z o.o.](https://cooltronic.pl) coded by [Pawel Potacki](https://potacki.com)
 
 ## Special thanks to
 
