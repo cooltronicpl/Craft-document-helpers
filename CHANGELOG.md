@@ -1,5 +1,8 @@
 # PDF Generator for Craft 3
 
+## 1.0.4 - 2022-11-14
+- Update Icon's, CHANEGLOG and README
+
 ## 0.1.0 - 2022-11-12
 
 - Feature update for Craft CMS 3
@@ -19,7 +22,7 @@
 - Add variables to footer and header
 - Changed fontDirs in plugin code to fontDir as in README.md
 
-## 0.0.7 - 2022-11-01
+## 0.0.7 - 2022-02-01
 
 - Add custom fonts to include in template
 

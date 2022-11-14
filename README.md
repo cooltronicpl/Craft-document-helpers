@@ -4,7 +4,7 @@ With ❤ by [CoolTRONIC.pl sp. z o.o.](https://cooltronic.pl) coded by [Pawel Po
 
 This plugin can generate PDF documents from an entry with a Twig template to a PDF file. We can generate, or download multiple PDFs from channel section entries on our website with CraftCMS 3 or 4. Some examples are in this README file. 
 
-MPDF for PHP8.x and Craft 4 needs a GD extension.
+MPDF for PHP8.x and Craft 4 need a GD extension.
 
 ![Icon](resources/pdf-black.png#gh-light-mode-only)
 ![Icon](resources/pdf-light.png#gh-dark-mode-only)
@@ -25,11 +25,11 @@ craft.documentHelpers.pdf(template_string, destination, filename, entry, pdfOpti
 
 * template_string - the location of the template file for the PDF file
 
-* destionation - where the file will be generated, the "file" and "download" option is excessively debugged, but you can pass only one download file, when you want to download multiple files, there is a JavaScript example in bottom of README.md 
+* destination - where the file will be generated, the "file" and "download" option is excessively debugged, but you can pass only one download file, when you want to download multiple files, there is a JavaScript example in the bottom of README.md 
 
 * filename - the name of a generated file 
 
-* entry - data inserted to generated template, which contains 'entry' array
+* entry - data inserted to the generated template, which contains 'entry' array
 
 ## Simple example
 
@@ -48,7 +48,7 @@ download>
 
 ## Entry variables inserted into a template
 
-All variables of entry in generated template is in entry array
+All variables of entry in a generated template are in entry array
 ```
 {{entry.VAR}}
 ```
@@ -86,10 +86,10 @@ The title of the current entry is available at variable:
   * pageNumbers add page numbers in the footer
   * title replaces default title of a generated PDF document
   * custom adds custom variable or variables
-  * password as string to password to auto protect your PDF, it can be text variable
-  * no_auto_page_break which disables system automatic page breaks, this is useful when you need to manually, you must add add manual custom page to documents with more than 1 pages break ie. ```<pagebreak>``` and size of margins to fit content, it may fix page braeks problems but not in all cases
-  * author sets an author meta, it can be text variable
-  * keywords sets keyword meta, insert as string: ```"keyword1, longer keyword2, keyword3"``` (seperated by comma), it can be text variable in this schema
+  * password as a string to password to auto-protect your PDF, it can be text variable
+  * no_auto_page_break which disables system automatic page breaks, this is useful when you need to manually, you must add a manual custom page to documents with more than one-page break in example ```<pagebreak>``` and the size of margins to fit the content, it may fix page breaks problems but not in all cases
+  * author sets an author meta, it can be a text variable
+  * keywords sets keyword meta, insert as a string: ```"keyword1, longer keyword2, keyword3"``` (separated by comma), it can be text variable in this schema
   * custom fonts:
     * fontdata
     * fontDir
@@ -248,13 +248,13 @@ When you chose your PDF filename, you must use safe characters. In the example t
 
 ## Browser caching problems of PDF files in some servers and hosting
 
-Also you can use another plugin with [Static Files Autoversioning](https://github.com/cooltronicpl/craft-files-autoversioning) when your hosting or server is caching PDF files.
+Also, you can use another plugin with [Static Files Autoversioning](https://github.com/cooltronicpl/craft-files-autoversioning) when your hosting or server is caching PDF files.
 
 ```
 <a href="{{alias('@web')}}{{version("/" ~ craft.documentHelper.pdf('_pdf/document.twig', 'file', 'pdf/book'  ~ '.pdf'  ,entry, pdfOptions))}}">LINK </a>
 ```
 
-This generate PDF with timestamp and caching policy problems of your hosting is gone.
+This generates a PDF with a timestamp and caching policy problems of your hosting are gone.
 
 ```
 <a href="http://some-domain.com/pdf/book.pdf?v=1668157143">LINK </a>
@@ -328,6 +328,6 @@ More about [CoolTRONIC.pl sp. z o.o. Interactive Agency](https://cooltronic.pl/)
 
 More about [main developer Pawel Potacki](https://potacki.com/)
 
-CoolTRONIC.pl sp. z o.o., hereby holds all copyright interest in the program “PDF Generator” written by Pawel Potacki.
+CoolTRONIC.pl sp. z o.o. hereby holds all copyright interest in the program “PDF Generator” written by Pawel Potacki.
 
 LICENSE.md file contains full License notices.
