@@ -1,5 +1,8 @@
 # PDF Generator for Craft 3 or 4
 
+## 1.0.4 - 2022-11-14
+- Update CHANEGLOG and README
+
 ## 1.0.3 - 2022-11-12
 - Feature update for Craft CMS 4
 - Add author option
@@ -22,6 +25,9 @@
 - Update for Craft 4
 - Now autoupdate of files works properly with PHP8.0.x like on examples
 
+## 0.1.1 - 2022-11-14
+- Update Icon's, CHANEGLOG and README for Craft CMS 3
+
 ## 0.1.0 - 2022-11-12
 - Feature update for Craft CMS 3
 - Add author option
@@ -38,7 +44,7 @@
 - add custom variables to footer and header
 - changed fontDirs variable in plugin code to fontDir as in README.md
 
-## 0.0.7 - 2022-11-01
+## 0.0.7 - 2022-02-01
 - Add custom fonts to include in template
 
 ## 0.0.6 - 2021-10-14
