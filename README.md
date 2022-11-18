@@ -112,7 +112,7 @@ Also after some update of MPDF which is used by PDF Generator. We have resolved 
 When you have only one site it should be an absolute path to in example to /config folder. like:
 `fontDir: "/path_to/config/"`
 
-On XAMPP in Windows, like that:
+On XAMPP in Windows hosts, we confirmed it like that:
 `fontDir: "file:///C:/xampp/htdocs/craft4/config/"`
 
 ## Returned values
