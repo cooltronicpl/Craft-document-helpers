@@ -106,7 +106,7 @@ fontdata: { 'roboto' : {
 		fontDir: "{{craft.app.path.configPath}}/",
 ```
 
-Also after some update of MPDF which is used by PDF Generator. We have resolved issue with passed paths. Now we must provide absolute path on server to config dir, or also we can pass main folder. Example for ISP Config 3.2 host:
+Also after update of MPDF which is used by PDF Generator. We have resolved issue with passed paths. Now we must provide absolute path on server to config dir, or also we can pass main folder. Example for ISP Config 3.2 host:
 `fontDir: "/var/www/clients/client0/web21/private/config/"`
 
 When you have only one site it should be an absolute path to in example to /config folder. like:
