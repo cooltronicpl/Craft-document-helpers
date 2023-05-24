@@ -8,7 +8,7 @@
  * @link      https://cooltronic.pl
  * @link      https://potacki.com
  * @license   https://github.com/cooltronicpl/Craft-document-helpers/blob/master/LICENSE.md
- * @copyright Copyright (c) 2022 CoolTRONIC.pl sp. z o.o. by Pawel Potacki
+ * @copyright Copyright (c) 2023 CoolTRONIC.pl sp. z o.o. by Pawel Potacki
  */
 
 namespace cooltronicpl\documenthelpers;
@@ -42,7 +42,7 @@ class DocumentHelper extends Plugin
     /**
      * @var string
      */
-    public string  $schemaVersion = '1.0.2';
+    public string  $schemaVersion = '1.1.0';
 
     // Public Methods
     // =========================================================================
