@@ -32,7 +32,6 @@
     "require": {
         "craftcms/cms": "^4.0.0",
         "mpdf/mpdf": "^8.0.10",
-		"baraja-core/php-pdf-to-image":"^1.4.0"
     },
     "autoload": {
         "psr-4": {
