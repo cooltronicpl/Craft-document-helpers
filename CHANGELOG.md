@@ -1,7 +1,16 @@
-# PDF Generator for Craft 3
+# PDF Generator for Craft 3 or 4
 
-## 1.0.4 - 2022-11-14
-- Update Icon's, CHANEGLOG and README
+## 0.2.0 - 2023-05-02
+
+- Refactoring neccesary code of plugin
+- Add attribute with path to custom temporary directory
+- We now cane set attribure portrait and landscape mode to make landscape
+- Add attribute with other format than default with A4 like since 1.0.4
+- Example with thumbnail in RADME.md
+
+## 0.1.1 - 2022-11-14
+
+- Update Icon's, CHANEGLOG and README for Craft CMS 3
 
 ## 0.1.0 - 2022-11-12
 
@@ -13,14 +22,14 @@
 
 ## 0.0.9 - 2021-11-11 [CRITICAL]
 
-- Fix of fontDir bug, thanks to @iwi-hi
+- Fix of fontDir bug, thanks to @iwe-hi
 
 ## 0.0.8 - 2021-11-10
 
 - Merged with @AramLoosman
-- Remove unused function
-- Add variables to footer and header
-- Changed fontDirs in plugin code to fontDir as in README.md
+- remove unused function
+- add custom variables to footer and header
+- changed fontDirs variable in plugin code to fontDir as in README.md
 
 ## 0.0.7 - 2022-02-01
 

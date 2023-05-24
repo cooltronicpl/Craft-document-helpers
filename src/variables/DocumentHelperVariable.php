@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * Class DocumentHelpersVariable
@@ -8,8 +9,9 @@
  * @link      https://cooltronic.pl
  * @link      https://potacki.com
  * @license   https://github.com/cooltronicpl/Craft-document-helpers/blob/master/LICENSE.md
- * @copyright Copyright (c) 2022 CoolTRONIC.pl sp. z o.o. by Pawel Potacki
+ * @copyright Copyright (c) 2023 CoolTRONIC.pl sp. z o.o. by Pawel Potacki
  */
+
 namespace cooltronicpl\documenthelpers\variables;
 
 use Craft;
@@ -22,15 +24,15 @@ use Craft;
 class DocumentHelperVariable
 {
     /**
-    * Fuction generates PDF with settings
-    * @param string $template twig template.
-    * @param string $destination type of generated document.
-    * @param string $filename the filename.
-    * @param array $variables Craft vars to parse.
-    * @param array $attributes optional atts passed to funtcion
-    *
-    * @return string
-    */
+     * Fuction generates PDF with settings
+     * @param string $template twig template.
+     * @param string $destination type of generated document.
+     * @param string $filename the filename.
+     * @param array $variables Craft vars to parse.
+     * @param array $attributes optional atts passed to funtcion
+     *
+     * @return string
+     */
     public function pdf($template, $destination, $filename, $variables, $attributes)
     {
         $defaultConfig = (new \Mpdf\Config\ConfigVariables())->getDefaults();
@@ -91,28 +93,32 @@ class DocumentHelperVariable
         } else {
             $fontData = $defaultFontConfig['fontdata'];
         }
-        if(isset($attributes["no_auto_page_break"])){
-            $pdf = new \Mpdf\Mpdf([
-                'margin_top' => $margin_top,
-                'margin_left' => $margin_left,
-                'margin_right' => $margin_right,
-                'margin_bottom' => $margin_bottom,
-                'mirrorMargins' => $mirrorMargins,
-                'fontDir' => $fontDir,
-                'fontdata' => $fontData,
-                'autoPageBreak' => false
-            ]);
-        } else{
-            $pdf = new \Mpdf\Mpdf([
-                'margin_top' => $margin_top,
-                'margin_left' => $margin_left,
-                'margin_right' => $margin_right,
-                'margin_bottom' => $margin_bottom,
-                'mirrorMargins' => $mirrorMargins,
-                'fontDir' => $fontDir,
-                'fontdata' => $fontData,
-            ]);
+        $arrParameters['margin_top'] = $margin_top;
+        $arrParameters['margin_left'] = $margin_left;
+        $arrParameters['margin_right'] = $margin_right;
+        $arrParameters['margin_bottom'] = $margin_bottom;
+        $arrParameters['mirrorMargins'] = $mirrorMargins;
+        $arrParameters['fontDir'] = $fontDir;
+        $arrParameters['fontdata'] = $fontData;
+        if (isset($attributes["no_auto_page_break"])) {
+            $arrParameters['autoPageBreak'] = false;
         }
+        if (isset($attributes["tempDir"])) {
+            $arrParameters['tempDir'] = $attributes["tempDir"];
+        }
+        if (isset($attributes['format'])) {
+            $arrParameters['format'] = $attributes["format"];
+        }
+        if (isset($attributes["landscape"])) {
+            $arrParameters['orientation'] = 'L';
+        } elseif (isset($attributes["portrait"])) {
+            $arrParameters['orientation'] = 'P';
+        }
+
+        $pdf = new \Mpdf\Mpdf(
+            $arrParameters
+        );
+
         if (isset($attributes['header'])) {
             $pdf_string = $pdf->SetHTMLHeader($html_header);
         }
@@ -139,7 +145,7 @@ class DocumentHelperVariable
         } else {
             $pdf->SetKeywords("PDF Generator, CoolTRONIC.pl, https://cooltronic.pl");
         }
-        if (isset($attributes['password'])){
+        if (isset($attributes['password'])) {
             $pdf->SetProtection(array(), 'UserPassword', $attributes['password']);
         }
         switch ($destination) {

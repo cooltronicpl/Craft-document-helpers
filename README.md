@@ -1,15 +1,17 @@
 # PDF Generator for Craft CMS 3.x and 4.x. 
 
-With ❤ by [CoolTRONIC.pl sp. z o.o.](https://cooltronic.pl) coded by [Pawel Potacki](https://potacki.com)
+With ❤ by [CoolTRONIC.pl sp. z o.o.](https://cooltronic.pl) developed by [Pawel Potacki](https://potacki.com)
 
-This plugin can generate PDF documents from an entry with a Twig template to a PDF file. We can generate, or download multiple PDFs from channel section entries on our website with CraftCMS 3 or 4. Some examples are in this README file. 
+This plugin allows you to generate PDF files from a Craft CMS entry using a Twig template. It supports the creation and download of multiple PDF files from entries within a specific channel section on a website running Craft CMS 3 or 4. You can find example implementations within this README file.
 
-MPDF for PHP8.x and Craft 4 need a GD extension.
+Please note that MPDF for PHP8.x and Craft 4 may require a GD extension.
 
 ![Icon](resources/pdf-black.png#gh-light-mode-only)
 ![Icon](resources/pdf-light.png#gh-dark-mode-only)
 
 ## Installation
+
+You can install this plugin by running the following command:
 
 ```
 composer require cooltronicpl/document-helper
@@ -17,86 +19,105 @@ composer require cooltronicpl/document-helper
 
 ## Usage
 
+The plugin can be used as follows:
+
 ```
 craft.documentHelpers.pdf(template_string, destination, filename, entry, pdfOptions)
 ```
 
-## Variables
+## Description of Parameters
 
-* template_string - the location of the template file for the PDF file
+* `template` - This is the location of the template file for the PDF, which should be located in the /templates directory.
 
-* destination - where the file will be generated, the "file" and "download" option is excessively debugged, but you can pass only one download file, when you want to download multiple files, there is a JavaScript example in the bottom of README.md 
+* `destination` - This indicates where the PDF file will be generated. It can be one of four options: "file", "inline", "download", or "string". The "file" and "download" options have been extensively debugged. To download multiple files, refer to the JavaScript example provided in the README.md file.
 
-* filename - the name of a generated file 
+* `filename` - This is the name of the generated PDF file.
 
-* entry - data inserted to the generated template, which contains 'entry' array
+* `entry` - This represents the data that will be inputted into the template to generate the PDF. This data is contained within an 'entry' array.
 
-## Simple example
+* `pdfOptions` - This parameter allows you to customize the generation of the PDF. The available options are described in the section on overriding default options.
+
+## Basic Usage Example
 
 ```
-{{craft.documentHelper.pdf("template.twig", "file", "document.pdf", entry, options)}} 
+{{craft.documentHelper.pdf("template.twig", "file", "document.pdf", entry, pdfOptions)}} 
 ```
 
-## Advanced example
+## Advanced Usage Example
 
 ```
 <a href="{{alias('@web')}}/
-{{craft.documentHelper.pdf("_pdf/document.twig", "file",  'pdf/' ~ entry.id ~ '.pdf' ,entry, pdfOptions)}}" 
+{{craft.documentHelper.pdf("_pdf/document.twig", "file",  'pdf/' ~ entry.id ~ '.pdf', entry, pdfOptions)}}" 
 download>
 </a>
 ```
 
-## Entry variables inserted into a template
+## Securely Displaying PDF Documents in the Browser Without Saving to the /web Folder
 
-All variables of entry in a generated template are in entry array
+Here is an example of a Twig layout that allows you to securely display a PDF document in the browser:
+
+```
+						{% set pdfOptions = {
+						date: entry.dateUpdated|date('U'),
+						header: "_pdf/header.twig",
+						footer: "_pdf/footer.twig"
+                        } %}
+				{% header "Content-Type: application/pdf" %}
+{{version("/" ~ craft.documentHelper.pdf('_pdf/document.twig', 'inline', '../book_example'  ~ '.pdf', entry, pdfOptions))}}
+
+```
+
+## Variables within a Template
+
+All variables from the entry in a generated template are placed in an 'entry' array:
+
 ```
 {{entry.VAR}}
 ```
 
-The title of the current entry is available at variable:
+The title of the current entry can be accessed via:
 
 ```
 {{title}}
 ```
 
-## Parameters
+## Overriding Default Options
 
-* template (in /templates folder) required
-* destination (file, inline, download, string) required
-* filename required
-* variables (like entry) required
+You can override the default options with `pdfOptions` as shown above. Here are the available options:
 
-```
-{% set pdfOptions = {
-	date: entry.dateUpdated|date('U'),
-} %}
-```
+* `date` - This is disabled by default. If you provide a date (in timestamp format) that is older than the creation date of the file, the existing file will be overwritten.  
+* `header` - This is the header Twig template, which is disabled by default.
+* `footer` - This is the footer Twig template, also disabled by default.
+* `margin_top` - The top margin defaults to 30.
+* `margin_bottom` - The bottom margin defaults to 30.
+* `margin_left` - The left margin defaults to 15.
+* `margin_right` - The right margin defaults to 15.
+* `mirrorMargins` - This defaults to 0 but can be set to 1.
+* `pageNumbers` - This adds page numbers in the footer.
+* `title` - This replaces the default title of the generated PDF document.
+* `custom` - This allows you to add custom variable or variables.
+* `password` - This can be used to add password protection to your PDF. The password should be provided as a string.
+* `no_auto_page_break`  - This disables automatic system page breaks. This can be useful if you need to manually add page breaks. For example, you can add a custom page to documents with more than one page break using <pagebreak>. This may fix page break issues in some cases, but not all.
+* `author` - This sets the author metadata. It should be provided as a string.
+* `keywords` - This sets the keyword metadata. It should be provided as a string in the following format: "keyword1, longer keyword2, keyword3".
+* `fonts`:
+    * `fontdata`, and `fontDir`  - These allow you to set custom fonts described above.
+* `tempDir` - This sets the path to the temporary directory used for generating PDFs. We have tested this with the main /tmp directory on the server with success. This could potentially improve performance when generating multiple PDFs.
+* `landscape` - If this is set, the PDF will be generated in landscape mode.
+* `portrait` - If this is set, the PDF will be generated in portrait mode.
+* `format` This sets the paper size for the PDF. The default is "A4", but you can set other sizes compatible with MPDF. Other popular formats include:
+  * A3
+  * A4 (default)
+  * A5
+  * Letter (8,5 x 11 in)
+  * Legal (8,5 x 14 in)
+  * Executive (7,25 x 10,5 in)
+  * B4
+  * B5
 
-## Custom default options overriding
-
-* pdfOptions like above:
-  * date (in timestamp) default disabled, if a date is provided in this parameter was smaller than a file created date, the file was overwritten  
-  * header (header twig template) default disabled
-  * footer (footer twig template) default disabled
-  * margin_top default 30
-  * margin_bottom default 30
-  * margin_left default 15
-  * margin_right default 15
-  * mirrorMargins default 0 (possible 1)
-  * pageNumbers add page numbers in the footer
-  * title replaces default title of a generated PDF document
-  * custom adds custom variable or variables
-  * password as a string to password to auto-protect your PDF, it can be text variable
-  * no_auto_page_break which disables system automatic page breaks, this is useful when you need to manually, you must add a manual custom page to documents with more than one-page break in example ```<pagebreak>``` and the size of margins to fit the content, it may fix page breaks problems but not in all cases
-  * author sets an author meta, it can be a text variable
-  * keywords sets keyword meta, insert as a string: ```"keyword1, longer keyword2, keyword3"``` (separated by comma), it can be text variable in this schema
-  * custom fonts:
-    * fontdata
-    * fontDir
-   
 ## Custom fonts
 
-Custom fonts example for Roboto-Regular.ttf and Roboto-Italic.ttf placed in config folder:
+This is an example of how to use custom fonts, specifically Roboto-Regular.ttf and Roboto-Italic.ttf, which should be placed in the config folder:
 
 ```
 fontdata: { 'roboto' : {
@@ -106,20 +127,16 @@ fontdata: { 'roboto' : {
 		fontDir: "{{craft.app.path.configPath}}/",
 ```
 
+After the update of MPDF, which is used by our PDF Generator, we have resolved an issue with passed paths. Now, you must provide an absolute path on the server to the config directory. Alternatively, you can pass the main folder. For instance, on ISP Config 3.2 host, you can use: `fontDir`: "/var/www/clients/client0/web21/private/config/".
 
-Also after update of MPDF which is used by PDF Generator. We have resolved issue with passed paths. Now we must provide absolute path on server to config dir, or also we can pass main folder. Example for ISP Config 3.2 host:
-`fontDir: "/var/www/clients/client0/web21/private/config/"`
+If you're running a single site, it should be an absolute path to the /config folder, like: fontDir: "/path_to/config/".
 
-When you have only one site it should be an absolute path to in example to /config folder. like:
-`fontDir: "/path_to/config/"`
-
-On XAMPP in Windows hosts, we confirmed it like that:
-`fontDir: "file:///C:/xampp/htdocs/craft4/config/"`
+For XAMPP in Windows hosts, the confirmed format is: fontDir: "file:///C:/xampp/htdocs/craft4/config/".
 
 ## Returned values
 
-* If the destination is 'inline' or 'string' the plugin returns a string
-* If the destination is 'download' or 'file' it returns the filename in /web folder
+* If the destination is `inline` or `string`, the plugin returns a string.
+* If the destination is `download` or `file`, it returns the filename in the /web folder.
 
 ## Example in a loop
 
@@ -149,11 +166,11 @@ On XAMPP in Windows hosts, we confirmed it like that:
 ...
 ```
 
-## Images in PDF
+## Including Images in PDF
 
-There are two tricks to render images in the PDF template.
+There are two ways to include images in the PDF template.
 
-It is possible when using this plugin: https://plugins.craftcms.com/image-toolbox 
+If you're using the Image Toolbox plugin, you can include images like this:
 
 ```
 {% set image = entry.photoFromCMS.one() %}
@@ -170,7 +187,7 @@ It is possible when using this plugin: https://plugins.craftcms.com/image-toolbo
 {{craft.images.picture(image, transformSettings, options)}}
 ```
 
-For example, include an image as a tag in a PDF document without a plugin.
+You can also include an image in a PDF document without a plugin, like this:
 
 ```
 {% set image = entry.photoFromCMS.first() %}
@@ -179,7 +196,24 @@ For example, include an image as a tag in a PDF document without a plugin.
 	{% endif %}
 ```
 
-## Custom title
+### Thumbnail of Generated PDF
+
+You can use [PDF Thumbnails by @scandel](https://github.com/scandel/pdfThumbnails) for client-side generation of PDF thumbnails. This requires the files pdfThumbnails.js, pdf.js, and pdf.worker.js to be loaded in the /web folder. The pdf.js and pdf.worker.js files from  [PDF.js can be found here](https://mozilla.github.io/pdf.js/getting_started/). 
+
+Here's an example:
+
+```
+<script src="{{alias('@web')}}/pdfThumbnails.js" data-pdfjs-src="{{alias('@web')}}/pdf_js/build/"></script>
+<script src="{{alias('@web')}}/pdf_js/build/pdf.js"></script>
+<script src="{{alias('@web')}}/pdf_js/build/pdf.worker.js"></script>
+				{% header "Cache-Control: no-cache" %}
+<a href="{{alias('@web')}}{{version("/" ~ craft.documentHelper.pdf('_pdf/document.twig', 'file', 'pdf/example.pdf'  , entry, pdfOptions))}}">
+<img class="img-responsive" data-pdf-thumbnail-file="{{alias('@web')}}/pdf/example.pdf" src="{{alias('@web')}}/pdfjs_placeholder.png">
+```
+
+## Custom Title of PDF Document
+
+To set a custom title for your PDF, use the `title` option in the `pdfOptions` as follows:
 
 ```
 {% set pdfOptions = {
@@ -188,9 +222,11 @@ For example, include an image as a tag in a PDF document without a plugin.
 } %}
 ```
 
-## Custom variables
+## Custom Variables
 
-### String or number
+### String or Number
+
+To pass a string or number to the PDF template, set it as a `custom` variable in the `pdfOptions`:
 
 ```
 {% set pdfOptions = {
@@ -199,13 +235,15 @@ For example, include an image as a tag in a PDF document without a plugin.
 } %}
 ```
 
-In PDF template
+Then, in your PDF template, you can call upon this custom variable:
 
 ```
 {{custom}}
 ```
 
 ### Arrays
+
+If you want to pass an array to the PDF template, define the array in the `custom` variable in the `pdfOptions`:
 
 ```
 {% set pdfOptions = {
@@ -218,33 +256,37 @@ In PDF template
 } %}
 ```
 
+You can then access the array variables in your PDF template:
+
 ```
 {{custom.slug}}
 {{custom.created.format('d/m/Y')}}
 ```
-## Custom page break
+## Custom Page Break in PDF Document
 
-You can add tags of MPDF in HTML content. This is a page break;
+You can add a page break in your HTML content using MPDF tags. The following tag represents a page break:
 
 ```
 <pagebreak>
 ```
 
-## Page and all pages numbers
+## Page and All Pages Numbers
 
-Actual page number
+To include the current page number, use the `{PAGENO}` tag:
 
 ```
 {PAGENO}
 ```
 
-All pages of the generated document
+To include the total number of pages in the document, use the `{nbpg}` tag:
 
 ```
 {nbpg}
 ```
 
-## Generate PDF file only when data of entry is changed
+## Generate PDF File Only When Data of Entry is Changed
+
+Use the following `pdfOptions` to ensure that a PDF is only generated when the data in an entry has been updated:
 
 ```
 {% set pdfOptions = {
@@ -252,77 +294,78 @@ All pages of the generated document
 	} %}
 ```
 
-## About filename characters
+## About Filename Characters
 
-When you chose your PDF filename, you must use safe characters. In the example this is forbidden characters in Windows filename ":", "/", "?", "|", "<", ">" or "\/".
+When selecting a filename for your PDF, ensure that you only use safe characters. The following characters are not allowed in Windows filenames: ":", "/", "?", "|", "<", ">" or "/".
 
-## Browser caching problems of PDF files in some servers and hosting
+## Browser Caching Problems of PDF Files in Some Servers and Hosting
 
-Also, you can use another plugin with [Static Files Autoversioning](https://github.com/cooltronicpl/craft-files-autoversioning) when your hosting or server is caching PDF files.
+If you are experiencing issues with your server or hosting caching PDF files, you can use the [Static Files Autoversioning](https://github.com/cooltronicpl/craft-files-autoversioning)plugin. This plugin adds a timestamp to your PDF, helping to avoid caching issues.
 
 ```
 <a href="{{alias('@web')}}{{version("/" ~ craft.documentHelper.pdf('_pdf/document.twig', 'file', 'pdf/book'  ~ '.pdf'  ,entry, pdfOptions))}}">LINK </a>
 ```
 
-This generates a PDF with a timestamp and caching policy problems of your hosting are gone.
+With this plugin, your PDF will have a timestamp and any caching policy problems with your hosting will be resolved. The following is an example of what the PDF link will look like:
 
 ```
 <a href="http://some-domain.com/pdf/book.pdf?v=1668157143">LINK </a>
 ```
+
 ## Requirements
 
-* Craft CMS >= 3.0.0 in 0.x branch
-* Craft CMS >= 4.0.0 in 1.x branch
+Craft CMS >= 3.0.0 for 0.x branch
+Craft CMS >= 4.0.0 for 1.x branch
 
-## Multiple PDF files downloading with JavaScript on some page
+## Multiple PDF Files Downloading with JavaScript on Any Page
 
-A browser may ask for permission to download multiple files to the end user. Simple example for some static files:
+Obtaining user permission may be necessary for browsers to download multiple files. Below is a straightforward example of downloading static files:
 
 ```
 <script>
 {% set pdfOptions = {
-		date: entry.dateUpdated|date('U')
-	} %}
-    var files = ["{{ alias('@web') }}/{{craft.documentHelper.pdf('_pdf/document.twig', 'file', 'pdf/' ~ entry.dateCreated|date("Y-m-d") ~ random(10) ~ '.pdf'  ,entry, pdfOptions)}}", "{{ alias('@web') }}/{{craft.documentHelper.pdf('_pdf/document.twig', 'file', 'pdf/' ~ entry.dateCreated|date("Y-m-d") ~ random(10) ~ '.pdf' , entry, pdfOptions)}}"];
-    for (var i = files.length - 1; i >= 0; i--) {
-        var a = document.createElement("a");
-        a.target = "_blank";
-        a.download = "download";
-        a.href = files[i];
-        a.click();
-    };
+    date: entry.dateUpdated|date('U')
+} %}
+var files = [
+    "{{ alias('@web') }}/{{craft.documentHelper.pdf('_pdf/document.twig', 'file', 'pdf/' ~ entry.dateCreated|date('Y-m-d') ~ random(10) ~ '.pdf', entry, pdfOptions)}}",
+    "{{ alias('@web') }}/{{craft.documentHelper.pdf('_pdf/document.twig', 'file', 'pdf/' ~ entry.dateCreated|date('Y-m-d') ~ random(10) ~ '.pdf', entry, pdfOptions)}}"
+];
+for (var i = files.length - 1; i >= 0; i--) {
+    var a = document.createElement("a");
+    a.target = "_blank";
+    a.download = "download";
+    a.href = files[i];
+    a.click();
+};
 </script>
 ```
 
-Simple example with loop:
+Example with a Loop:
 
 ```
 {% set pdfOptions = {
-		date: entry.dateUpdated|date('U')
-	} %}
+    date: entry.dateUpdated|date('U')
+} %}
 <script>
-    var files = [
-     {% for item in craft.entries.section('xxx').orderBy('title asc').all() %}
-	
-	    "{{alias('@web')}}/
-	    {{craft.documentHelper.pdf("_pdf/document.twig", "file",  'pdf/' ~ item.id ~ '.pdf', item, pdfOptions)}}"
-	
-        {% if loop.last %}{% else %}, {% endif %}
-    {% endfor %}
-        ];
-    for (var i = files.length - 1; i >= 0; i--) {
-        var a = document.createElement("a");
-        a.target = "_blank";
-        a.download = "download";
-        a.href = files[i];
-        a.click();
-    };
+var files = [
+{% for item in craft.entries.section('xxx').orderBy('title asc').all() %}
+    "{{alias('@web')}}/{{craft.documentHelper.pdf('_pdf/document.twig', 'file', 'pdf/' ~ item.id ~ '.pdf', item, pdfOptions)}}"
+    {% if loop.last %}{% else %}, {% endif %}
+{% endfor %}
+];
+for (var i = files.length - 1; i >= 0; i--) {
+    var a = document.createElement("a");
+    a.target = "_blank";
+    a.download = "download";
+    a.href = files[i];
+    a.click();
+};
 </script>
 ```
 
-## Special thanks to
+## Credits
 
-Special thanks to contributors and bug checkers:
+Special thanks to the developers and testers who have contributed to this project and helped identify and fix bugs:
 
 * [@mokopan](https://github.com/mokopan)
 * [@AramLoosman](https://github.com/AramLoosman)
