@@ -114,6 +114,10 @@ You can override the default options with `pdfOptions` as shown above. Here are 
   * Executive (7,25 x 10,5 in)
   * B4
   * B5
+* `watermarkImage` - This option creates a watermark using the image file specified by the provided path.
+* `watermarkText` - This option creates a watermark using the text provided.
+* `autoToC` - This option automatically generates a Table of Contents using the H1-H6 tags in your document.
+* `autoBookmarks` - This option automatically generates bookmarks using the H1-H6 tags in your document.
 
 ## Custom fonts
 
@@ -312,11 +316,6 @@ With this plugin, your PDF will have a timestamp and any caching policy problems
 <a href="http://some-domain.com/pdf/book.pdf?v=1668157143">LINK </a>
 ```
 
-## Requirements
-
-Craft CMS >= 3.0.0 for 0.x branch
-Craft CMS >= 4.0.0 for 1.x branch
-
 ## Multiple PDF Files Downloading with JavaScript on Any Page
 
 Obtaining user permission may be necessary for browsers to download multiple files. Below is a straightforward example of downloading static files:
@@ -362,6 +361,102 @@ for (var i = files.length - 1; i >= 0; i--) {
 };
 </script>
 ```
+
+## RTL Direction
+
+The direction of the text can be set in mPDF by using the HTML dir attribute in your HTML Twig template markup. For example:
+
+```
+<div dir="rtl">This is some text in a right-to-left language.</div>
+```
+
+### Language
+
+To specify a language in mPDF, you can use the lang attribute in your HTML. For example:
+
+```
+<div lang="ar">هذا نص باللغة العربية</div>
+```
+### Font
+
+In order for mPDF to display the correct characters, you'll also need to use a font that supports the characters of the language you're using. mPDF comes with several fonts that support a wide range of characters. You can set the font using the CSS font-family property.  For example, to use the 'Arial' font:
+
+```
+div {
+    font-family: 'Arial';
+}
+```
+
+### RTL full example
+
+```
+<div dir="rtl" lang="ar" style="font-family: Arial;">هذا نص باللغة العربية</div>
+```
+
+## Watermark
+
+Watermarks can be added to your PDFs using mPDF parameters. This can be either in the form of an image or text. 
+
+### Image Watermark
+
+You can include a PNG or JPG image as a watermark in your PDF. Specify the path and file extension of your image in the 'watermarkImage' parameter. 
+
+For example:
+
+```
+{% set pdfOptions = {
+    'watermarkImage': 'path/to/your/image.ext'
+} %}
+```
+
+Replace 'path/to/your/image.ext' with the actual path and file extension of your image.
+
+### Text Watermark
+
+You can also add a text watermark to your PDF. Simply specify your desired text in the 'watermarkText' parameter.
+
+For example:
+
+```
+{% set pdfOptions = {
+    'watermarkText': 'My text watermark example'
+} %}
+```
+
+Replace 'My text watermark example' with the actual text you want to use as a watermark.
+
+## Table of Contents
+
+You have the ability to create your own Table of Contents as per the guidelines in the [mPDF ToC documentantion](https://mpdf.github.io/what-else-can-i-do/table-of-contents.html).
+
+Additionally, we can enable automatic generation of a Table of Contents from H1-H6 tags present in your PDF document. You can activate this feature by setting the `autoToC` option to true.
+
+For instance:
+
+```
+{% set pdfOptions = {
+    'autoToC': true
+} %}
+```
+
+## Bookmarks
+
+Manually adding bookmarks can be done with the bookmark tag `<bookmark content="Text" />`. The content attribute is used to set the text of the bookmark. You can also use the optional `level` attribute to set the nesting level of the bookmark.
+
+Additionally, we can enable automatic generation of a Bookmarks from H1-H6 tags present in your PDF document. You can activate this feature by setting the `autoBookmarks` option to true.
+
+For instance:
+
+```
+{% set pdfOptions = {
+    'autoBookmarks': true
+} %}
+```
+
+## Requirements
+
+Craft CMS >= 3.0.0 for 0.x branch
+Craft CMS >= 4.0.0 for 1.x branch
 
 ## Credits
 

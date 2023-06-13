@@ -127,7 +127,34 @@ class DocumentHelperVariable
         if (isset($attributes['pageNumbers'])) {
             $pdf_string = $pdf->setFooter('{PAGENO}');
         }
-
+        if (isset($attributes['watermarkImage'])){
+            $pdf->SetWatermarkImage($attributes['watermarkImage']);
+            $pdf->showWatermarkImage = true;
+        }
+        if (isset($attributes['watermarkText'])){
+            $pdf->SetWatermarkText($attributes['watermarkText']);
+            $pdf->showWatermarkText = true;
+        }
+        if (isset($attributes['autoToC'])){
+            $pdf->h2toc = array(
+                'H1' => 0,
+                'H2' => 1,
+                'H3' => 2,
+                'H4' => 3,
+                'H5' => 4,
+                'H6' => 5
+            );
+        }
+        if (isset($attributes['autoBookmarks'])){
+            $pdf->h2bookmarks = array(
+                'H1' => 0,
+                'H2' => 1,
+                'H3' => 2,
+                'H4' => 3,
+                'H5' => 4,
+                'H6' => 5
+            );
+        }
         $pdf_string = $pdf->WriteHTML($html);
         if (isset($attributes['title'])) {
             $pdf->SetTitle($attributes['title']);
@@ -148,7 +175,7 @@ class DocumentHelperVariable
         if (isset($attributes['password'])) {
             $pdf->SetProtection(array(), 'UserPassword', $attributes['password']);
         }
-        
+
         switch ($destination) {
             case 'file':
                 $output = \Mpdf\Output\Destination::FILE;

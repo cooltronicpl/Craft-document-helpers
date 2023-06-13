@@ -1,12 +1,19 @@
 # PDF Generator for Craft 3 or 4
 
+## 1.1.1 - 2023-06-13
+
+- Introduced an example for right-to-left (RTL) text
+- Expanded pdfOptions with support for Watermark Images and Text
+- Implemented functionality for automatic Table of Contents generation
+- Implemented functionality for automatic Bookmarks generation
+
 ## 1.1.0 - 2023-05-02
 
-- Refactoring neccesary code of plugin
-- Add attribute with path to custom temporary directory
-- We now cane set attribure portrait and landscape mode to make landscape
-- Add attribute with other format than default with A4 like since 1.0.4
-- Example with thumbnail in RADME.md
+- Performed necessary code refactoring for the plugin.
+- Introduced a new attribute to specify a custom temporary directory path.
+- Added capability to set the PDF orientation to either portrait or landscape mode.
+- Expanded format options beyond the default A4, effective since version 1.0.4.
+- Included an example of a PDF thumbnail in the README.md documentation.
 
 ## 1.0.4 - 2022-11-14
 
@@ -38,13 +45,20 @@
 - Update for Craft 4
 - Now autoupdate of files works properly with PHP8.0.x like on examples
 
+## 0.2.1 - 2023-06-13
+
+- Introduced an example for right-to-left (RTL) text
+- Expanded pdfOptions with support for Watermark Images and Text
+- Implemented functionality for automatic Table of Contents generation
+- Implemented functionality for automatic Bookmarks generation
+
 ## 0.2.0 - 2023-05-02
 
-- Refactoring neccesary code of plugin
-- Add attribute with path to custom temporary directory
-- We now cane set attribure portrait and landscape mode to make landscape
-- Add attribute with other format than default with A4 like since 1.0.4
-- Example with thumbnail in RADME.md
+- Performed necessary code refactoring for the plugin.
+- Introduced a new attribute to specify a custom temporary directory path.
+- Added capability to set the PDF orientation to either portrait or landscape mode.
+- Expanded format options beyond the default A4, effective since version 1.0.4.
+- Included an example of a PDF thumbnail in the README.md documentation.
 
 ## 0.1.1 - 2022-11-14
 
