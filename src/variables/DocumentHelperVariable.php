@@ -35,8 +35,8 @@ class DocumentHelperVariable
      */
     public function pdf($template, $destination, $filename, $variables, $attributes)
     {
-        $defaultConfig = (new \Mpdf\Config\ConfigVariables())->getDefaults();
-        $defaultFontConfig = (new \Mpdf\Config\FontVariables())->getDefaults();
+        $defaultConfig = (new \Mpdf\Config\ConfigVariables ())->getDefaults();
+        $defaultFontConfig = (new \Mpdf\Config\FontVariables ())->getDefaults();
 
         if (file_exists($filename) && isset($attributes['date'])) {
             if (filemtime($filename) > $attributes['date']) {
@@ -115,10 +115,9 @@ class DocumentHelperVariable
             $arrParameters['orientation'] = 'P';
         }
 
-        $pdf = new \Mpdf\Mpdf(
+        $pdf = new \Mpdf\Mpdf (
             $arrParameters
         );
-
         if (isset($attributes['header'])) {
             $pdf_string = $pdf->SetHTMLHeader($html_header);
         }
@@ -128,32 +127,32 @@ class DocumentHelperVariable
         if (isset($attributes['pageNumbers'])) {
             $pdf_string = $pdf->setFooter('{PAGENO}');
         }
-        if (isset($attributes['watermarkImage'])){
+        if (isset($attributes['watermarkImage'])) {
             $pdf->SetWatermarkImage($attributes['watermarkImage']);
             $pdf->showWatermarkImage = true;
         }
-        if (isset($attributes['watermarkText'])){
+        if (isset($attributes['watermarkText'])) {
             $pdf->SetWatermarkText($attributes['watermarkText']);
             $pdf->showWatermarkText = true;
         }
-        if (isset($attributes['autoToC'])){
+        if (isset($attributes['autoToC'])) {
             $pdf->h2toc = array(
                 'H1' => 0,
                 'H2' => 1,
                 'H3' => 2,
                 'H4' => 3,
                 'H5' => 4,
-                'H6' => 5
+                'H6' => 5,
             );
         }
-        if (isset($attributes['autoBookmarks'])){
+        if (isset($attributes['autoBookmarks'])) {
             $pdf->h2bookmarks = array(
                 'H1' => 0,
                 'H2' => 1,
                 'H3' => 2,
                 'H4' => 3,
                 'H5' => 4,
-                'H6' => 5
+                'H6' => 5,
             );
         }
         $pdf_string = $pdf->WriteHTML($html);
@@ -165,9 +164,9 @@ class DocumentHelperVariable
         if (isset($attributes['author'])) {
             $pdf->SetAuthor($attributes['author']);
         } else {
-            $pdf->SetAuthor("Made by CoolTRONIC.pl PDF Generator cooltronic.pl");
+            $pdf->SetAuthor("Made by CoolTRONIC.pl PDF Generator https://cooltronic.pl");
         }
-        $pdf->SetCreator("Made by CoolTRONIC.pl PDF Generator cooltronic.pl");
+        $pdf->SetCreator("Made by CoolTRONIC.pl PDF Generator https://cooltronic.pl");
         if (isset($attributes['keywords'])) {
             $pdf->SetKeywords($attributes['keywords'] . ", PDF Generator, CoolTRONIC.pl, https://cooltronic.pl");
         } else {
@@ -176,6 +175,7 @@ class DocumentHelperVariable
         if (isset($attributes['password'])) {
             $pdf->SetProtection(array(), 'UserPassword', $attributes['password']);
         }
+
         switch ($destination) {
             case 'file':
                 $output = \Mpdf\Output\Destination::FILE;
@@ -194,19 +194,100 @@ class DocumentHelperVariable
                 break;
         }
         $return = $pdf->Output($filename, $output);
+
         if ($destination == 'file') {
+            unset($pdf);
             return $filename;
         }
         if ($destination == 'download') {
+            unset($pdf);
             return $filename;
         }
         if ($destination == 'inline') {
+            unset($pdf);
             return $return;
         }
         if ($destination == 'string') {
+            unset($pdf);
             return $return;
         }
 
         return null;
+    }
+
+    public function pdfAsset($template, $tempFilename, $variables, $attributes, $volumeHandle)
+    {
+        // Generate the PDF using the existing pdf method
+        $pdfPath = $this->pdf($template, 'file', $tempFilename, $variables, $attributes);
+        $info = pathinfo($tempFilename);
+        if (isset($attributes['assetFilename'])) {
+            $filename = $attributes['assetFilename'];
+        } else {
+            $filename = $info['basename'];
+        }
+
+        // Set the volume ID of the asset
+        $volumeId = Craft::$app->volumes->getVolumeByHandle($volumeHandle)->id;
+
+        // Find the existing asset
+        $assetQuery = \craft\elements\Asset::find();
+        $assetQuery->filename = $filename;
+        $assetQuery->volumeId = $volumeId;
+        $asset = $assetQuery->one();
+
+        // If the asset doesn't exist or the temp file is newer, create or update the asset
+        if (!$asset || filemtime($tempFilename) > $asset->dateModified->getTimestamp()) {
+            if (!$asset) {
+                $asset = new \craft\elements\Asset ();
+            }
+
+            if (isset($attributes['assetTitle'])) {
+                $asset->title = $attributes['assetTitle'];
+            }
+
+            if (isset($attributes['assetSiteId'])) {
+                $asset->siteId = $attributes['assetSiteId'];
+            }
+
+            $asset->volumeId = $volumeId;
+
+            // Find the folder where the asset will be stored
+            $folder = Craft::$app->assets->getRootFolderByVolumeId($asset->volumeId);
+
+            // Get the ID of the folder
+            $folderId = $folder->id;
+
+            // Set the temporary file path of the asset to the path of the generated PDF
+            $asset->tempFilePath = $tempFilename;
+
+            // Set the filename of the asset to the basename of the generated PDF
+            $asset->filename = $filename;
+
+            // Set the new folder ID of the asset to the ID of the folder
+            $asset->newFolderId = $folderId;
+
+            // Set the scenario of the asset to create
+            $asset->setScenario(\craft\elements\Asset::SCENARIO_DEFAULT);
+
+            // Save the asset
+            $result = Craft::$app->getElements()->saveElement($asset);
+
+            // Check if the asset was saved successfully
+            if (!$result) {
+                return false;
+                Craft::error("Can't find asset: " . $filename . ', in volume: ' . $volumeHandle);
+            }
+        }
+
+        if (isset($attributes['assetDelete'])) {
+            if (file_exists($tempFilename)) {
+                if (unlink($tempFilename)) {
+                    Craft::info("Delete temporary PDF file on path: " . $tempFilename);
+                } else {
+                    Craft::error("Deletion error of temporary PDF file on path: " . $tempFilename);
+                }
+            }
+        }
+        return $asset;
     }
 }
