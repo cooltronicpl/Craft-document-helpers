@@ -1,5 +1,16 @@
 # PDF Generator for Craft 3 or 4
 
+## 1.2.0 - 2023-06-22
+
+- **Feature**: Introduced `pdfAsset` method, which can create, update, or retrieve a Craft CMS Asset.
+- **Enhancement**: Added additional options to `pdfOptions` for the new `pdfAsset` method:
+  - `assetDelete`: Deletes the temporary file after adding the Asset
+  - `assetTitle`: Sets a custom title for the stored Asset
+  - `assetFilename`: Sets a custom filename for the stored Asset
+  - `assetSiteId`: Sets a custom siteId for the Asset
+- **Feature**: Updated README with descriptions of the new method, options, and a guide on generating thumbnails for PDF Assets.
+- **Enhancement**: Switched to the Craft License for legal reasons.
+
 ## 1.1.1 - 2023-06-13
 
 - Introduced an example for right-to-left (RTL) text
@@ -29,7 +40,7 @@
 
 ## 1.0.2 - 2022-11-10
 
-- Merged with @AramLoosman 
+- Merged with @AramLoosman
 - Remove unused function
 - Add custom variables to footer and header
 - Changed fontDirs variable in plugin code to fontDir as in README.md
@@ -44,6 +55,17 @@
 
 - Update for Craft 4
 - Now autoupdate of files works properly with PHP8.0.x like on examples
+
+## 0.3.0 - 2023-06-22
+
+- **Feature**: Introduced `pdfAsset` method, which can create, update, or retrieve a Craft CMS Asset.
+- **Enhancement**: Added additional options to `pdfOptions` for the new `pdfAsset` method:
+  - `assetDelete`: Deletes the temporary file after adding the Asset
+  - `assetTitle`: Sets a custom title for the stored Asset
+  - `assetFilename`: Sets a custom filename for the stored Asset
+  - `assetSiteId`: Sets a custom siteId for the Asset
+- **Feature**: Updated README with descriptions of the new method, options, and a guide on generating thumbnails for PDF Assets.
+- **Enhancement**: Switched to the Craft License for legal reasons.
 
 ## 0.2.1 - 2023-06-13
 

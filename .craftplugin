@@ -1,1 +1,28 @@
-{"pluginName":"PDF Generator","pluginDescription":"PDF Generator","pluginVersion":"1.1.1","pluginAuthorName":"CoolTRONIC.pl sp. z o.o.","pluginVendorName":"cooltronic.pl","pluginAuthorUrl":"https://cooltronic.pl","pluginAuthorGithub":"https://github.com/cooltronicpl","codeComments":"","pluginComponents":["services","settings","twigextensions"],"consolecommandName":"","controllerName":"","cpsectionName":"","elementName":"","fieldName":"","modelName":"","purchasableName":"","recordName":"","serviceName":"","taskName":"","utilityName":"","widgetName":"","apiVersion":"api_version_3_0"}
+{
+    "pluginName": "PDF Generator",
+    "pluginDescription": "Revolutionize your PDF creation process with the PDF Generator for Craft CMS. Create and manage PDFs with ease using customizable templates and a range of options.",
+    "pluginVersion": "1.2.0",
+    "pluginAuthorName": "CoolTRONIC.pl sp. z o.o.",
+    "pluginVendorName": "cooltronic.pl",
+    "pluginAuthorUrl": "https://cooltronic.pl",
+    "pluginAuthorGithub": "https://github.com/cooltronicpl",
+    "codeComments": "",
+    "pluginComponents": [
+        "services",
+        "settings",
+        "twigextensions"
+    ],
+    "consolecommandName": "",
+    "controllerName": "",
+    "cpsectionName": "",
+    "elementName": "",
+    "fieldName": "",
+    "modelName": "",
+    "purchasableName": "",
+    "recordName": "",
+    "serviceName": "",
+    "taskName": "",
+    "utilityName": "",
+    "widgetName": "",
+    "apiVersion": "api_version_3_0"
+}
