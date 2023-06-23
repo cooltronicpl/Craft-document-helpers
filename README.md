@@ -26,6 +26,7 @@ Please note that MPDF for PHP8.x and Craft 4 may require a GD extension.
   - [Example in a loop](#example-in-a-loop)
   - [Twig template example](#twig-template-example)
   - [Adding PDFs to Assets](#adding-pdfs-to-assets)
+  - [Advanced pdfAsset Method Options](#advanced-pdfAsset-ethod-options)
   - [Including Images in PDF](#including-images-in-pdf)
     - [Thumbnail of Generated PDF on Frontend](#thumbnail-of-generated-pdf-on-frontend)
     - [Generating and Displaying Thumbnails of PDF Assets](#generating-and-displaying-thumbnails-of-pdf-assets)
@@ -251,7 +252,8 @@ To include a PDF file into your assets, you need to specify the filename using t
 
 In this example, a timestamp is added to the file URL to ensure the file is refreshed when it changes, beneficial for various caching solutions like [Varnish Cache & Preload](https://plugins.craftcms.com/varnishcache), Blitz, or CDNs like Cloudflare.
 
-Advanced pdfAsset Method Options
+### Advanced `pdfAsset` Method Options
+
 By default, the title of the PDF is based on the filename. However, you can override this along with other settings using pdfOptions:
 
 ```twig
@@ -632,4 +634,3 @@ Special thanks to the developers and testers who have contributed to this projec
 ## License
 
 This project is licensed under the Craft License. See the [LICENSE.md](https://github.com/cooltronicpl/Craft-document-helpers/blob/master/LICENSE.md) file for details.
-
