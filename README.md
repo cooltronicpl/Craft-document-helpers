@@ -341,7 +341,7 @@ Here's an example of how to generate and display a thumbnail:
 {% if asset %}
 <a href="{{asset.url()}}?v={{asset.dateModified|date('U')}}">
     {% set transformedPdf = craft.pdfTransform.render(asset) %}
-    <img src="{{ transformedPdf.url }}?v={{asset.transformedPdf.dateModified|date('U')}}" />
+    <img src="{{ transformedPdf.url }}?v={{transformedPdf.dateModified|date('U')}}" />
 </a>
 {% endif %}
 ```
