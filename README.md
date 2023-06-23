@@ -17,7 +17,7 @@ Please note that MPDF for PHP8.x and Craft 4 may require a GD extension.
   - [Parameters pdf method](#parameters-pdf-method)
     - [Usage Example of pdf method](#usage-example-of-pdf-method)
   - [Parameters pdfAsset method](#parameters-pdfasset-method)
-    - [Usage Example of pdfAsset method](#usage-example-of-pdf-method)
+    - [Usage Example of pdfAsset method](#usage-example-of-pdfasset-method)
   - [Securely Displaying PDF Documents in the Browser Without Saving to the /web Folder](#securely-displaying-pdf-documents-in-the-browser-without-saving-to-the-web-folder)
   - [Variables within a Template](#variables-within-a-template)
   - [Overriding Default Options](#overriding-default-options)
