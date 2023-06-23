@@ -26,7 +26,7 @@ Please note that MPDF for PHP8.x and Craft 4 may require a GD extension.
   - [Example in a loop](#example-in-a-loop)
   - [Twig template example](#twig-template-example)
   - [Adding PDFs to Assets](#adding-pdfs-to-assets)
-  - [Advanced pdfAsset Method Options](#advanced-pdfAsset-ethod-options)
+  - [Advanced pdfAsset Method Options](#advanced-pdfasset-method-options)
   - [Including Images in PDF](#including-images-in-pdf)
     - [Thumbnail of Generated PDF on Frontend](#thumbnail-of-generated-pdf-on-frontend)
     - [Generating and Displaying Thumbnails of PDF Assets](#generating-and-displaying-thumbnails-of-pdf-assets)
