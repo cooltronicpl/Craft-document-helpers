@@ -1,5 +1,10 @@
 # PDF Generator for Craft 3 or 4
 
+## 0.3.1 - 2023-06-23
+
+- **Fix**: Corrected the `composer.json` file for accurate synchronization with the plugin store.
+- **Fix**: Made revisions to `README.md` and fixed minor bugs.
+
 ## 0.3.0 - 2023-06-22
 
 - **Feature**: Introduced `pdfAsset` method, which can create, update, or retrieve a Craft CMS Asset.
