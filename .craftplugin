@@ -1,9 +1,9 @@
 {
     "pluginName": "PDF Generator",
     "pluginDescription": "Revolutionize your PDF creation process with the PDF Generator for Craft CMS. Create and manage PDFs with ease using customizable templates and a range of options.",
-    "pluginVersion": "1.2.0",
+    "pluginVersion": "1.2.1",
     "pluginAuthorName": "CoolTRONIC.pl sp. z o.o.",
-    "pluginVendorName": "cooltronic.pl",
+    "pluginVendorName": "cooltronicpl",
     "pluginAuthorUrl": "https://cooltronic.pl",
     "pluginAuthorGithub": "https://github.com/cooltronicpl",
     "codeComments": "",
