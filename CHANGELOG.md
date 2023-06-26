@@ -1,5 +1,22 @@
 # PDF Generator for Craft 3 or 4
 
+## 0.3.2 - 2023-06-26
+
+- **New Feature**: Introduced additional parameters for image thumbnail generation in `pdfOptions` for `pdfAsset` and `pdf` methods:
+  - `assetThumb`: Generates an image thumbnail of the Asset using `pdfAsset`. Individual options include:
+    - `assetThumbVolumeHandle`: An optional parameter for specifying the Volume Handle for the Thumbnail.
+  - `dumbThumb`: Generates a simple thumbnail image (without Asset) using the `pdf` method.
+  - Thumbnail customization options for both `assetThumb` and `dumbThumb` include:
+    - `thumbType`: Allows selection of thumbnail format from `jpg`, `gif`, `webp`, `avif`, and `png`.
+    - `thumbWidth`: Specifies the width of the thumbnail.
+    - `thumbHeight`: Specifies the height of the thumbnail.
+    - `thumbPage`: Specifies the page to generate (first page is 0).
+    - `thumbTrim`: Trims and centers the page.
+    - `thumbBgColor`: Sets the background color of the thumbnail (default is white).
+    - `thumbTrimFrameColor`: Changes the color of the trim frame.
+- **Bug Fix**: Resolved an issue causing deletion of PDF files with the `pdfAsset` method, even without `assetDelete`. Also fixed minor bugs.
+- **Enhancement**: Updated `README.md` with information about the newly added thumbnail generation options.
+
 ## 0.3.1 - 2023-06-23
 
 - **Fix**: Corrected the `composer.json` file for accurate synchronization with the plugin store.
