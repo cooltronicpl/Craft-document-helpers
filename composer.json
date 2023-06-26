@@ -2,7 +2,7 @@
     "name": "cooltronicpl/document-helpers",
     "description": "Revolutionize your PDF creation process with the PDF Generator for Craft CMS. Create and manage PDFs with ease using customizable templates and a range of options.",
     "type": "craft-plugin",
-    "version": "1.2.1",
+    "version": "1.2.2",
     "keywords": [
         "craft",
         "cms",
@@ -71,7 +71,7 @@
     ],
     "require": {
         "craftcms/cms": "^4.0.0",
-        "mpdf/mpdf": "^8.0.10"
+        "mpdf/mpdf": "^8.0.10",
     },
     "autoload": {
         "psr-4": {

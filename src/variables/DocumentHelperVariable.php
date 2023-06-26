@@ -14,6 +14,7 @@
 
 namespace cooltronicpl\documenthelpers\variables;
 
+use cooltronicpl\documenthelpers\classes\ExtendedAsset;
 use Craft;
 
 /**
@@ -35,85 +36,45 @@ class DocumentHelperVariable
      */
     public function pdf($template, $destination, $filename, $variables, $attributes)
     {
+        $runtimePath = Craft::$app->getPath()->getRuntimePath();
+        $pdfGeneratorPath = FileHelper::normalizePath($runtimePath . '/temp/pdfgenerator');
+
+        if (!is_dir($pdfGeneratorPath)) {
+            FileHelper::createDirectory($pdfGeneratorPath);
+        }
+        
         $defaultConfig = (new \Mpdf\Config\ConfigVariables ())->getDefaults();
         $defaultFontConfig = (new \Mpdf\Config\FontVariables ())->getDefaults();
 
-        if (file_exists($filename) && isset($attributes['date'])) {
-            if (filemtime($filename) > $attributes['date']) {
+        if (!isset($attributes['dumbThumb'])) {
+            if ((file_exists($filename) && $attributes['date'] ?? false && filemtime($filename) > $attributes['date'])) {
                 return $filename;
             }
         }
-        $vars['entry'] = $variables->getFieldValues();
-        if (isset($attributes['custom'])) {
-            $vars['custom'] = $attributes['custom'];
-        }
-        if (isset($variables['title'])) {
-            $vars['title'] = $variables['title'];
-        }
-        $html = Craft::$app->getView()->renderTemplate($template, $vars);
-        if (isset($attributes['header'])) {
-            $html_header = Craft::$app->getView()->renderTemplate($attributes['header'], $vars);
-        }
-        if (isset($attributes['footer'])) {
-            $html_footer = Craft::$app->getView()->renderTemplate($attributes['footer'], $vars);
-        }
 
-        if (isset($attributes['margin_top'])) {
-            $margin_top = $attributes['margin_top'];
-        } else {
-            $margin_top = 30;
-        }
-        if (isset($attributes['margin_left'])) {
-            $margin_left = $attributes['margin_left'];
-        } else {
-            $margin_left = 15;
-        }
-        if (isset($attributes['margin_right'])) {
-            $margin_right = $attributes['margin_right'];
-        } else {
-            $margin_right = 15;
-        }
-        if (isset($attributes['margin_bottom'])) {
-            $margin_bottom = $attributes['margin_bottom'];
-        } else {
-            $margin_bottom = 30;
-        }
-        if (isset($attributes['mirrorMargins'])) {
-            $mirrorMargins = $attributes['mirrorMargins'];
-        } else {
-            $mirrorMargins = 0;
-        }
-        if (isset($attributes['fontDir'])) {
-            $fontDir = $attributes['fontDir'];
-        } else {
-            $fontDir = $defaultConfig['fontDir'];
-        }
-        if (isset($attributes['fontdata'])) {
-            $fontData = $attributes['fontdata'];
-        } else {
-            $fontData = $defaultFontConfig['fontdata'];
-        }
-        $arrParameters['margin_top'] = $margin_top;
-        $arrParameters['margin_left'] = $margin_left;
-        $arrParameters['margin_right'] = $margin_right;
-        $arrParameters['margin_bottom'] = $margin_bottom;
-        $arrParameters['mirrorMargins'] = $mirrorMargins;
-        $arrParameters['fontDir'] = $fontDir;
-        $arrParameters['fontdata'] = $fontData;
-        if (isset($attributes["no_auto_page_break"])) {
-            $arrParameters['autoPageBreak'] = false;
-        }
-        if (isset($attributes["tempDir"])) {
-            $arrParameters['tempDir'] = $attributes["tempDir"];
-        }
-        if (isset($attributes['format'])) {
-            $arrParameters['format'] = $attributes["format"];
-        }
-        if (isset($attributes["landscape"])) {
-            $arrParameters['orientation'] = 'L';
-        } elseif (isset($attributes["portrait"])) {
-            $arrParameters['orientation'] = 'P';
-        }
+        $vars = [
+            'entry' => $variables->getFieldValues(),
+            'custom' => $attributes['custom'] ?? null,
+            'title' => $variables['title'] ?? null,
+        ];
+
+        $html = Craft::$app->getView()->renderTemplate($template, $vars);
+        $html_header = $attributes['header'] ? Craft::$app->getView()->renderTemplate($attributes['header'], $vars) : null;
+        $html_footer = $attributes['footer'] ? Craft::$app->getView()->renderTemplate($attributes['footer'], $vars) : null;
+
+        $arrParameters = [
+            'margin_top' => $attributes['margin_top'] ?? 30,
+            'margin_left' => $attributes['margin_left'] ?? 15,
+            'margin_right' => $attributes['margin_right'] ?? 15,
+            'margin_bottom' => $attributes['margin_bottom'] ?? 30,
+            'mirrorMargins' => $attributes['mirrorMargins'] ?? 0,
+            'fontDir' => $attributes['fontDir'] ?? $defaultConfig['fontDir'],
+            'fontdata' => $attributes['fontdata'] ?? $defaultFontConfig['fontdata'],
+            'autoPageBreak' => $attributes["no_auto_page_break"] ?? true,
+            'tempDir' => $attributes["tempDir"] ?? $pdfGeneratorPath,
+            'format' => $attributes['format'] ?? null,
+            'orientation' => ($attributes["landscape"] ?? false) ? 'L' : (($attributes["portrait"] ?? false) ? 'P' : null),
+        ];
 
         $pdf = new \Mpdf\Mpdf (
             $arrParameters
@@ -194,9 +155,50 @@ class DocumentHelperVariable
                 break;
         }
         $return = $pdf->Output($filename, $output);
+        if (isset($attributes['dumbThumb'])) {
+            if (isset($attributes['thumbType'])) {
+                $assetType = $attributes['thumbType'];
+            } else { $assetType = "jpg";}
+            // Get the pathinfo
+            $infoDumb = pathinfo($filename);
 
+            // Get the filename without extension
+            $dumbThumbFilename = $infoDumb['filename'];
+
+            // Get the directory path
+            $dumpDir = $infoDumb['dirname'];
+            if (!file_exists($dumpDir . DIRECTORY_SEPARATOR . $dumbThumbFilename . '.' . $assetType)) {
+                if (isset($attributes['thumbWidth'])) {
+                    $cols = $attributes['thumbWidth'];
+                } else { $cols = 210;}
+                if (isset($attributes['thumbHeight'])) {
+                    $rows = $attributes['thumbHeight'];
+                } else { $rows = 297;}
+                if (isset($attributes['thumbBgColor'])) {$thumbBgColor = $attributes['thumbBgColor'];} else { $thumbBgColor = 'white';}
+                if (isset($attributes['thumbPage'])) {$thumbPage = $attributes['thumbPage'];} else { $thumbPage = 0;}
+                if (isset($attributes['thumbTrim'])) {$thumbTrim = $attributes['thumbTrim'];} else { $thumbTrim = false;}
+                if (isset($attributes['thumbTrimFrameColor'])) {$thumbTrimFrameColor = $attributes['thumbTrimFrameColor'];} else { $thumbTrimFrameColor = false;}
+                try {
+                    $thumb = new GenerateThumbConfiguration(
+                        pdfPath:$filename,
+                        savePath:$dumpDir . DIRECTORY_SEPARATOR . $dumbThumbFilename . '.' . $assetType,
+                        format:$assetType,
+                        cols:$cols,
+                        rows:$rows,
+                        bgColor:$thumbBgColor,
+                        page:$thumbPage,
+                        trim:$thumbTrim,
+                        frameColor:$thumbTrimFrameColor
+                    );
+                    $thumbGenerator = new GenerateThumb();
+                    $thumbGenerator->convert($thumb);
+                } catch (\Exception $e) {
+                    // Log the error message
+                    Craft::error('Error generating thumbnail: ' . $e->getMessage());
+                }
+            }
+        }
         if ($destination == 'file') {
-            unset($pdf);
             return $filename;
         }
         if ($destination == 'download') {
@@ -211,7 +213,6 @@ class DocumentHelperVariable
             unset($pdf);
             return $return;
         }
-
         return null;
     }
 
@@ -219,13 +220,12 @@ class DocumentHelperVariable
     {
         // Generate the PDF using the existing pdf method
         $pdfPath = $this->pdf($template, 'file', $tempFilename, $variables, $attributes);
-        $info = pathinfo($tempFilename);
+        $info = pathinfo($pdfPath);
         if (isset($attributes['assetFilename'])) {
             $filename = $attributes['assetFilename'];
         } else {
             $filename = $info['basename'];
         }
-
         // Set the volume ID of the asset
         $volumeId = Craft::$app->volumes->getVolumeByHandle($volumeHandle)->id;
 
@@ -252,13 +252,21 @@ class DocumentHelperVariable
             $asset->volumeId = $volumeId;
 
             // Find the folder where the asset will be stored
-            $folder = Craft::$app->assets->getRootFolderByVolumeId($asset->volumeId);
+            $folder = Craft::$app->assets->getRootFolderByVolumeId($volumeId);
 
             // Get the ID of the folder
             $folderId = $folder->id;
+            $tempCopyInfo = pathinfo($pdfPath);
+            $tempName = $tempCopyInfo['basename'];
+            $tempDirName = $tempCopyInfo['dirname'];
+            // Add these lines
+            $copyFilename = $tempDirName . '/copy_' . $tempName;
+            if (!copy($tempFilename, $copyFilename)) {
+                Craft::error('Failed to copy file: ' . $tempFilename);
+            }
 
             // Set the temporary file path of the asset to the path of the generated PDF
-            $asset->tempFilePath = $tempFilename;
+            $asset->tempFilePath = $copyFilename;
 
             // Set the filename of the asset to the basename of the generated PDF
             $asset->filename = $filename;
@@ -268,10 +276,9 @@ class DocumentHelperVariable
 
             // Set the scenario of the asset to create
             $asset->setScenario(\craft\elements\Asset::SCENARIO_DEFAULT);
-
             // Save the asset
+            
             $result = Craft::$app->getElements()->saveElement($asset);
-
             // Check if the asset was saved successfully
             if (!$result) {
                 return false;
@@ -279,15 +286,131 @@ class DocumentHelperVariable
             }
         }
 
-        if (isset($attributes['assetDelete'])) {
-            if (file_exists($tempFilename)) {
-                if (unlink($tempFilename)) {
-                    Craft::info("Delete temporary PDF file on path: " . $tempFilename);
-                } else {
-                    Craft::error("Deletion error of temporary PDF file on path: " . $tempFilename);
+        if (isset($attributes['assetThumb'])) {
+            if (isset($attributes['thumbType'])) {
+                $assetType = $attributes['thumbType'];
+            } else { $assetType = "jpg";}
+            if (isset($attributes['assetFilename'])) {
+                $finalNameThumb = $attributes['assetFilename'] . '.' . $assetType;
+            } else {
+                $finalNameThumb = $info['basename'] . '.' . $assetType;
+            }
+            // Get the pathinfo
+            $infoThumb = pathinfo($tempFilename);
+
+            // Get the filename without extension
+            $fileTempName = $infoThumb['filename'];
+
+            // Get the directory path
+            $dirTemp = $infoThumb['dirname'];
+            if (isset($attributes['thumbWidth'])) {
+                $cols = $attributes['thumbWidth'];
+            } else { $cols = 210;}
+            if (isset($attributes['thumbHeight'])) {
+                $rows = $attributes['thumbHeight'];
+            } else { $rows = 297;}
+            if (isset($attributes['thumbBgColor'])) {$thumbBgColor = $attributes['thumbBgColor'];} else { $thumbBgColor = 'white';}
+            if (isset($attributes['thumbPage'])) {$thumbPage = $attributes['thumbPage'];} else { $thumbPage = 0;}
+            if (isset($attributes['thumbTrim'])) {$thumbTrim = $attributes['thumbTrim'];} else { $thumbTrim = false;}
+            if (isset($attributes['thumbTrimFrameColor'])) {$thumbTrimFrameColor = $attributes['thumbTrimFrameColor'];} else { $thumbTrimFrameColor = false;}
+            try {
+                $thumb = new GenerateThumbConfiguration(
+                    pdfPath:$pdfPath,
+                    savePath:$dirTemp . DIRECTORY_SEPARATOR . $fileTempName . '.' . $assetType,
+                    format:$assetType,
+                    cols:$cols,
+                    rows:$rows,
+                    bgColor:$thumbBgColor,
+                    page:$thumbPage,
+                    trim:$thumbTrim,
+                    frameColor:$thumbTrimFrameColor
+                );
+                $thumbGenerator = new GenerateThumb();
+                $thumbGenerator->convert($thumb);
+            } catch (\Exception $e) {
+                // Log the error message
+                Craft::error('Error generating thumbnail: ' . $e->getMessage());
+            }
+
+            if (isset($attributes['assetThumbVolumeHandle'])) {
+                $thumbVolumeHandle = $attributes['assetThumbVolumeHandle'];
+                $thumbVolumeId = Craft::$app->volumes->getVolumeByHandle($attributes['assetThumbVolumeId'])->id;
+            } else {
+                $thumbVolumeHandle = $volumeHandle;
+                $thumbVolumeId = Craft::$app->volumes->getVolumeByHandle($volumeHandle)->id;
+            }
+            // Find the existing asset
+            $assetQueryThumb = \craft\elements\Asset::find();
+            $assetQueryThumb->filename = $finalNameThumb;
+            $assetQueryThumb->volumeId = $thumbVolumeId;
+            $assetThumb = $assetQueryThumb->one();
+
+            // If the asset doesn't exist or the temp file is newer, create or update the asset
+            if (!$assetThumb || (file_exists($dirTemp . DIRECTORY_SEPARATOR . $fileTempName . '.' . $assetType) && filemtime($dirTemp . DIRECTORY_SEPARATOR . $fileTempName . '.' . $assetType) > $assetThumb->dateModified->getTimestamp())) {
+                if (!$assetThumb) {
+                    $assetThumb = new \craft\elements\Asset ();
+                }
+
+                if (isset($attributes['assetTitle'])) {
+                    $assetThumb->title = $attributes['assetTitle'];
+                }
+
+                if (isset($attributes['assetSiteId'])) {
+                    $assetThumb->siteId = $attributes['assetSiteId'];
+                }
+
+                $assetThumb->volumeId = $thumbVolumeId;
+
+                $folder = Craft::$app->assets->getRootFolderByVolumeId($thumbVolumeId);
+
+                $folderId = $folder->id;
+
+                $assetThumb->tempFilePath = $dirTemp . DIRECTORY_SEPARATOR . $fileTempName . '.' . $assetType;
+
+                $assetThumb->filename = $finalNameThumb;
+
+                $assetThumb->newFolderId = $folderId;
+
+                $assetThumb->setScenario(\craft\elements\Asset::SCENARIO_DEFAULT);
+
+                try {
+                    $resultThumb = Craft::$app->getElements()->saveElement($assetThumb);
+                } catch (\Exception $e) {
+                    Craft::error('Error relocating thumbnail: ' . $e->getMessage());
+                }
+                if (!isset($resultThumb)) {
+                    return false;
+                    Craft::error("Can't find assetThumb: " . $dirTemp . DIRECTORY_SEPARATOR . $fileTempName . '.' . $assetType . " and save it into: " . $filename . '.' . $assetType . ", in volume: " . $assetVolumeHandle);
                 }
             }
         }
-        return $asset;
+        $extendedAsset = new ExtendedAsset();
+        foreach ($asset->getAttributes() as $name => $value) {
+            $extendedAsset->$name = $value;
+        }
+        if (isset($attributes['assetThumb'])) {$extendedAsset->assetThumb = $assetThumb;}
+
+        if (isset($attributes['assetDelete'])) {
+            if (file_exists($tempFilename)) {
+                if (unlink($tempFilename)) {
+                    Craft::info("Deleted (unlink) temporary PDF file on path: " . $tempFilename);
+                } else {
+                    Craft::error("Deletion error (unlink) of temporary PDF file on path: " . $tempFilename);
+                }
+            }
+
+            if (isset($attributes['assetThumb'])) {
+                if (file_exists($dirTemp . DIRECTORY_SEPARATOR . $fileTempName . '.' . $assetType)) {
+                    if (unlink($dirTemp . DIRECTORY_SEPARATOR . $fileTempName . '.' . $assetType)) {
+                        Craft::info("Deleted (unlink) temporary PDF Thumb file on path: " . $dirTemp . DIRECTORY_SEPARATOR . $fileTempName . '.' . $assetType);
+                    } else {
+                        Craft::error("Deletion error (unlink) of temporary PDF Thumb on path: " . $dirTemp . DIRECTORY_SEPARATOR . $fileTempName . '.' . $assetType);
+                    }
+                }
+            }
+        }
+
+        return $extendedAsset;
     }
+
 }
