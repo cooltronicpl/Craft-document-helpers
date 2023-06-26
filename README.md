@@ -138,7 +138,7 @@ You can securely display PDF documents in the browser without saving them to the
 						footer: "_pdf/footer.twig"
                         } %}
 				{% header "Content-Type: application/pdf" %}
-{{version("/" ~ craft.documentHelper.pdf('_pdf/document.twig', 'inline', '../book_example'  ~ '.pdf', entry, pdfOptions))}}
+{{craft.documentHelper.pdf('_pdf/document.twig', 'inline', '../book_example'  ~ '.pdf', entry, pdfOptions)}}
 
 ```
 
