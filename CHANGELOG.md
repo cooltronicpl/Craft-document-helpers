@@ -1,5 +1,9 @@
 # PDF Generator for Craft 3 or 4
 
+## 1.2.3 - 2023-07-16
+
+- **Bug Fix**: Solved a problem that was introduced by importing the `FileHelper` class.
+
 ## 1.2.2 - 2023-06-26
 
 - **New Feature**: Introduced additional parameters for image thumbnail generation in `pdfOptions` for `pdfAsset` and `pdf` methods:

@@ -15,6 +15,7 @@
 namespace cooltronicpl\documenthelpers\variables;
 
 use cooltronicpl\documenthelpers\classes\ExtendedAsset;
+use craft\helpers\FileHelper;
 use Craft;
 
 /**
