@@ -55,7 +55,7 @@ You can install the PDF Generator plugin from the Craft Plugin Store or through 
 
 ### Craft Plugin Store
 
-Go to the Craft Plugin Store in your project’s Control Panel and search for "PDF Generator". Then click on the "Install" button in its modal window.
+Go to the [Craft CMS Plugin Store](https://plugins.craftcms.com/document-helpers) in your project’s Control Panel and search for "PDF Generator". Then click on the "Install" button in its modal window.
 
 ## Composer
 
