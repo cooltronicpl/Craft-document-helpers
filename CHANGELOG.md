@@ -1,5 +1,9 @@
 # PDF Generator for Craft 3 or 4
 
+## 1.2.4 - 2023-08-24
+
+- **Bug Fix**: Fixed a problem that occurred due to the introduction of the `ExtendedAsset` class, which had a conflicting declaration of setter and getter methods and an incorrect `getMimeType` getter return type declaration. This fix resolves the issues with thumbnail generation.
+
 ## 1.2.3 - 2023-07-16
 
 - **Bug Fix**: Solved a problem that was introduced by importing the `FileHelper` class.

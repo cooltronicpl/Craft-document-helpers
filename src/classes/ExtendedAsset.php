@@ -25,7 +25,6 @@
 class ExtendedAsset extends craft\elements\Asset {
     public $assetThumb;
     private $_url;
-    private $_isFolder;
     private $_isDraft;
     private $_isRevision;
     private $_isUnpublishedDraft;
@@ -44,14 +43,6 @@ class ExtendedAsset extends craft\elements\Asset {
 
     public function setUrl($url) {
         $this->_url = $url;
-    }
-
-    public function getIsFolder() {
-        return $this->_isFolder ?? parent::getIsFolder();
-    }
-
-    public function setIsFolder($isFolder) {
-        $this->_isFolder = $isFolder;
     }
 
     public function getIsDraft(): bool {
@@ -110,8 +101,9 @@ class ExtendedAsset extends craft\elements\Asset {
         $this->_hasFocalPoint = $hasFocalPoint;
     }
 
-    public function getMimeType(): string {
-        return $this->_mimeType ?? parent::getMimeType();
+    public function getMimeType($transform = null): ?string
+    {
+        return $this->_mimeType ?? parent::getMimeType($transform);
     }
 
     public function setMimeType($mimeType) {
