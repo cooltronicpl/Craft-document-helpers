@@ -43,12 +43,12 @@ class DocumentHelperVariable
         if (!is_dir($pdfGeneratorPath)) {
             FileHelper::createDirectory($pdfGeneratorPath);
         }
-        
+
         $defaultConfig = (new \Mpdf\Config\ConfigVariables ())->getDefaults();
         $defaultFontConfig = (new \Mpdf\Config\FontVariables ())->getDefaults();
 
         if (!isset($attributes['dumbThumb'])) {
-            if ((file_exists($filename) && $attributes['date'] ?? false && filemtime($filename) > $attributes['date'])) {
+            if ((file_exists($filename) && isset($attributes['date']) && filemtime($filename) > $attributes['date'])) {
                 return $filename;
             }
         }
@@ -278,7 +278,7 @@ class DocumentHelperVariable
             // Set the scenario of the asset to create
             $asset->setScenario(\craft\elements\Asset::SCENARIO_DEFAULT);
             // Save the asset
-            
+
             $result = Craft::$app->getElements()->saveElement($asset);
             // Check if the asset was saved successfully
             if (!$result) {
