@@ -1,5 +1,11 @@
 # PDF Generator for Craft 3 or 4
 
+## 0.4.0 - 2023-11-22
+
+- **Bug Fix**: Fixed a bug that caused incorrect date validation of PDF file.
+- **Bug Fix**: Fixed a bug that caused an error when using headers and footers.
+- **New Feature**: Added a feature that allows you to include a QR code image in the template using `qrdata` and `qrimg` variables.
+
 ## 0.3.2 - 2023-06-26
 
 - **New Feature**: Introduced additional parameters for image thumbnail generation in `pdfOptions` for `pdfAsset` and `pdf` methods:

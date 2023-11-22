@@ -640,6 +640,23 @@ In your JavaScript code pass `pdfs` from Craft CMS, you can then loop over the p
 </script>
 ```
 
+### Display QRCode
+
+Prepare the `qrdata` string that contains the information you want to encode in the QRCode. The format of the `qrdata` string depends on the type of information you want to attach. Here are some common formats:
+
+- For a website link, you can just use the URL of the website, such as `https://cooltronic.pl/`
+- For a plain text, you can use any message you want, such as `Hello, world!`
+- For a contact information, you can use the vCard format, which is a standard for exchanging personal data, such as `BEGIN:VCARD\nVERSION:3.0\nN:Potacki;Pawel\nTEL;TYPE=work,voice;VALUE=uri:tel:+99-888-777-666\nEMAIL:pawel@cooltronic.pl\nEND:VCARD`
+- For a WiFi configuration, you can use the WIFI format, which is a simple way to share network settings, such as `WIFI:S:MyNetwork;T:WPA;P:MyPassword;;`
+
+In the Twig template, insert the QRCode image where you want by using this code:
+
+```
+<img src="{{qrimg}}">
+```
+
+Where `{{qrimg}}` is the variable that holds the image from the [PHP QRCode generator](https://php-qrcode.readthedocs.io/).
+
 ### RTL Text Direction
 
 he PDF Generator plugin supports right-to-left (RTL) text direction. To enable RTL text direction set HTML `dir` attribute in your HTML Twig template markup. For example:
