@@ -1,8 +1,14 @@
 # PDF Generator for Craft 3 or 4
 
+## 1.3.0 - 2023-11-22
+
+- **Bug Fix**: Fixed a bug that caused incorrect date validation of PDF file.
+- **Bug Fix**: Fixed a bug that caused an error when using headers and footers.
+- **New Feature**: Added a feature that allows you to include a QR code image in the template using `qrdata` and `qrimg` variables.
+
 ## 1.2.5 - 2023-08-24
 
-- **Bug Fix**: Solved a problem that was caused by the new `Generatethumb` class, which had many errors in the code. This fix makes the thumbnail generation work correctly.
+- **Bug Fix**: Solved a problem that was caused by the new `GenerateThumb` class, which had many errors in the code. This fix makes the thumbnail generation work correctly.
 
 ## 1.2.4 - 2023-08-24
 
@@ -90,6 +96,12 @@
 
 - Update for Craft 4
 - Now autoupdate of files works properly with PHP8.0.x like on examples
+
+## 0.4.0 - 2023-11-22
+
+- **Bug Fix**: Fixed a bug that caused incorrect date validation of PDF file.
+- **Bug Fix**: Fixed a bug that caused an error when using headers and footers.
+- **New Feature**: Added a feature that allows you to include a QR code image in the template using `qrdata` and `qrimg` variables.
 
 ## 0.3.2 - 2023-06-26
 

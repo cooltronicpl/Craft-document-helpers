@@ -17,7 +17,7 @@ namespace cooltronicpl\documenthelpers\variables;
 use cooltronicpl\documenthelpers\classes\ExtendedAsset;
 use craft\helpers\FileHelper;
 use Craft;
-
+use chillerlan\QRCode\QRCode as QRCode;
 /**
  * @author    CoolTRONIC.pl sp. z o.o. <github@cooltronic.pl>
  * @author    Pawel Potacki
@@ -48,20 +48,23 @@ class DocumentHelperVariable
         $defaultFontConfig = (new \Mpdf\Config\FontVariables ())->getDefaults();
 
         if (!isset($attributes['dumbThumb'])) {
-            if ((file_exists($filename) && $attributes['date'] ?? false && filemtime($filename) > $attributes['date'])) {
+            if ((file_exists($filename) && isset($attributes['date']) && filemtime($filename) > $attributes['date'])) {
                 return $filename;
             }
         }
-
+        if (isset($attributes['qrdata'])){
+            $attributes['qrdata'] = (new QRCode)->render($attributes['qrdata']);
+        }
         $vars = [
             'entry' => $variables->getFieldValues(),
             'custom' => $attributes['custom'] ?? null,
             'title' => $variables['title'] ?? null,
+            'qrimg' => $attributes['qrdata'] ?? null
         ];
 
         $html = Craft::$app->getView()->renderTemplate($template, $vars);
-        $html_header = $attributes['header'] ? Craft::$app->getView()->renderTemplate($attributes['header'], $vars) : null;
-        $html_footer = $attributes['footer'] ? Craft::$app->getView()->renderTemplate($attributes['footer'], $vars) : null;
+        $html_header = isset($attributes['header']) ? Craft::$app->getView()->renderTemplate($attributes['header'], $vars) : null;
+        $html_footer = isset($attributes['footer']) ? Craft::$app->getView()->renderTemplate($attributes['footer'], $vars) : null;
 
         $arrParameters = [
             'margin_top' => $attributes['margin_top'] ?? 30,
