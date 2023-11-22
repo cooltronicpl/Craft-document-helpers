@@ -201,6 +201,7 @@ You can override the default options with `pdfOptions` as shown above. Here are 
 - `assetThumb`: This option generates a thumbnail image of a Craft CMS image Asset using the `pdfAsset` method (requires ImageMagick). It can be accessed in the Twig template as `asset.assetThumb`.
   - `assetThumbVolumeHandle`: This is an optional parameter that specifies the Volume Handle for the thumbnail. If not provided, the PDF Volume Handle is used. The volume handle must have a `Base URL` in your test: `@web\pdffiles` in Craft CMS Filesystems, Assets settings.
 - `dumbThumb`: This option generates a basic thumbnail image (without an Asset) using the `pdf` method (requires ImageMagick).
+- `qrdata`: This option allows you to generate a QR Code image from any data you provide. The image will be available on the Twig template with `{{qrimg}}` variable.
 
 Both `assetThumb` and `dumbThumb` support the following optional customizations:
 
@@ -649,6 +650,17 @@ Prepare the `qrdata` string that contains the information you want to encode in 
 - For a plain text, you can use any message you want, such as `Hello, world!`
 - For a contact information, you can use the vCard format, which is a standard for exchanging personal data, such as `BEGIN:VCARD\nVERSION:3.0\nN:Potacki;Pawel\nTEL;TYPE=work,voice;VALUE=uri:tel:+99-888-777-666\nEMAIL:pawel@cooltronic.pl\nEND:VCARD`
 - For a WiFi configuration, you can use the WIFI format, which is a simple way to share network settings, such as `WIFI:S:MyNetwork;T:WPA;P:MyPassword;;`
+
+Example:
+
+```
+{% set pdfOptions = {
+	...
+	qrdata: "https://cooltronic.pl"
+	...
+}
+%}    
+```
 
 In the Twig template, insert the QRCode image where you want by using this code:
 
