@@ -40,6 +40,7 @@ Please note that MPDF for PHP8.x and Craft 4 may require a GD extension.
   - [Filename Characters](#filename-characters)
   - [Browser Caching Issues of PDF Files on Some Servers and Hosting](#browser-caching-issues-of-pdf-files-on-some-servers-and-hosting)
   - [Downloading Multiple PDF Files with JavaScript on Any Page](#downloading-multiple-pdf-files-with-javascript-on-any-page)
+  - [Display QRCode](#display-qrcode)
   - [RTL Text Direction](#rtl-text-direction)
   - [Add Watermark](#add-watermark)
   - [Generate PDF Table of Contents](#generate-pdf-table-of-contents)
