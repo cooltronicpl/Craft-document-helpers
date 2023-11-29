@@ -672,7 +672,7 @@ Where `{{qrimg}}` is the variable that holds the image from the [PHP QRCode gene
 
 ### RTL Text Direction
 
-he PDF Generator plugin supports right-to-left (RTL) text direction. To enable RTL text direction set HTML `dir` attribute in your HTML Twig template markup. For example:
+The PDF Generator plugin supports right-to-left (RTL) text direction. To enable RTL text direction set HTML `dir` attribute in your HTML Twig template markup. For example:
 
 ```
 <div dir="rtl">This is some text in a right-to-left language.</div>
