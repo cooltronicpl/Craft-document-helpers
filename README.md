@@ -778,6 +778,8 @@ Special thanks to the developers and testers who have contributed to this projec
 - [@mokopan](https://github.com/mokopan)
 - [@AramLoosman](https://github.com/AramLoosman)
 - [@iwe-hi](https://github.com/iwe-hi)
+- [@d-karstens](https://github.com/d-karstens)
+- [@chillerlan/php-qrcode](https://github.com/chillerlan/php-qrcode/)
 
 ## License
 
