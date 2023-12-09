@@ -1,5 +1,17 @@
 # PDF Generator for Craft 3 or 4
 
+## 1.3.1 - 2023-12-09
+
+### **Enhancement**
+
+- Made QR Code package as optional and not installed by default.
+- Implemented plugin default settings screen.
+
+### **New Feature**
+
+- Added a new option to configure the plugin globally.
+- Enabled installing additional packages from the Settings menu.
+
 ## 1.3.0 - 2023-11-22
 
 - **Bug Fix**: Fixed a bug that caused incorrect date validation of PDF file.
@@ -96,6 +108,18 @@
 
 - Update for Craft 4
 - Now autoupdate of files works properly with PHP8.0.x like on examples
+
+## 0.4.1 - 2023-12-09
+
+### **Enhancement**
+
+- Made QR Code package as optional and not installed by default.
+- Implemented plugin default settings screen.
+
+### **New Feature**
+
+- Added a new option to configure the plugin globally.
+- Enabled installing additional packages from the Settings menu.
 
 ## 0.4.0 - 2023-11-22
 

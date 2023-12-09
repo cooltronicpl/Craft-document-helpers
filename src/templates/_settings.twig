@@ -1,0 +1,378 @@
+{% extends "documenthelpers/_layouts/cpp.twig" %}
+
+{% import "_includes/forms" as forms %}
+
+{% set title = 'PDF Generator' %}
+
+{% set selectedTab = 'general' %}
+
+{% set tabs = {
+    general: {label: 'General'|t, url: '#general'},
+    thumb: {label: 'Thumbnails (ImageMagick)'|t, url: "#thumb" },
+    optional: {label: 'Optional functions to enable'|t, url: '#optional'}
+} %}
+{% block content %}
+
+	<div class="tab-contents">
+
+		<div id="content-general" class="tab-content">
+			<h2>Welcome! General Settings</h2>
+
+			<p>The general settings section is optional in configuring your PDF Generator default values of plugin. Here, you can set default options for your generated PDFs.</p>
+
+			<p>More about values which can you set is
+				<a href="https://github.com/cooltronicpl/Craft-document-helpers#overriding-default-options">here</a>.</p>
+
+			<p>You can override default value in the Twig functions individually for every variable in `pdfOptions`.</p>
+
+			{{ forms.textField({
+    label: "Header template" | t,
+    id: 'header',
+    name: 'header',
+    instructions: " This is path of the header Twig template."|t,
+    value: settings. header|default(null),
+    errors: settings.getErrors('header')
+}) }}
+
+			{{ forms.textField({
+    label: "Footer template" | t,
+    id: 'footer',
+    name: 'footer',
+    instructions: " This is path of the footer Twig template."|t,
+    value: settings. header|default(null),
+    errors: settings.getErrors('footer')
+}) }}
+			{{ forms.textField({
+    label: "Footer template" | t,
+    id: 'margin_top',
+    name: 'margin_top',
+    instructions: "The top margin defaults to 30."|t,
+    value: settings. margin_top|default(null),
+    errors: settings.getErrors('margin_top')
+}) }}
+			{{ forms.textField({
+    label: "Footer template" | t,
+    id: 'margin_bottom',
+    name: 'margin_bottom',
+    instructions: "The bottom margin defaults to 30."|t,
+    value: settings. margin_bottom|default(null),
+    errors: settings.getErrors('margin_bottom')
+}) }}
+
+			{{ forms.textField({
+    label: "Footer template" | t,
+    id: 'margin_left',
+    name: 'margin_left',
+    instructions: "The left margin defaults to 15."|t,
+    value: settings. margin_left|default(null),
+    errors: settings.getErrors('margin_left')
+}) }}
+			{{ forms.textField({
+    label: "Footer template" | t,
+    id: 'margin_right',
+    name: 'margin_right',
+    instructions: "The right margin defaults to 15."|t,
+    value: settings. margin_right|default(null),
+    errors: settings.getErrors('margin_right')
+}) }}
+			{{ forms.textField({
+    label: "Page numbers" | t,
+    id: 'pageNumbers',
+    name: 'pageNumbers',
+    instructions: "This adds page numbers in the footer."|t,
+    value: settings. pageNumbers|default(null),
+    errors: settings.getErrors('pageNumbers')
+}) }}
+
+			{{ forms.textField({
+    label: "Title" | t,
+    id: 'title',
+    name: 'title',
+    instructions: "This replaces the default title of the generated PDF document."|t,
+    value: settings. title|default(null),
+    errors: settings.getErrors('title')
+}) }}
+
+			{{ forms.textField({
+    label: "Password" | t,
+    id: 'password',
+    name: 'password',
+    instructions: "This can be used to add password protection to your PDF."|t,
+    value: settings. password|default(null),
+    errors: settings.getErrors('password')
+}) }}
+
+			{{ forms.lightswitchField({
+    label: "No automatic page break" | t,
+    id: 'no_auto_page_break',
+    name: 'no_auto_page_break',
+    instructions: "This disables automatic system page breaks. This can be useful if you need to manually add page breaks. For example, you can add a custom page to documents with more than one page break using <pagebreak>. This may fix page break issues in some cases, but not all." | t,
+    on: settings.no_auto_page_break,
+
+}) }}
+
+			{{ forms.textField({
+    label: "Author" | t,
+    id: 'author',
+    name: 'author',
+    instructions: "This sets the author metadata. It should be provided as a string."|t,
+    value: settings. author|default(null),
+    errors: settings.getErrors('author')
+}) }}
+			{{ forms.textField({
+    label: "Keywords" | t,
+    id: 'keywords',
+    name: 'keywords',
+    instructions: "This sets the keyword metadata. It should be provided as a string in the following format: `keyword1, longer keyword2, keyword3`."|t,
+    value: settings. keywords|default(null),
+    errors: settings.getErrors('keywords')
+}) }}
+			{{ forms.textField({
+    label: "Temporary directory" | t,
+    id: 'tempDir',
+    name: 'tempDir',
+    instructions: "This sets the path to the temporary directory used for generating PDFs. We have tested this with the main /tmp directory on the server with success. This could potentially improve performance when generating multiple PDFs."|t,
+    value: settings. tempDir|default(null),
+    errors: settings.getErrors('tempDir')
+}) }}
+			{{ forms.textField({
+    label: "Temporary directory" | t,
+    id: 'tempDir',
+    name: 'tempDir',
+    instructions: "This sets the path to the temporary directory used for generating PDFs. We have tested this with the main /tmp directory on the server with success. This could potentially improve performance when generating multiple PDFs."|t,
+    value: settings. tempDir|default(null),
+    errors: settings.getErrors('tempDir')
+}) }}
+			{{ forms.lightswitchField({
+    label: "Landscape" | t,
+    id: 'landscape',
+    name: 'landscape',
+    instructions: " If this is set, the PDF will be generated in landscape mode." | t,
+    on: settings.landscape,
+
+}) }}
+			{{ forms.lightswitchField({
+    label: "Portrait" | t,
+    id: 'portrait',
+    name: 'portrait',
+    instructions: "If this is set, the PDF will be generated in portrait mode." | t,
+    on: settings.portrait,
+
+}) }}
+			{{ forms.textField({
+    label: "Format" | t,
+    id: 'format',
+    name: 'format',
+    instructions: "This sets the paper size for the PDF. The default is A4, but you can set other sizes compatible with MPDF. Other popular formats include: A3, A4 (default), A5, Letter (8,5 x 11 in), Legal (8,5 x 14 in), Executive (7,25 x 10,5 in), B4, B5"|t,
+    value: settings. format|default(null),
+    errors: settings.getErrors('format')
+}) }}
+			{{ forms.textField({
+    label: "Watermark image" | t,
+    id: 'watermarkImage',
+    name: 'watermarkImage',
+    instructions: "This option creates a watermark using the image file specified by the provided path."|t,
+    value: settings. watermarkImage|default(null),
+    errors: settings.getErrors('watermarkImage')
+}) }}
+			{{ forms.textField({
+    label: "Watermark text" | t,
+    id: 'watermarkText',
+    name: 'watermarkText',
+    instructions: "This option creates a watermark using the text provided."|t,
+    value: settings. watermarkText|default(null),
+    errors: settings.getErrors('watermarkText')
+}) }}
+			{{ forms.lightswitchField({
+    label: "Automatic Table of Contents" | t,
+    id: 'autoToC',
+    name: 'autoToC',
+    instructions: "This option automatically generates a Table of Contents using the H1-H6 tags in your document."|t,
+    on: settings.autoToC,
+}) }}
+			{{ forms.lightswitchField({
+    label: "Automatic bookmarks" | t,
+    id: 'autoBookmarks',
+    name: 'autoBookmarks',
+    instructions: "This option automatically generates bookmarks using the H1-H6 tags in your document."|t,
+    on: settings.autoBookmarks,
+}) }}
+			{{ forms.textField({
+    label: "Asset title" | t,
+    id: 'assetTitle',
+    name: 'assetTitle',
+    instructions: "This option allows you to set a custom title for the Asset in the Craft CMS system when using the `pdfAsset` method."|t,
+    value: settings. assetTitle|default(null),
+    errors: settings.getErrors('assetTitle')
+}) }}
+			{{ forms.textField({
+    label: "Asset filename" | t,
+    id: 'assetFilename',
+    name: 'assetFilename',
+    instructions: "This option allows you to change the target filename of the file in the Craft CMS Asset when using the `pdfAsset` method."|t,
+    value: settings. assetFilename|default(null),
+    errors: settings.getErrors('assetFilename') 
+}) }}
+			{{ forms.lightswitchField({
+    label: "Asset delete" | t,
+    id: 'assetDelete',
+    name: 'assetDelete'|default(null),
+    on: settings.assetDelete,
+    instructions: "If this set it enables the deletion of the internally generated file in the `@root` path. Please note that this operation is irreversible and may consume more resources. This is because the Asset is updated and the PDF is generated on every load when using the `pdfAsset` method." | t,
+}) }}
+			{{ forms.textField({
+    label: "assetSiteId" | t,
+    id: 'assetSiteId',
+    name: 'assetSiteId',
+    instructions: "This option allows you to assign a custom `siteId` to the Asset of `pdfAsset` method. The `siteId` should be passed as a number, representing the ID of the site to which the generated asset should belong."|t,
+    value: settings. assetSiteId|default(null),
+    errors: settings.getErrors('assetSiteId')
+}) }}
+
+		</div>
+		<div id="content-thumb" class="tab-content">
+
+			<h2>Thumbanils with configured ImageMagick</h2>
+
+			<p>It requires ImageMagick properly configured on your server (host)
+				<a href="https://github.com/cooltronicpl/Craft-document-helpers#what-if-i-cannot-generate-thumbnails-with-enabled-imagemagick">more about it</a>.</p>
+
+			{{ forms.lightswitchField({
+    label: "Asset thumb" | t,
+    id: 'assetThumb',
+    name: 'assetThumb',
+    on: settings.assetThumb,
+    instructions: "If this set it generates a thumbnail image of a Craft CMS image Asset using the `pdfAsset` method (requires ImageMagick). It can be accessed in the Twig template as `asset.assetThumb`." | t,
+}) }}
+			{{ forms.textField({
+    label: "Asset thumb volume handle" | t,
+    id: 'assetThumbVolumeHandle',
+    name: 'assetThumbVolumeHandle'|default(null),
+    instructions: "This is an optional parameter that specifies the Volume Handle for the thumbnail. If not provided, the PDF Volume Handle is used. The volume handle must have a `Base URL` in your test: `@web\pdffiles` in Craft CMS Filesystems, Assets settings."|t,
+    value: settings. assetThumbVolumeHandle,
+    errors: settings.getErrors('assetThumbVolumeHandle')
+}) }}
+			{{ forms.lightswitchField({
+    label: "Asset dumb thumb" | t,
+    id: 'dumbThumb',
+    name: 'dumbThumb',
+    on: settings.dumbThumb,
+    instructions: "This option generates a basic thumbnail image (without an Asset) using the `pdf` method (requires ImageMagick)."|t,
+}) }}
+
+
+			<p>
+				Both `assetThumb` and `dumbThumb` support the following optional customizations:
+			</p>
+			{{ forms.textField({
+    label: "Thumb type" | t,
+    id: 'thumbType',
+    name: 'thumbType',
+    instructions: "This parameter allows you to choose the format of the thumbnail. Options include `jpg`, `gif`, `webp`, `avif`, and `png`. The default format is `jpg`."|t,
+    value: settings. thumbType|default(null),
+    errors: settings.getErrors('thumbType')
+}) }}
+			{{ forms.textField({
+    label: "Thumb width" | t,
+    id: 'thumbWidth',
+    name: 'thumbWidth',
+    instructions: "This parameter specifies the width of the thumbnail in pixels. The default width is `210`."|t,
+    value: settings. thumbWidth|default(null),
+    errors: settings.getErrors('thumbWidth')
+}) }}
+			{{ forms.textField({
+    label: "Thumb height" | t,
+    id: 'thumbHeight',
+    name: 'thumbHeight',
+    instructions: "This parameter specifies the height of the thumbnail in pixels. The default height is `297`."|t,
+    value: settings. thumbHeight|default(null),
+    errors: settings.getErrors('thumbHeight')
+}) }}
+			{{ forms.textField({
+    label: "Thumb page" | t,
+    id: 'thumbPage',
+    name: 'thumbPage',
+    instructions: "This parameter specifies the page to generate the thumbnail from. The default is the first page, which is numbered from `0`."|t,
+    value: settings. thumbPage|default(null),
+    errors: settings.getErrors('thumbPage')
+}) }}
+			{{ forms.textField({
+    label: "Thumb background color" | t,
+    id: 'thumbBgColor',
+    name: 'thumbBgColor',
+    instructions: "This parameter specifies the background color of the thumbnail. Options include `black`, `rgb(33,66,99)`, and `#123456`. The default color is `white`."|t,
+    value: settings. thumbBgColor|default(null),
+    errors: settings.getErrors('thumbBgColor')
+}) }}
+			{{ forms.textField({
+    label: "Thumb trim" | t,
+    id: 'thumbTrim',
+    name: 'thumbTrim',
+    instructions: "This parameter, when set to `true`, trims your page and centers the content. The default value is `false`."|t,
+    value: settings. thumbTrim|default(null),
+    errors: settings.getErrors('thumbTrim')
+}) }}
+			{{ forms.textField({
+    label: "Thumb trim frame color" | t,
+    id: 'thumbTrimFrameColor',
+    name: 'thumbTrimFrameColor',
+    instructions: "This parameter changes the color of the trim frame. Colors can be specified as `black` or in RGB format (e.g., `rgb(12,1,2)`) or in HEX format (e.g., `#662266`)."|t,
+    value: settings. thumbTrimFrameColor|default(null),
+    errors: settings.getErrors('thumbTrimFrameColor')
+}) }}
+		</div>
+		<div id="content-optional" class="tab-content">
+			<h2>
+				Install optional packages
+			</h2>
+			<p>
+				In this section you can install optional packages to your plugin.
+			</p>
+			<p>
+				Install package:
+				<a hrf="https://github.com/chillerlan/php-qrcode">chillerlan/php-qrcode</a>
+				for QR Code generation</p>
+			<a href="{{ actionUrl('documenthelpers/install/install-package', { package: 'chillerlan/php-qrcode' , version: "4.3"}) }}" class="btn btngroup-btn-first">Install package for QR Code generation</a>
+			{{forms.textField({
+    label: "QR Data to generate" | t,
+    id: 'qrdata',
+    name: 'qrdata',
+    instructions: "This option allows you to generate a QR Code image from any data you provide. The image will be available on the Twig template with `{{qrimg}}` variable. Required optional package from plugin settings."|t,
+    value: settings.qrdata|default(null),
+    errors: settings.getErrors('qrdata')
+}) }}
+			{{forms.textField({
+    label: "Custom PHP Path" | t,
+    id: 'phpPath',
+    name: 'phpPath',
+    instructions: "This option allows you to set custom php binary path or name like '\usr\bin\php' or 'php', or 'php8.0' which can resolve problem with not installable packages during to problems php path or misconfiguration."|t,
+    value: settings.phpPath|default(null),
+    errors: settings.getErrors('phpPath')
+}) }}
+		</div>
+	</div>
+	<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+
+	{# Write your JavaScript #}
+	<script>
+		$(document).ready(function () { // Hide all tab content divs by default
+$('.tab-content').hide();
+
+// Show the first tab content div
+$('.tab-content:first').show();
+
+// When a tab is clicked
+$('.scrollable a').click(function () { // Get the ID of the tab
+
+var tabId = $(this).attr('id').replace('settings-tab-', '');
+// Hide all tab content divs
+$('.tab-content').hide();
+
+// Show the clicked tab's content div and select current tab
+$('#settings-content-' + tabId).show();
+$('.sel').removeClass('sel');
+$(this).addClass('sel');
+});
+});
+	</script>
+{% endblock %}

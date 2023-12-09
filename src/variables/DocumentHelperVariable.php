@@ -16,8 +16,8 @@ namespace cooltronicpl\documenthelpers\variables;
 
 use cooltronicpl\documenthelpers\classes\ExtendedAsset;
 use craft\helpers\FileHelper;
+use craft\helpers\StringHelper;
 use Craft;
-use chillerlan\QRCode\QRCode as QRCode;
 /**
  * @author    CoolTRONIC.pl sp. z o.o. <github@cooltronic.pl>
  * @author    Pawel Potacki
@@ -46,61 +46,76 @@ class DocumentHelperVariable
         
         $defaultConfig = (new \Mpdf\Config\ConfigVariables ())->getDefaults();
         $defaultFontConfig = (new \Mpdf\Config\FontVariables ())->getDefaults();
+        $plugin = Craft::$app->plugins->getPlugin('documenthelpers');
+        // Get the settings
+        $settings = $plugin->getSettings();
+        $settings = $settings->toArray();
+        foreach ($settings as $key => $value) {
+            // Check if the value is an empty string
+            if ($value === '') {
+              // Set the value to null
+              $settings[$key] = null;
+            }
+        }
+        Craft::info("PDF Settins: " . StringHelper::toString($settings));
+        $settings = array_merge($settings, $attributes);
+        Craft::info("PDF Settins2: " . StringHelper::toString($settings));
 
-        if (!isset($attributes['dumbThumb'])) {
-            if ((file_exists($filename) && isset($attributes['date']) && filemtime($filename) > $attributes['date'])) {
+        if (!isset($settings['dumbThumb'])) {
+            if ((file_exists($filename) && isset($settings['date']) && filemtime($filename) > $settings['date'])) {
                 return $filename;
             }
         }
-        if (isset($attributes['qrdata'])){
-            $attributes['qrdata'] = (new QRCode)->render($attributes['qrdata']);
+        if (isset($settings['qrdata'])){
+            $settings['qrdata'] = (new \chillerlan\QRCode\QRCode)->render($settings['qrdata']);
         }
+
         $vars = [
             'entry' => $variables->getFieldValues(),
-            'custom' => $attributes['custom'] ?? null,
+            'custom' => $settings['custom'] ?? null,
             'title' => $variables['title'] ?? null,
-            'qrimg' => $attributes['qrdata'] ?? null
+            'qrimg' => $settings['qrdata'] ?? null
         ];
 
         $html = Craft::$app->getView()->renderTemplate($template, $vars);
-        $html_header = isset($attributes['header']) ? Craft::$app->getView()->renderTemplate($attributes['header'], $vars) : null;
-        $html_footer = isset($attributes['footer']) ? Craft::$app->getView()->renderTemplate($attributes['footer'], $vars) : null;
+        $html_header = isset($settings['header']) ? Craft::$app->getView()->renderTemplate($settings['header'], $vars) : null;
+        $html_footer = isset($settings['footer']) ? Craft::$app->getView()->renderTemplate($settings['footer'], $vars) : null;
 
         $arrParameters = [
-            'margin_top' => $attributes['margin_top'] ?? 30,
-            'margin_left' => $attributes['margin_left'] ?? 15,
-            'margin_right' => $attributes['margin_right'] ?? 15,
-            'margin_bottom' => $attributes['margin_bottom'] ?? 30,
-            'mirrorMargins' => $attributes['mirrorMargins'] ?? 0,
-            'fontDir' => $attributes['fontDir'] ?? $defaultConfig['fontDir'],
-            'fontdata' => $attributes['fontdata'] ?? $defaultFontConfig['fontdata'],
-            'autoPageBreak' => $attributes["no_auto_page_break"] ?? true,
-            'tempDir' => $attributes["tempDir"] ?? $pdfGeneratorPath,
-            'format' => $attributes['format'] ?? null,
-            'orientation' => ($attributes["landscape"] ?? false) ? 'L' : (($attributes["portrait"] ?? false) ? 'P' : null),
+            'margin_top' => $settings['margin_top'] ?? 30,
+            'margin_left' => $settings['margin_left'] ?? 15,
+            'margin_right' => $settings['margin_right'] ?? 15,
+            'margin_bottom' => $settings['margin_bottom'] ?? 30,
+            'mirrorMargins' => $settings['mirrorMargins'] ?? 0,
+            'fontDir' => $settings['fontDir'] ?? $defaultConfig['fontDir'],
+            'fontdata' => $settings['fontdata'] ?? $defaultFontConfig['fontdata'],
+            'autoPageBreak' => $settings["no_auto_page_break"] ?? true,
+            'tempDir' => $settings["tempDir"] ?? $pdfGeneratorPath,
+            'format' => $settings['format'] ?? null,
+            'orientation' => ($settings["landscape"] ?? false) ? 'L' : (($settings["portrait"] ?? false) ? 'P' : null),
         ];
 
         $pdf = new \Mpdf\Mpdf (
             $arrParameters
         );
-        if (isset($attributes['header'])) {
+        if (isset($settings['header'])) {
             $pdf_string = $pdf->SetHTMLHeader($html_header);
         }
-        if (isset($attributes['footer'])) {
+        if (isset($settings['footer'])) {
             $pdf_string = $pdf->SetHTMLFooter($html_footer);
         }
-        if (isset($attributes['pageNumbers'])) {
+        if (isset($settings['pageNumbers'])) {
             $pdf_string = $pdf->setFooter('{PAGENO}');
         }
-        if (isset($attributes['watermarkImage'])) {
-            $pdf->SetWatermarkImage($attributes['watermarkImage']);
+        if (isset($settings['watermarkImage'])) {
+            $pdf->SetWatermarkImage($settings['watermarkImage']);
             $pdf->showWatermarkImage = true;
         }
-        if (isset($attributes['watermarkText'])) {
-            $pdf->SetWatermarkText($attributes['watermarkText']);
+        if (isset($settings['watermarkText'])) {
+            $pdf->SetWatermarkText($settings['watermarkText']);
             $pdf->showWatermarkText = true;
         }
-        if (isset($attributes['autoToC'])) {
+        if (isset($settings['autoToC'])) {
             $pdf->h2toc = array(
                 'H1' => 0,
                 'H2' => 1,
@@ -110,7 +125,7 @@ class DocumentHelperVariable
                 'H6' => 5,
             );
         }
-        if (isset($attributes['autoBookmarks'])) {
+        if (isset($settings['autoBookmarks'])) {
             $pdf->h2bookmarks = array(
                 'H1' => 0,
                 'H2' => 1,
@@ -121,24 +136,24 @@ class DocumentHelperVariable
             );
         }
         $pdf_string = $pdf->WriteHTML($html);
-        if (isset($attributes['title'])) {
-            $pdf->SetTitle($attributes['title']);
+        if (isset($settings['title'])) {
+            $pdf->SetTitle($settings['title']);
         } elseif (isset($variables['title'])) {
             $pdf->SetTitle($variables['title']);
         }
-        if (isset($attributes['author'])) {
-            $pdf->SetAuthor($attributes['author']);
+        if (isset($settings['author'])) {
+            $pdf->SetAuthor($settings['author']);
         } else {
             $pdf->SetAuthor("Made by CoolTRONIC.pl PDF Generator https://cooltronic.pl");
         }
         $pdf->SetCreator("Made by CoolTRONIC.pl PDF Generator https://cooltronic.pl");
-        if (isset($attributes['keywords'])) {
-            $pdf->SetKeywords($attributes['keywords'] . ", PDF Generator, CoolTRONIC.pl, https://cooltronic.pl");
+        if (isset($settings['keywords'])) {
+            $pdf->SetKeywords($settings['keywords'] . ", PDF Generator, CoolTRONIC.pl, https://cooltronic.pl");
         } else {
             $pdf->SetKeywords("PDF Generator, CoolTRONIC.pl, https://cooltronic.pl");
         }
-        if (isset($attributes['password'])) {
-            $pdf->SetProtection(array(), 'UserPassword', $attributes['password']);
+        if (isset($settings['password'])) {
+            $pdf->SetProtection(array(), 'UserPassword', $settings['password']);
         }
 
         switch ($destination) {
@@ -159,9 +174,9 @@ class DocumentHelperVariable
                 break;
         }
         $return = $pdf->Output($filename, $output);
-        if (isset($attributes['dumbThumb'])) {
-            if (isset($attributes['thumbType'])) {
-                $assetType = $attributes['thumbType'];
+        if (isset($settings['dumbThumb'])) {
+            if (isset($settings['thumbType'])) {
+                $assetType = $settings['thumbType'];
             } else { $assetType = "jpg";}
             // Get the pathinfo
             $infoDumb = pathinfo($filename);
@@ -172,16 +187,16 @@ class DocumentHelperVariable
             // Get the directory path
             $dumpDir = $infoDumb['dirname'];
             if (!file_exists($dumpDir . DIRECTORY_SEPARATOR . $dumbThumbFilename . '.' . $assetType)) {
-                if (isset($attributes['thumbWidth'])) {
-                    $cols = $attributes['thumbWidth'];
+                if (isset($settings['thumbWidth'])) {
+                    $cols = $settings['thumbWidth'];
                 } else { $cols = 210;}
-                if (isset($attributes['thumbHeight'])) {
-                    $rows = $attributes['thumbHeight'];
+                if (isset($settings['thumbHeight'])) {
+                    $rows = $settings['thumbHeight'];
                 } else { $rows = 297;}
-                if (isset($attributes['thumbBgColor'])) {$thumbBgColor = $attributes['thumbBgColor'];} else { $thumbBgColor = 'white';}
-                if (isset($attributes['thumbPage'])) {$thumbPage = $attributes['thumbPage'];} else { $thumbPage = 0;}
-                if (isset($attributes['thumbTrim'])) {$thumbTrim = $attributes['thumbTrim'];} else { $thumbTrim = false;}
-                if (isset($attributes['thumbTrimFrameColor'])) {$thumbTrimFrameColor = $attributes['thumbTrimFrameColor'];} else { $thumbTrimFrameColor = false;}
+                if (isset($settings['thumbBgColor'])) {$thumbBgColor = $settings['thumbBgColor'];} else { $thumbBgColor = 'white';}
+                if (isset($settings['thumbPage'])) {$thumbPage = $settings['thumbPage'];} else { $thumbPage = 0;}
+                if (isset($settings['thumbTrim'])) {$thumbTrim = $settings['thumbTrim'];} else { $thumbTrim = false;}
+                if (isset($settings['thumbTrimFrameColor'])) {$thumbTrimFrameColor = $settings['thumbTrimFrameColor'];} else { $thumbTrimFrameColor = false;}
                 try {
                     $thumb = new GenerateThumbConfiguration(
                         pdfPath:$filename,
@@ -222,11 +237,26 @@ class DocumentHelperVariable
 
     public function pdfAsset($template, $tempFilename, $variables, $attributes, $volumeHandle)
     {
+        $plugin = Craft::$app->plugins->getPlugin('documenthelpers');
+        // Get the settings
+        $settings = $plugin->getSettings();
+        $settings = $settings->toArray();
+        Craft::info("PDF Settins: " . StringHelper::toString($settings));
+        foreach ($settings as $key => $value) {
+            // Check if the value is an empty string
+            if ($value === '') {
+              // Set the value to null
+              $settings[$key] = null;
+            }
+        }
+        $settings = array_merge($settings, $attributes);
+        Craft::info("PDF Settins2: " . StringHelper::toString($settings));
         // Generate the PDF using the existing pdf method
         $pdfPath = $this->pdf($template, 'file', $tempFilename, $variables, $attributes);
         $info = pathinfo($pdfPath);
-        if (isset($attributes['assetFilename'])) {
-            $filename = $attributes['assetFilename'];
+        $plugin = Craft::$app->plugins->getPlugin('documenthelpers');
+        if (isset($settings['assetFilename'])) {
+            $filename = $settings['assetFilename'];
         } else {
             $filename = $info['basename'];
         }
@@ -245,12 +275,12 @@ class DocumentHelperVariable
                 $asset = new \craft\elements\Asset ();
             }
 
-            if (isset($attributes['assetTitle'])) {
-                $asset->title = $attributes['assetTitle'];
+            if (isset($settings['assetTitle'])) {
+                $asset->title = $settings['assetTitle'];
             }
 
-            if (isset($attributes['assetSiteId'])) {
-                $asset->siteId = $attributes['assetSiteId'];
+            if (isset($settings['assetSiteId'])) {
+                $asset->siteId = $settings['assetSiteId'];
             }
 
             $asset->volumeId = $volumeId;
@@ -290,12 +320,12 @@ class DocumentHelperVariable
             }
         }
 
-        if (isset($attributes['assetThumb'])) {
-            if (isset($attributes['thumbType'])) {
-                $assetType = $attributes['thumbType'];
+        if (isset($settings['assetThumb'])) {
+            if (isset($settings['thumbType'])) {
+                $assetType = $settings['thumbType'];
             } else { $assetType = "jpg";}
-            if (isset($attributes['assetFilename'])) {
-                $finalNameThumb = $attributes['assetFilename'] . '.' . $assetType;
+            if (isset($settings['assetFilename'])) {
+                $finalNameThumb = $settings['assetFilename'] . '.' . $assetType;
             } else {
                 $finalNameThumb = $info['basename'] . '.' . $assetType;
             }
@@ -307,16 +337,16 @@ class DocumentHelperVariable
 
             // Get the directory path
             $dirTemp = $infoThumb['dirname'];
-            if (isset($attributes['thumbWidth'])) {
-                $cols = $attributes['thumbWidth'];
+            if (isset($settings['thumbWidth'])) {
+                $cols = $settings['thumbWidth'];
             } else { $cols = 210;}
-            if (isset($attributes['thumbHeight'])) {
-                $rows = $attributes['thumbHeight'];
+            if (isset($settings['thumbHeight'])) {
+                $rows = $settings['thumbHeight'];
             } else { $rows = 297;}
-            if (isset($attributes['thumbBgColor'])) {$thumbBgColor = $attributes['thumbBgColor'];} else { $thumbBgColor = 'white';}
-            if (isset($attributes['thumbPage'])) {$thumbPage = $attributes['thumbPage'];} else { $thumbPage = 0;}
-            if (isset($attributes['thumbTrim'])) {$thumbTrim = $attributes['thumbTrim'];} else { $thumbTrim = false;}
-            if (isset($attributes['thumbTrimFrameColor'])) {$thumbTrimFrameColor = $attributes['thumbTrimFrameColor'];} else { $thumbTrimFrameColor = false;}
+            if (isset($settings['thumbBgColor'])) {$thumbBgColor = $settings['thumbBgColor'];} else { $thumbBgColor = 'white';}
+            if (isset($settings['thumbPage'])) {$thumbPage = $settings['thumbPage'];} else { $thumbPage = 0;}
+            if (isset($settings['thumbTrim'])) {$thumbTrim = $settings['thumbTrim'];} else { $thumbTrim = false;}
+            if (isset($settings['thumbTrimFrameColor'])) {$thumbTrimFrameColor = $settings['thumbTrimFrameColor'];} else { $thumbTrimFrameColor = false;}
             try {
                 $thumb = new GenerateThumbConfiguration(
                     pdfPath:$pdfPath,
@@ -336,9 +366,9 @@ class DocumentHelperVariable
                 Craft::error('Error generating thumbnail: ' . $e->getMessage());
             }
 
-            if (isset($attributes['assetThumbVolumeHandle'])) {
-                $thumbVolumeHandle = $attributes['assetThumbVolumeHandle'];
-                $thumbVolumeId = Craft::$app->volumes->getVolumeByHandle($attributes['assetThumbVolumeId'])->id;
+            if (isset($settings['assetThumbVolumeHandle'])) {
+                $thumbVolumeHandle = $settings['assetThumbVolumeHandle'];
+                $thumbVolumeId = Craft::$app->volumes->getVolumeByHandle($settings['assetThumbVolumeId'])->id;
             } else {
                 $thumbVolumeHandle = $volumeHandle;
                 $thumbVolumeId = Craft::$app->volumes->getVolumeByHandle($volumeHandle)->id;
@@ -355,12 +385,12 @@ class DocumentHelperVariable
                     $assetThumb = new \craft\elements\Asset ();
                 }
 
-                if (isset($attributes['assetTitle'])) {
-                    $assetThumb->title = $attributes['assetTitle'];
+                if (isset($settings['assetTitle'])) {
+                    $assetThumb->title = $settings['assetTitle'];
                 }
 
-                if (isset($attributes['assetSiteId'])) {
-                    $assetThumb->siteId = $attributes['assetSiteId'];
+                if (isset($settings['assetSiteId'])) {
+                    $assetThumb->siteId = $settings['assetSiteId'];
                 }
 
                 $assetThumb->volumeId = $thumbVolumeId;
@@ -392,9 +422,9 @@ class DocumentHelperVariable
         foreach ($asset->getAttributes() as $name => $value) {
             $extendedAsset->$name = $value;
         }
-        if (isset($attributes['assetThumb'])) {$extendedAsset->assetThumb = $assetThumb;}
+        if (isset($settings['assetThumb'])) {$extendedAsset->assetThumb = $assetThumb;}
 
-        if (isset($attributes['assetDelete'])) {
+        if (isset($settings['assetDelete'])) {
             if (file_exists($tempFilename)) {
                 if (unlink($tempFilename)) {
                     Craft::info("Deleted (unlink) temporary PDF file on path: " . $tempFilename);
@@ -403,7 +433,7 @@ class DocumentHelperVariable
                 }
             }
 
-            if (isset($attributes['assetThumb'])) {
+            if (isset($settings['assetThumb'])) {
                 if (file_exists($dirTemp . DIRECTORY_SEPARATOR . $fileTempName . '.' . $assetType)) {
                     if (unlink($dirTemp . DIRECTORY_SEPARATOR . $fileTempName . '.' . $assetType)) {
                         Craft::info("Deleted (unlink) temporary PDF Thumb file on path: " . $dirTemp . DIRECTORY_SEPARATOR . $fileTempName . '.' . $assetType);
