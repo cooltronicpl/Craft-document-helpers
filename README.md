@@ -139,7 +139,7 @@ You can securely display PDF documents in the browser without saving them to the
 						footer: "_pdf/footer.twig"
                         } %}
 				{% header "Content-Type: application/pdf" %}
-{{version("/" ~ craft.documentHelper.pdf('_pdf/document.twig', 'inline', '../book_example'  ~ '.pdf', entry, pdfOptions))}}
+{{craft.documentHelper.pdf('_pdf/document.twig', 'inline', '../book_example'  ~ '.pdf', entry, pdfOptions)}}
 
 ```
 
@@ -201,7 +201,7 @@ You can override the default options with `pdfOptions` as shown above. Here are 
 - `assetThumb`: This option generates a thumbnail image of a Craft CMS image Asset using the `pdfAsset` method (requires ImageMagick). It can be accessed in the Twig template as `asset.assetThumb`.
   - `assetThumbVolumeHandle`: This is an optional parameter that specifies the Volume Handle for the thumbnail. If not provided, the PDF Volume Handle is used. The volume handle must have a `Base URL` in your test: `@web\pdffiles` in Craft CMS Filesystems, Assets settings.
 - `dumbThumb`: This option generates a basic thumbnail image (without an Asset) using the `pdf` method (requires ImageMagick).
-- `qrdata`: This option allows you to generate a QR Code image from any data you provide. The image will be available on the Twig template with `{{qrimg}}` variable.
+- `qrdata`: This option allows you to generate a QR Code image from any data you provide. The image will be available on the Twig template with `{{qrimg}}` variable. Required to install optional package from plugin settings.
 
 Both `assetThumb` and `dumbThumb` support the following optional customizations:
 
@@ -213,6 +213,7 @@ Both `assetThumb` and `dumbThumb` support the following optional customizations:
 - `thumbTrim`: This parameter, when set to `true`, trims your page and centers the content. The default value is `false`.
 - `thumbTrimFrameColor`: This parameter changes the color of the trim frame. Colors can be specified as `black` or in RGB format (e.g., `rgb(12,1,2)`) or in HEX format (e.g., `#662266`).
 
+All settings can be set globally in plugin settings page and be overwritten individually by `pdfOptions`.
 
 ### Custom fonts
 
@@ -619,7 +620,7 @@ for (var i = files.length - 1; i >= 0; i--) {
 </script>
 ```
 
-#### Example with Loop of pdfAsset method
+#### Example with pdfAsset method
 
 You can download multiple PDF files with JavaScript on any page. To do this, you can use the `pdfs` parameter looped through `pdfAsset` method to specify an array of entries, in this example items of channel section `xxx` for which you want to generate PDF files.
 
@@ -644,7 +645,7 @@ In your JavaScript code pass `pdfs` from Craft CMS, you can then loop over the p
 
 ### Display QRCode
 
-Prepare the `qrdata` string that contains the information you want to encode in the QRCode. The format of the `qrdata` string depends on the type of information you want to attach. Here are some common formats:
+Prepare the `qrdata` string that contains the information you want to encode in the QRCode. The format of the `qrdata` string depends on the type of information you want to attach. You need to install optional package in Plugin Settings `Optional` pane. Here are some common formats:
 
 - For a website link, you can just use the URL of the website, such as `https://cooltronic.pl/`
 - For a plain text, you can use any message you want, such as `Hello, world!`
@@ -668,11 +669,22 @@ In the Twig template, insert the QRCode image where you want by using this code:
 <img src="{{qrimg}}">
 ```
 
-Where `{{qrimg}}` is the variable that holds the image from the [PHP QRCode generator](https://php-qrcode.readthedocs.io/).
+Where `{{qrimg}}` is the variable that holds the image from the package [PHP QRCode generator](https://php-qrcode.readthedocs.io/).
+
+You can install package manually when you encounter problems in automatic installation for Craft CMS 3.x (you need 3.4) and for 4.x (you need 4.3) version of optional package for display QR Code generation. This is example to how install to your main Craft (`@root`) installation directory:
+
+```
+composer require chillerlan/php-qrcode:^4.3
+composer require chillerlan/php-qrcode:^3.4
+```
+
+### Optional packages
+
+You can install optional packages in plugins settings in section `Optional functions to enable`. 
 
 ### RTL Text Direction
 
-he PDF Generator plugin supports right-to-left (RTL) text direction. To enable RTL text direction set HTML `dir` attribute in your HTML Twig template markup. For example:
+The PDF Generator plugin supports right-to-left (RTL) text direction. To enable RTL text direction set HTML `dir` attribute in your HTML Twig template markup. For example:
 
 ```
 <div dir="rtl">This is some text in a right-to-left language.</div>
@@ -778,7 +790,9 @@ Special thanks to the developers and testers who have contributed to this projec
 - [@mokopan](https://github.com/mokopan)
 - [@AramLoosman](https://github.com/AramLoosman)
 - [@iwe-hi](https://github.com/iwe-hi)
-
+- [@d-karstens](https://github.com/d-karstens)
+- [@chillerlan/php-qrcode](https://github.com/chillerlan/php-qrcode/)
+  
 ## License
 
 This project is licensed under the Craft License. See the [LICENSE.md](https://github.com/cooltronicpl/Craft-document-helpers/blob/master/LICENSE.md) file for details.

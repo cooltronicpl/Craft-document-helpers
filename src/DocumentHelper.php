@@ -15,6 +15,9 @@ namespace cooltronicpl\documenthelpers;
 use cooltronicpl\documenthelpers\variables\DocumentHelperVariable;
 use craft\base\Plugin;
 use craft\web\twig\variables\CraftVariable;
+use cooltronicpl\documenthelpers\models\Settings;
+use cooltronicpl\documenthelpers\controller\PluginInstallController;
+use Craft;
 use yii\base\Event;
 
 /**
@@ -45,13 +48,45 @@ class DocumentHelper extends Plugin
 
     // Public Methods
     // =========================================================================
+    public function hasCpSection()
+    {
+        return false;
+    }
 
+    public function hasSettings()
+    {
+        return true;
+    }
+
+    public $controllerMap = [
+        'install' => PluginInstallController::class,
+    ];
+
+    protected function settingsHtml(): string
+    {
+        // Get the settings model
+        $settings = $this->getSettings();
+
+        return \Craft::$app->getView()->renderTemplate(
+            'documenthelpers/_settings',
+            [
+                'settings' => $settings,
+            ]
+        );
+    }
+
+    /**
+     * @return Settings
+     */
+    protected function createSettingsModel(): Settings
+    {
+        return new Settings();
+    }
     /**
      * {@inheritdoc}
      */
     public function init()
     {
-        parent::init();
         self::$plugin = $this;
 
         Event::on(
@@ -63,6 +98,8 @@ class DocumentHelper extends Plugin
                 $variable->set('documentHelper', DocumentHelperVariable::class);
             }
         );
+        Craft::setAlias('@documenthelpers', __DIR__);
+        parent::init();
     }
 
 }
