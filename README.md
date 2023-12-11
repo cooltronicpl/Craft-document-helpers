@@ -12,7 +12,7 @@ Developed by [CoolTRONIC.pl sp. z o.o.](https://cooltronic.pl) and [Pawel Potack
   - [`pdf` method Parameters](#pdf-method-parameters)
   - [Parameters `pdfAsset` method](#parameters-pdfasset-method)
   - [Securely Displaying PDF Documents in the Browser Without Saving to the /web Folder](#securely-displaying-pdf-documents-in-the-browser-without-saving-to-the-web-folder)
-  - [Variables in template](#variables-within-a-template)
+  - [Variables in template](#variables-in-template)
   - [How to use custom templates by code block and URL](#how-to-use-custom-templates-by-code-block-and-url)
     - [How to use custom variables with code block](#how-to-use-custom-variables-with-code-block)
   - [Overriding Default Options](#overriding-default-options)
