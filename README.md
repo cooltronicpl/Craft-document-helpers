@@ -10,13 +10,11 @@ Developed by [CoolTRONIC.pl sp. z o.o.](https://cooltronic.pl) and [Pawel Potack
 - [Installation](#installation)
 - [Usage](#usage)
   - [`pdf` method Parameters](#pdf-method-parameters)
-    - [Example of `pdf` method](#example-of-pdf-method)
   - [Parameters `pdfAsset` method](#parameters-pdfasset-method)
-    - [Example of `pdfAsset` method](#example-of-pdfasset-method)
   - [Securely Displaying PDF Documents in the Browser Without Saving to the /web Folder](#securely-displaying-pdf-documents-in-the-browser-without-saving-to-the-web-folder)
-  - [Variables within a Template](#variables-within-a-template)
-    - [How to use custom templates by code block and URL](#how-to-use-custom-templates-by-code-block-and-url)
-      - [How to use custom variables with code block](#how-to-use-custom-variables-with-code-block)
+  - [Variables in template](#variables-within-a-template)
+  - [How to use custom templates by code block and URL](#how-to-use-custom-templates-by-code-block-and-url)
+    - [How to use custom variables with code block](#how-to-use-custom-variables-with-code-block)
   - [Overriding Default Options](#overriding-default-options)
   - [Custom fonts](#custom-fonts)
   - [Return values](#return-values)
@@ -89,7 +87,7 @@ Method returns string with filename for anchors or string content for PDF files 
 {{craft.documentHelper.pdf("template.twig", "file", "document.pdf", entry, pdfOptions)}}
 ```
 
-#### Example of `pdf` method
+Example of `pdf` method:
 
 ```twig
 <a href="{{alias('@web')}}/
@@ -112,7 +110,7 @@ The `pdfAsset` method generates a PDF file from a Twig template, saves it as an 
 
 - `volumeHandle` - This parameter should contains volume handle name on which we need to add PDF as Craft CMS asset from system. The volume handle must have a `Base URL` in your test: `@web\pdffiles` in Craft CMS Filesystems, Assets settings.
 
-#### Example of `pdfAsset` method
+Example of `pdfAsset` method:
 
 ```twig
 {% set asset = craft.documentHelper.pdfAsset('_pdf/document.twig', alias('@root')~'/example.pdf', entry, pdfOptions, 'pdffiles') %}
@@ -137,7 +135,7 @@ You can securely display PDF documents in the browser without saving them to the
 {{craft.documentHelper.pdf('_pdf/document.twig', 'inline', '../book_example'  ~ '.pdf', entry, pdfOptions)}}
 
 ```
-## Variables in Twig template
+## Variables in template
 
 Within the PDF Twig template, you can access the passed `entry` in a generated twig template array:
 
@@ -151,7 +149,7 @@ The title of the current entry can be accessed via:
 {{title}}
 ```
 
-### How to use custom templates by code block and URL
+## How to use custom templates by code block and URL
 
 You can use a URL or an HTML code block as a template for the PDF file. To do this, pass the URL or the HTML code block as the `template` parameter.
 
@@ -190,7 +188,7 @@ Example of code block:
 <a href="{{alias('@web')}}{{craft.documentHelper.pdf(html, 'file', 'pdf/exampleHTML.pdf'  , entry, pdfOptions)}}">HTML PDF</a>
 ```
 
-#### How to use custom variables with code block
+### How to use custom variables with code block
 
 You can pass custom variables to the PDF template using the `custom` or `qrimg` options in the `pdfOptions` array. The `custom` option allows you to pass any variable, while the `qrimg` option allows you to pass a QR code image from `qrdata` variable.
 
