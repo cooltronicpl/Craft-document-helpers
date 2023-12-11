@@ -196,8 +196,6 @@ Example of using custom variables:
 
 ```
 {% set pdfOptions = {
-	header: "_pdf/header.twig",
-	footer: "_pdf/footer.twig",
 	qrdata: "https://cooltronic.pl"
     custom: entry.var
     }
