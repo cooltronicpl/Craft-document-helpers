@@ -15,9 +15,9 @@
 namespace cooltronicpl\documenthelpers\variables;
 
 use cooltronicpl\documenthelpers\classes\ExtendedAsset;
-use craft\helpers\FileHelper;
-use craft\helpers\StringHelper;
 use Craft;
+use craft\helpers\FileHelper;
+
 /**
  * @author    CoolTRONIC.pl sp. z o.o. <github@cooltronic.pl>
  * @author    Pawel Potacki
@@ -43,43 +43,114 @@ class DocumentHelperVariable
         if (!is_dir($pdfGeneratorPath)) {
             FileHelper::createDirectory($pdfGeneratorPath);
         }
-        
-        $defaultConfig = (new \Mpdf\Config\ConfigVariables ())->getDefaults();
-        $defaultFontConfig = (new \Mpdf\Config\FontVariables ())->getDefaults();
+
+        $defaultConfig = (new \Mpdf\Config\ConfigVariables())->getDefaults();
+        $defaultFontConfig = (new \Mpdf\Config\FontVariables())->getDefaults();
         $plugin = Craft::$app->plugins->getPlugin('documenthelpers');
         // Get the settings
         $settings = $plugin->getSettings();
         $settings = $settings->toArray();
         foreach ($settings as $key => $value) {
-            // Check if the value is an empty string
             if ($value === '') {
-              // Set the value to null
-              $settings[$key] = null;
+                $settings[$key] = null;
+            }
+            if ($value == false) {
+                $settings[$key] = null;
             }
         }
-        Craft::info("PDF Settins: " . StringHelper::toString($settings));
         $settings = array_merge($settings, $attributes);
-        Craft::info("PDF Settins2: " . StringHelper::toString($settings));
-
         if (!isset($settings['dumbThumb'])) {
             if ((file_exists($filename) && isset($settings['date']) && filemtime($filename) > $settings['date'])) {
                 return $filename;
             }
         }
-        if (isset($settings['qrdata'])){
-            $settings['qrdata'] = (new \chillerlan\QRCode\QRCode)->render($settings['qrdata']);
+        if (isset($settings['qrdata'])) {
+            if (class_exists('chillerlan\\QRCode\\QRCode')) {
+                $settings['qrdata'] = (new \chillerlan\QRCode\QRCode)->render($settings['qrdata']);
+            } else {
+                $settings['qrdata'] = Craft::getAlias('@documenthelpers') . '/' . "resources/QR.jpg";
+            }
         }
 
         $vars = [
             'entry' => $variables->getFieldValues(),
             'custom' => $settings['custom'] ?? null,
             'title' => $variables['title'] ?? null,
-            'qrimg' => $settings['qrdata'] ?? null
+            'qrimg' => $settings['qrdata'] ?? null,
         ];
+        if (file_exists(Craft::getAlias('@templates') . '/' . $template) && is_file(Craft::getAlias('@templates') . '/' . $template)) {
+            $html = Craft::$app->getView()->renderTemplate($template, $vars);
+        }
+        elseif (filter_var($template, FILTER_VALIDATE_URL)) {
+            $html = file_get_contents($template);
+            if (isset($settings['URLPurify']) && $settings['URLPurify'] == true && file_exists(Craft::getAlias('@root') . '/vendor/ezyang/htmlpurifier/library/HTMLPurifier.autoload.php') && is_file(Craft::getAlias('@root') . '/vendor/ezyang/htmlpurifier/library/HTMLPurifier.autoload.php')) {
+                require_once Craft::getAlias('@root') . '/vendor/ezyang/htmlpurifier/library/HTMLPurifier.autoload.php';
+                $config = \HTMLPurifier_Config::createDefault();
+                if (isset($settings['encoding'])) {
+                    $config->set('Core.Encoding', $settings['encoding']);
+                }
+                $config->set('HTML.Allowed', 'img[src|alt|width|height]');
+                $config->set('URI.DisableExternalResources', false);
+                $purifier = new \HTMLPurifier($config);
+                $html = $purifier->purify($html);
 
-        $html = Craft::$app->getView()->renderTemplate($template, $vars);
-        $html_header = isset($settings['header']) ? Craft::$app->getView()->renderTemplate($settings['header'], $vars) : null;
-        $html_footer = isset($settings['footer']) ? Craft::$app->getView()->renderTemplate($settings['footer'], $vars) : null;
+            }
+        } elseif ($template != strip_tags($template)) {
+            $html = Craft::$app->getView()->renderString($template, $vars);
+        } 
+        else {
+            $html = "<h1>Error in retriving a template, contents:<br> ".$template."</h1>";
+        }
+        if(isset($settings['header'])){
+            if (file_exists(Craft::getAlias('@templates') . '/' . $settings['header']) && is_file(Craft::getAlias('@templates') . '/' . $settings['header'])) {
+                $html_header = Craft::$app->getView()->renderTemplate($settings['header'], $vars);
+            }
+            elseif (filter_var($settings['header'], FILTER_VALIDATE_URL)) {
+                $html_header = file_get_contents($settings['header']);
+                if (isset($settings['URLPurify']) && $settings['URLPurify'] == true && file_exists(Craft::getAlias('@root') . '/vendor/ezyang/htmlpurifier/library/HTMLPurifier.autoload.php') && is_file(Craft::getAlias('@root') . '/vendor/ezyang/htmlpurifier/library/HTMLPurifier.autoload.php')) {
+                    require_once Craft::getAlias('@root') . '/vendor/ezyang/htmlpurifier/library/HTMLPurifier.autoload.php';
+                    $config = \HTMLPurifier_Config::createDefault();
+                    if (isset($settings['encoding'])) {
+                        $config->set('Core.Encoding', $settings['encoding']);
+                    }
+                    $config->set('HTML.Allowed', 'img[src|alt|width|height]');
+                    $config->set('URI.DisableExternalResources', false);
+                    $purifier = new \HTMLPurifier($config);
+                    $html = $purifier->purify($html);
+    
+                }
+            } elseif ($settings['header'] != strip_tags($settings['header'])) {
+                $html_header = Craft::$app->getView()->renderString($settings['header'], $vars);
+            } 
+            else {
+                $html_header = "<h1>Error in retriving a template of header, contents:<br> ".$settings['header']."</h1>";
+            }
+        }
+        if(isset($settings['footer'])){
+            if (file_exists(Craft::getAlias('@templates') . '/' . $settings['footer']) && is_file(Craft::getAlias('@templates') . '/' . $settings['footer'])) {
+                $html_footer = Craft::$app->getView()->renderTemplate($settings['footer'], $vars);
+            }
+            elseif (filter_var($settings['footer'], FILTER_VALIDATE_URL)) {
+                $html_footer = file_get_contents($settings['footer']);
+                if (isset($settings['URLPurify']) && $settings['URLPurify'] == true && file_exists(Craft::getAlias('@root') . '/vendor/ezyang/htmlpurifier/library/HTMLPurifier.autoload.php') && is_file(Craft::getAlias('@root') . '/vendor/ezyang/htmlpurifier/library/HTMLPurifier.autoload.php')) {
+                    require_once Craft::getAlias('@root') . '/vendor/ezyang/htmlpurifier/library/HTMLPurifier.autoload.php';
+                    $config = \HTMLPurifier_Config::createDefault();
+                    if (isset($settings['encoding'])) {
+                        $config->set('Core.Encoding', $settings['encoding']);
+                    }
+                    $config->set('HTML.Allowed', 'img[src|alt|width|height]');
+                    $config->set('URI.DisableExternalResources', false);
+                    $purifier = new \HTMLPurifier($config);
+                    $html_footer = $purifier->purify($html);
+    
+                }
+            } elseif ($settings['footer'] != strip_tags($settings['footer'])) {
+                $html_footer = Craft::$app->getView()->renderString($settings['footer'], $vars);
+            } 
+            else {
+                $html_footer = "<h1>Error in retriving a template of header, contents:<br> ".$settings['header']."</h1>";
+            }
+        }
 
         $arrParameters = [
             'margin_top' => $settings['margin_top'] ?? 30,
@@ -95,9 +166,19 @@ class DocumentHelperVariable
             'orientation' => ($settings["landscape"] ?? false) ? 'L' : (($settings["portrait"] ?? false) ? 'P' : null),
         ];
 
-        $pdf = new \Mpdf\Mpdf (
+        $pdf = new \Mpdf\Mpdf(
             $arrParameters
         );
+        if (isset($settings['URLPurify']) && $settings['URLPurify'] == true && file_exists(Craft::getAlias('@root') . '/vendor/ezyang/htmlpurifier/library/HTMLPurifier.autoload.php') && is_file(Craft::getAlias('@root') . '/vendor/ezyang/htmlpurifier/library/HTMLPurifier.autoload.php')) {
+            $pdf->allow_charset_conversion = true;
+            $html = iconv('UTF-8', 'UTF-8//IGNORE', $html);
+        }
+        else{
+            $html = iconv('UTF-8', 'UTF-8//IGNORE', $html);
+        }
+        if (isset($settings['encoding'])) {
+            $pdf->charset_in = $settings['encoding'];
+        }
         if (isset($settings['header'])) {
             $pdf_string = $pdf->SetHTMLHeader($html_header);
         }
@@ -199,15 +280,15 @@ class DocumentHelperVariable
                 if (isset($settings['thumbTrimFrameColor'])) {$thumbTrimFrameColor = $settings['thumbTrimFrameColor'];} else { $thumbTrimFrameColor = false;}
                 try {
                     $thumb = new GenerateThumbConfiguration(
-                        pdfPath:$filename,
-                        savePath:$dumpDir . DIRECTORY_SEPARATOR . $dumbThumbFilename . '.' . $assetType,
-                        format:$assetType,
-                        cols:$cols,
-                        rows:$rows,
-                        bgColor:$thumbBgColor,
-                        page:$thumbPage,
-                        trim:$thumbTrim,
-                        frameColor:$thumbTrimFrameColor
+                        pdfPath: $filename,
+                        savePath: $dumpDir . DIRECTORY_SEPARATOR . $dumbThumbFilename . '.' . $assetType,
+                        format: $assetType,
+                        cols: $cols,
+                        rows: $rows,
+                        bgColor: $thumbBgColor,
+                        page: $thumbPage,
+                        trim: $thumbTrim,
+                        frameColor: $thumbTrimFrameColor
                     );
                     $thumbGenerator = new GenerateThumb();
                     $thumbGenerator->convert($thumb);
@@ -238,19 +319,17 @@ class DocumentHelperVariable
     public function pdfAsset($template, $tempFilename, $variables, $attributes, $volumeHandle)
     {
         $plugin = Craft::$app->plugins->getPlugin('documenthelpers');
-        // Get the settings
         $settings = $plugin->getSettings();
         $settings = $settings->toArray();
-        Craft::info("PDF Settins: " . StringHelper::toString($settings));
         foreach ($settings as $key => $value) {
-            // Check if the value is an empty string
             if ($value === '') {
-              // Set the value to null
-              $settings[$key] = null;
+                $settings[$key] = null;
+            }
+            if ($value == false) {
+                $settings[$key] = null;
             }
         }
         $settings = array_merge($settings, $attributes);
-        Craft::info("PDF Settins2: " . StringHelper::toString($settings));
         // Generate the PDF using the existing pdf method
         $pdfPath = $this->pdf($template, 'file', $tempFilename, $variables, $attributes);
         $info = pathinfo($pdfPath);
@@ -272,7 +351,7 @@ class DocumentHelperVariable
         // If the asset doesn't exist or the temp file is newer, create or update the asset
         if (!$asset || filemtime($tempFilename) > $asset->dateModified->getTimestamp()) {
             if (!$asset) {
-                $asset = new \craft\elements\Asset ();
+                $asset = new \craft\elements\Asset();
             }
 
             if (isset($settings['assetTitle'])) {
@@ -311,7 +390,7 @@ class DocumentHelperVariable
             // Set the scenario of the asset to create
             $asset->setScenario(\craft\elements\Asset::SCENARIO_DEFAULT);
             // Save the asset
-            
+
             $result = Craft::$app->getElements()->saveElement($asset);
             // Check if the asset was saved successfully
             if (!$result) {
@@ -349,15 +428,15 @@ class DocumentHelperVariable
             if (isset($settings['thumbTrimFrameColor'])) {$thumbTrimFrameColor = $settings['thumbTrimFrameColor'];} else { $thumbTrimFrameColor = false;}
             try {
                 $thumb = new GenerateThumbConfiguration(
-                    pdfPath:$pdfPath,
-                    savePath:$dirTemp . DIRECTORY_SEPARATOR . $fileTempName . '.' . $assetType,
-                    format:$assetType,
-                    cols:$cols,
-                    rows:$rows,
-                    bgColor:$thumbBgColor,
-                    page:$thumbPage,
-                    trim:$thumbTrim,
-                    frameColor:$thumbTrimFrameColor
+                    pdfPath: $pdfPath,
+                    savePath: $dirTemp . DIRECTORY_SEPARATOR . $fileTempName . '.' . $assetType,
+                    format: $assetType,
+                    cols: $cols,
+                    rows: $rows,
+                    bgColor: $thumbBgColor,
+                    page: $thumbPage,
+                    trim: $thumbTrim,
+                    frameColor: $thumbTrimFrameColor
                 );
                 $thumbGenerator = new GenerateThumb();
                 $thumbGenerator->convert($thumb);
@@ -382,7 +461,7 @@ class DocumentHelperVariable
             // If the asset doesn't exist or the temp file is newer, create or update the asset
             if (!$assetThumb || (file_exists($dirTemp . DIRECTORY_SEPARATOR . $fileTempName . '.' . $assetType) && filemtime($dirTemp . DIRECTORY_SEPARATOR . $fileTempName . '.' . $assetType) > $assetThumb->dateModified->getTimestamp())) {
                 if (!$assetThumb) {
-                    $assetThumb = new \craft\elements\Asset ();
+                    $assetThumb = new \craft\elements\Asset();
                 }
 
                 if (isset($settings['assetTitle'])) {
