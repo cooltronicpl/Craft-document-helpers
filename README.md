@@ -157,10 +157,10 @@ Example of using a URL as a template:
 
 ```
 {% set pdfOptions = {
-
+		
 	}
 %} 
-<a href="{{alias('@web')}}{{craft.documentHelper.pdf('https://cooltronic.pl/', 'file', 'pdf/exampleURLv15.pdf'  , entry, pdfOptions)}}">    <img class="img-responsive" data-pdf-thumbnail-file="{{alias('@web')}}/pdf/example.pdf" src="{{alias('@web')}}/pdfjs_placeholder.png"></a>
+<a href="{{alias('@web')}}{{craft.documentHelper.pdf('https://cooltronic.pl/', 'file', 'pdf/exampleURL.pdf'  , entry, pdfOptions)}}">URL Example</a>
 ```
 
 After installing custom URL Purifier (HTMLPurifier) package in plugin settings you can solve problems with scraping of external websites and enable `URLPurify` option. When you encouter problems try to install this package in `@root` path:
