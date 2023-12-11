@@ -254,22 +254,22 @@ You can override the default options with `pdfOptions` as shown above. Here are 
 - `assetFilename` - This option allows you to change the target filename of the file in the Craft CMS Asset when using the `pdfAsset` method.
 - `assetDelete` - This option enables the deletion of the internally generated file in the `@root` path. Please note that this operation is irreversible and may consume more resources. This is because the Asset is updated and the PDF is generated on every load when using the `pdfAsset` method.
 - `assetSiteId` - This option allows you to assign a custom `siteId` to the Asset of `pdfAsset` method. The `siteId` should be passed as a number, representing the ID of the site to which the generated asset should belong.
-- `assetThumb`: This option generates a thumbnail image of a Craft CMS image Asset using the `pdfAsset` method (requires ImageMagick). It can be accessed in the Twig template as `asset.assetThumb`.
+- `assetThumb` - This option generates a thumbnail image of a Craft CMS image Asset using the `pdfAsset` method (requires ImageMagick). It can be accessed in the Twig template as `asset.assetThumb`.
   - `assetThumbVolumeHandle`: This is an optional parameter that specifies the Volume Handle for the thumbnail. If not provided, the PDF Volume Handle is used. The volume handle must have a `Base URL` in your test: `@web\pdffiles` in Craft CMS Filesystems, Assets settings.
-- `dumbThumb`: This option generates a basic thumbnail image (without an Asset) using the `pdf` method (requires ImageMagick).
-- `qrdata`: This option allows you to generate a QR Code image from any data you provide. The image will be available on the Twig template with `{{qrimg}}` variable. Required to install optional package from plugin settings.
+- `dumbThumb` - This option generates a basic thumbnail image (without an Asset) using the `pdf` method (requires ImageMagick).
+- `qrdata` - This option allows you to generate a QR Code image from any data you provide. The image will be available on the Twig template with `{{qrimg}}` variable. Required to install optional package from plugin settings.
 - `encoding` - This can set encoding of input stream like URL, HTML or Twig template.
 - `URLPurify` - This enable external library to make HTML Purify provided URL in `template` when set to true.
 
 Both `assetThumb` and `dumbThumb` support the following optional customizations:
 
-- `thumbType`: This parameter allows you to choose the format of the thumbnail. Options include `jpg`, `gif`, `webp`, `avif`, and `png`. The default format is `jpg`.
-- `thumbWidth`: This parameter specifies the width of the thumbnail in pixels. The default width is `210`.
-- `thumbHeight`: This parameter specifies the height of the thumbnail in pixels. The default height is `297`.
-- `thumbPage`: This parameter specifies the page to generate the thumbnail from. The default is the first page, which is numbered from `0`.
-- `thumbBgColor`: This parameter specifies the background color of the thumbnail. Options include `black`, `rgb(33,66,99)`, and `#123456`. The default color is `white`.
-- `thumbTrim`: This parameter, when set to `true`, trims your page and centers the content. The default value is `false`.
-- `thumbTrimFrameColor`: This parameter changes the color of the trim frame. Colors can be specified as `black` or in RGB format (e.g., `rgb(12,1,2)`) or in HEX format (e.g., `#662266`).
+- `thumbType` - This parameter allows you to choose the format of the thumbnail. Options include `jpg`, `gif`, `webp`, `avif`, and `png`. The default format is `jpg`.
+- `thumbWidth` - This parameter specifies the width of the thumbnail in pixels. The default width is `210`.
+- `thumbHeight` - This parameter specifies the height of the thumbnail in pixels. The default height is `297`.
+- `thumbPage` - This parameter specifies the page to generate the thumbnail from. The default is the first page, which is numbered from `0`.
+- `thumbBgColor` - This parameter specifies the background color of the thumbnail. Options include `black`, `rgb(33,66,99)`, and `#123456`. The default color is `white`.
+- `thumbTrim` - This parameter, when set to `true`, trims your page and centers the content. The default value is `false`.
+- `thumbTrimFrameColor` - This parameter changes the color of the trim frame. Colors can be specified as `black` or in RGB format (e.g., `rgb(12,1,2)`) or in HEX format (e.g., `#662266`).
 
 All settings can be set globally in plugin settings page and be overwritten individually by `pdfOptions`.
 
