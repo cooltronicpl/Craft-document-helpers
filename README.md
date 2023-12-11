@@ -1,8 +1,6 @@
 # Craft CMS PDF Generator (Versions 3.x and 4.x)
 
-Developed by [CoolTRONIC.pl sp. z o.o.](https://cooltronic.pl) and [Pawel Potacki](https://potacki.com), this plugin allows you to create PDF files from Craft CMS entries using a Twig template. It supports the creation and download of multiple PDF files from entries within a specific channel section on a website running Craft CMS 3 or 4. Example implementations can be found within this README file.
-
-Please note that MPDF for PHP8.x and Craft 4 may require a GD extension.
+Developed by [CoolTRONIC.pl sp. z o.o.](https://cooltronic.pl) and [Pawel Potacki](https://potacki.com). This plugin allows you to generate PDF files from Twig templates using the mPDF library. You can customize the PDF output with various options and save it as a file, an asset, or a string. You can also use URL or HTML code blocks as templates.
 
 ![Icon](resources/pdf-black.png#gh-light-mode-only)
 ![Icon](resources/pdf-light.png#gh-dark-mode-only)
@@ -10,15 +8,13 @@ Please note that MPDF for PHP8.x and Craft 4 may require a GD extension.
 ## Contents
 
 - [Installation](#installation)
-  - [Craft Plugin Store](#craft-plugin-store)
-  - [Composer](#composer)
 - [Usage](#usage)
   - [`pdf` method Parameters](#pdf-method-parameters)
-    - [Example of `pdf` method](#example-of-pdf-method)
   - [Parameters `pdfAsset` method](#parameters-pdfasset-method)
-    - [Example of `pdfAsset` method](#example-of-pdfasset-method)
   - [Securely Displaying PDF Documents in the Browser Without Saving to the /web Folder](#securely-displaying-pdf-documents-in-the-browser-without-saving-to-the-web-folder)
-  - [Variables within a Template](#variables-within-a-template)
+  - [Variables in template](#variables-within-a-template)
+  - [How to use custom templates by code block and URL](#how-to-use-custom-templates-by-code-block-and-url)
+    - [How to use custom variables with code block](#how-to-use-custom-variables-with-code-block)
   - [Overriding Default Options](#overriding-default-options)
   - [Custom fonts](#custom-fonts)
   - [Return values](#return-values)
@@ -40,6 +36,7 @@ Please note that MPDF for PHP8.x and Craft 4 may require a GD extension.
   - [Filename Characters](#filename-characters)
   - [Browser Caching Issues of PDF Files on Some Servers and Hosting](#browser-caching-issues-of-pdf-files-on-some-servers-and-hosting)
   - [Downloading Multiple PDF Files with JavaScript on Any Page](#downloading-multiple-pdf-files-with-javascript-on-any-page)
+  - [Optional packages](#optional-packages)
   - [Display QRCode](#display-qrcode)
   - [RTL Text Direction](#rtl-text-direction)
   - [Add Watermark](#add-watermark)
@@ -54,11 +51,7 @@ Please note that MPDF for PHP8.x and Craft 4 may require a GD extension.
 
 You can install the PDF Generator plugin from the Craft Plugin Store or through Composer.
 
-### Craft Plugin Store
-
 Go to the [Craft CMS Plugin Store](https://plugins.craftcms.com/document-helpers) in your project’s Control Panel and search for "PDF Generator". Then click on the "Install" button in its modal window.
-
-## Composer
 
 Open your terminal and go to your Craft project:
 
@@ -69,7 +62,7 @@ cd /path/to/project
 Then tell Composer to require the plugin:
 
 ```bash
-composer require cooltronic/document-helper
+composer require cooltronic/document-helpers
 ```
 
 ## Usage
@@ -78,7 +71,7 @@ composer require cooltronic/document-helper
 
 The pdf method generates a PDF file from a Twig template and returns a URL to the file. The method accepts an array of parameters:
 
-- `template` - This is the location of the template file for the PDF, which should be located in the /templates directory.
+- `template` - This is the location of the template file for the PDF, which should be located in the /templates directory. Also you can pass URL or HTML code block from 1.3.2 or 0.4.2.
 
 - `destination` - This indicates where the PDF file will be generated. It can be one of four options: `file`, `inline`, `download`, or `string`. To download multiple files, refer to the JavaScript example provided in the README.md file.
 
@@ -94,7 +87,7 @@ Method returns string with filename for anchors or string content for PDF files 
 {{craft.documentHelper.pdf("template.twig", "file", "document.pdf", entry, pdfOptions)}}
 ```
 
-#### Example of `pdf` method
+Example of `pdf` method:
 
 ```twig
 <a href="{{alias('@web')}}/
@@ -107,7 +100,7 @@ download>
 
 The `pdfAsset` method generates a PDF file from a Twig template, saves it as an asset, and returns an Asset model. The method accepts an array of parameters:
 
-- `template` - This is the location of the template file for the PDF, which should be located in the /templates directory.
+- `template` - This is the location of the template file for the PDF, which should be located in the /templates directory. Also you can pass here now a URL or a HTML code block from 1.3.2 or 0.4.2.
 
 - `filename` - This is the name of temporary or / and final of generated PDF file.
 
@@ -117,7 +110,7 @@ The `pdfAsset` method generates a PDF file from a Twig template, saves it as an 
 
 - `volumeHandle` - This parameter should contains volume handle name on which we need to add PDF as Craft CMS asset from system. The volume handle must have a `Base URL` in your test: `@web\pdffiles` in Craft CMS Filesystems, Assets settings.
 
-#### Example of `pdfAsset` method
+Example of `pdfAsset` method:
 
 ```twig
 {% set asset = craft.documentHelper.pdfAsset('_pdf/document.twig', alias('@root')~'/example.pdf', entry, pdfOptions, 'pdffiles') %}
@@ -142,8 +135,7 @@ You can securely display PDF documents in the browser without saving them to the
 {{craft.documentHelper.pdf('_pdf/document.twig', 'inline', '../book_example'  ~ '.pdf', entry, pdfOptions)}}
 
 ```
-
-## Variables within a Template
+## Variables in template
 
 Within the PDF Twig template, you can access the passed `entry` in a generated twig template array:
 
@@ -157,13 +149,79 @@ The title of the current entry can be accessed via:
 {{title}}
 ```
 
+## How to use custom templates by code block and URL
+
+You can use a URL or an HTML code block as a template for the PDF file. To do this, pass the URL or the HTML code block as the `template` parameter.
+
+Example of using a URL as a template:
+
+```
+{% set pdfOptions = {
+
+	}
+%} 
+<a href="{{alias('@web')}}{{craft.documentHelper.pdf('https://cooltronic.pl/', 'file', 'pdf/exampleURLv15.pdf'  , entry, pdfOptions)}}">    <img class="img-responsive" data-pdf-thumbnail-file="{{alias('@web')}}/pdf/example.pdf" src="{{alias('@web')}}/pdfjs_placeholder.png"></a>
+```
+
+After installing custom URL Purifier (HTMLPurifier) package in plugin settings you can solve problems with scraping of external websites and enable `URLPurify` option. When you encouter problems try to install this package in `@root` path:
+```
+# Craft CMS 4
+composer require ezyang/htmlpurifier:^4.17 
+# Craft CMS 3
+composer require ezyang/htmlpurifier:^4.13 
+```
+
+Example of code block:
+
+```
+{% set pdfOptions = {
+
+	}
+%}    
+{% set html %}
+    <h1>This is a basic example</h1>
+    <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod.</p>
+	<br>
+	<p>HTML Contents</p>
+{% endset %}
+
+<a href="{{alias('@web')}}{{craft.documentHelper.pdf(html, 'file', 'pdf/exampleHTML.pdf'  , entry, pdfOptions)}}">HTML PDF</a>
+```
+
+### How to use custom variables with code block
+
+You can pass custom variables to the PDF template using the `custom` or `qrimg` options in the `pdfOptions` array. The `custom` option allows you to pass any variable, while the `qrimg` option allows you to pass a QR code image from `qrdata` variable.
+
+Example of using custom variables:
+
+```
+{% set pdfOptions = {
+	header: "_pdf/header.twig",
+	footer: "_pdf/footer.twig",
+	qrdata: "https://cooltronic.pl"
+    custom: entry.var
+    }
+%}
+{% set pdf_content %}
+    <h1>This is a basic example</h1>
+    <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod.</p>
+	<br>
+	{% verbatim %}
+    <p>QR Code:</p>
+	<img src="{{qrimg}}" alt="QR Code"/>
+    {{custom}}
+	{% endverbatim %}
+{% endset %}
+<a href="{{alias('@web')}}{{craft.documentHelper.pdf(pdf_content, 'file', 'pdf/html.pdf', entry , pdfOptions)}}">HTML QR Code & Custom PDF</a>
+```
+
 ### Overriding Default Options
 
 You can override the default options with `pdfOptions` as shown above. Here are the available options:
 
 - `date` - This is disabled by default. If you provide a date (in timestamp format) that is older than the creation date of the file, the existing file will be overwritten.
-- `header` - This is the header Twig template, which is disabled by default.
-- `footer` - This is the footer Twig template, also disabled by default.
+- `header` - The optional location of the template file for the header, which should be in the `/templates` directory. You can also use a URL or an HTML code block as a template.
+- `footer` - The optional location of the template file for the footer, which should be in the `/templates` directory. You can also use a URL or an HTML code block as a template.
 - `margin_top` - The top margin defaults to 30.
 - `margin_bottom` - The bottom margin defaults to 30.
 - `margin_left` - The left margin defaults to 15.
@@ -202,6 +260,8 @@ You can override the default options with `pdfOptions` as shown above. Here are 
   - `assetThumbVolumeHandle`: This is an optional parameter that specifies the Volume Handle for the thumbnail. If not provided, the PDF Volume Handle is used. The volume handle must have a `Base URL` in your test: `@web\pdffiles` in Craft CMS Filesystems, Assets settings.
 - `dumbThumb`: This option generates a basic thumbnail image (without an Asset) using the `pdf` method (requires ImageMagick).
 - `qrdata`: This option allows you to generate a QR Code image from any data you provide. The image will be available on the Twig template with `{{qrimg}}` variable. Required to install optional package from plugin settings.
+- `encoding` - This can set encoding of input stream like URL, HTML or Twig template.
+- `URLPurify` - This enable external library to make HTML Purify provided URL in `template` when set to true.
 
 Both `assetThumb` and `dumbThumb` support the following optional customizations:
 
@@ -642,6 +702,9 @@ In your JavaScript code pass `pdfs` from Craft CMS, you can then loop over the p
     });
 </script>
 ```
+### Optional packages
+
+Navigate to the PDF Generator plugin, and click on the "Optional functions to enable" section. You will see a list of buttons to install for each optional package and set individual settings.
 
 ### Display QRCode
 
@@ -674,13 +737,11 @@ Where `{{qrimg}}` is the variable that holds the image from the package [PHP QRC
 You can install package manually when you encounter problems in automatic installation for Craft CMS 3.x (you need 3.4) and for 4.x (you need 4.3) version of optional package for display QR Code generation. This is example to how install to your main Craft (`@root`) installation directory:
 
 ```
+# Craft CMS 4
 composer require chillerlan/php-qrcode:^4.3
+# Craft CMS 3
 composer require chillerlan/php-qrcode:^3.4
 ```
-
-### Optional packages
-
-You can install optional packages in plugins settings in section `Optional functions to enable`. 
 
 ### RTL Text Direction
 

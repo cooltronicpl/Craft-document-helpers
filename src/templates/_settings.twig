@@ -43,7 +43,7 @@
     errors: settings.getErrors('footer')
 }) }}
 			{{ forms.textField({
-    label: "Footer template" | t,
+    label: "Margin top" | t,
     id: 'margin_top',
     name: 'margin_top',
     instructions: "The top margin defaults to 30."|t,
@@ -51,7 +51,7 @@
     errors: settings.getErrors('margin_top')
 }) }}
 			{{ forms.textField({
-    label: "Footer template" | t,
+    label: "Margin bottom" | t,
     id: 'margin_bottom',
     name: 'margin_bottom',
     instructions: "The bottom margin defaults to 30."|t,
@@ -60,7 +60,7 @@
 }) }}
 
 			{{ forms.textField({
-    label: "Footer template" | t,
+    label: "Margin left" | t,
     id: 'margin_left',
     name: 'margin_left',
     instructions: "The left margin defaults to 15."|t,
@@ -68,7 +68,7 @@
     errors: settings.getErrors('margin_left')
 }) }}
 			{{ forms.textField({
-    label: "Footer template" | t,
+    label: "Margin right" | t,
     id: 'margin_right',
     name: 'margin_right',
     instructions: "The right margin defaults to 15."|t,
@@ -135,14 +135,6 @@
     value: settings. tempDir|default(null),
     errors: settings.getErrors('tempDir')
 }) }}
-			{{ forms.textField({
-    label: "Temporary directory" | t,
-    id: 'tempDir',
-    name: 'tempDir',
-    instructions: "This sets the path to the temporary directory used for generating PDFs. We have tested this with the main /tmp directory on the server with success. This could potentially improve performance when generating multiple PDFs."|t,
-    value: settings. tempDir|default(null),
-    errors: settings.getErrors('tempDir')
-}) }}
 			{{ forms.lightswitchField({
     label: "Landscape" | t,
     id: 'landscape',
@@ -157,7 +149,6 @@
     name: 'portrait',
     instructions: "If this is set, the PDF will be generated in portrait mode." | t,
     on: settings.portrait,
-
 }) }}
 			{{ forms.textField({
     label: "Format" | t,
@@ -326,10 +317,9 @@
 				Install optional packages
 			</h2>
 			<p>
-				In this section you can install optional packages to your plugin.
+				The optional packages are additional features that you can enable or disable in the plugin settings. They provide more functionality and customization for the PDF generation process. The optional packages are:
 			</p>
 			<p>
-				Install package:
 				<a hrf="https://github.com/chillerlan/php-qrcode">chillerlan/php-qrcode</a>
 				for QR Code generation</p>
 			<a href="{{ actionUrl('documenthelpers/install/install-package', { package: 'chillerlan/php-qrcode' , version: "3.4"}) }}" class="btn btngroup-btn-first">Install package for QR Code generation</a>
@@ -340,6 +330,16 @@
     instructions: "This option allows you to generate a QR Code image from any data you provide. The image will be available on the Twig template with `{{qrimg}}` variable. Required optional package from plugin settings."|t,
     value: settings.qrdata|default(null),
     errors: settings.getErrors('qrdata')
+}) }}
+<a href="https://github.com/ezyang/htmlpurifier">ezyang/htmlpurifier</a>
+				for HTML (URL) purifier for problems with scraped websites on some URLs.</p>
+			<a href="{{ actionUrl('documenthelpers/install/install-package', { package: 'ezyang/htmlpurifier' , version: "4.17"}) }}" class="btn btngroup-btn-first">Install package for scraped URL HTML purify</a>
+			{{ forms.lightswitchField({
+    label: "Provided URL (HTML) Purfiy" | t,
+    id: 'URLPurify',
+    name: 'URLPurify',
+    on: settings.URLPurify,
+    instructions: "If this is set it enables URL Purification by external library." | t,
 }) }}
 			{{forms.textField({
     label: "Custom PHP Path" | t,

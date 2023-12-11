@@ -62,7 +62,7 @@ class Settings extends Model
     public $thumbTrim = null;
     public $thumbTrimFrameColor = null;
     public $phpPath = null;
-
+    public $URLPurify = null;
     public function rules(): array
     {
         return [

@@ -1,5 +1,24 @@
 # PDF Generator for Craft 3 or 4
 
+## 0.4.2 - 2023-12-11
+
+### Fixed
+
+- Corrected spelling errors in the plugin settings panel descriptions.
+- Added checks for the existence of Twig or HTML files in the `template`, `header`, and `footer` parameters.
+- Added checks for the existence of external classes of optional QR code generator package.
+- Resolved an issue where setting an option to `false` could cause problems with the `isset()` function.
+
+### Added
+
+- Enabled the generation of PDFs from inline code block content or custom URLs as the `template`, `header`, and `footer` parameters.
+
+### Changed
+
+- Included an optional package for scraping external URLs with HTML Purifier.
+- Added the `URLPurify` option to sanitize the HTML content scraped from URLs when installed optional package.
+- Added the `encoding` option to specify the encoding for the `URLPurify` and `mPDF` input streams.
+
 ## 0.4.1 - 2023-12-09
 
 ### **Enhancement**
