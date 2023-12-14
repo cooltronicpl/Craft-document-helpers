@@ -62,7 +62,7 @@ cd /path/to/project
 Then tell Composer to require the plugin:
 
 ```bash
-composer require cooltronic/document-helpers
+composer require cooltronicpl/document-helpers
 ```
 
 ## Usage
