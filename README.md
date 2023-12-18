@@ -25,7 +25,7 @@ Developed by [CoolTRONIC.pl sp. z o.o.](https://cooltronic.pl) and [Pawel Potack
   - [Including Images in PDF](#including-images-in-pdf)
     - [Thumbnail of Generated PDF on Frontend](#thumbnail-of-generated-pdf-on-frontend)
     - [Generating on the backend and Displaying Thumbnails by PDF Generator by `assetThumb` option to add into Assets on `pdfAsset` method](#generating-on-backend-and-displaying-thumbnails-by-pdf-generator-by-assetthumb-option-to-add-into-assets-on-pdfasset-method)
-    - [Generating on backend and Displaying Dumb Thumbnails by PDF Generator by `dumbThumb` option to default `pdf` method](#generating-on-the-backend-and-displaying-dumb-thumbnails-by-pdf-generator-by-dumbthumb-option-to-default-pdf-method)
+    - [Generating on the backend and Displaying Dumb Thumbnails by PDF Generator by `dumbThumb` option to default `pdf` method](#generating-on-the-backend-and-displaying-dumb-thumbnails-by-pdf-generator-by-dumbthumb-option-to-default-pdf-method)
     - [Generating on the backend and Displaying Thumbnails of PDF Assets by external PDF Transform plugin](#generating-on-the-backend-and-displaying-thumbnails-of-pdf-assets-by-external-pdf-transform-plugin)
     - [What if I cannot generate Thumbnails with enabled ImageMagick?](#what-if-i-cannot-generate-thumbnails-with-enabled-imagemagick)
   - [Custom Title of PDF Document](#custom-title-of-pdf-document)
@@ -287,7 +287,7 @@ Both `assetThumb` and `dumbThumb` support the following optional customizations:
 - `thumbPage` - This parameter specifies the page to generate the thumbnail from. The default is the first page, which is numbered from `0`.
 - `thumbBgColor` - This parameter specifies the background colour of the thumbnail. Options include `black`, `rgb(33,66,99)`, and `#123456`. The default colour is `white`.
 - `thumbTrim` - This parameter, when set to `true`, trims your page and centres the content. The default value is `false`.
-- `thumbTrimFrameColor` - This parameter changes the colour of the trim frame. Colours can be specified as `black` or in RGB format (e.g., `rgb(12,1,2)`) or in HEX format (e.g., `#662266`).
+- `thumbTrimFrameColor` - This parameter changes the colour of the trim frame. Colours can be specified as `black` or in RGB format (e.g., `rgb(12,1,2)`) or HEX format (e.g., `#662266`).
 - `thumbBestfit` - This boolean value determines whether to fit the image within the given dimensions or not. If `true`, the image will be scaled down so that it fits within the given dimensions. If `false`, the image will be stretched or cropped to fill the given dimensions.
 
 You can also choose these options globally by checking the options in the Plugin Settings and overwriting them in the `pdfOptions` parameter.
@@ -306,7 +306,7 @@ fontdata: { 'roboto' : {
 
 After the update of MPDF, which is used by our PDF Generator, we have resolved an issue with passed paths. Now, you must provide an absolute path on the server to the config directory. Alternatively, you can pass the main folder. For instance, on ISP Config 3.2 host, you can use: `fontDir`: `/var/www/clients/client0/web21/private/config/`.
 
-If you're running a single site, it should be an absolute path to the `/config` folder, like: fontDir: `/path_to/config/`.
+If you're running a single site, it should be an absolute path to the `/config` folder, like fontDir: `/path_to/config/`.
 
 For XAMPP in Windows hosts, the confirmed format is working `fontDir`: `file:///C:/xampp/htdocs/craft4/config/`.
 
@@ -495,7 +495,7 @@ To add thumbnails generated with the old `pdf` method you may use the following 
     dumbThumb: true,
     }
 %}
-<a href="{{alias('@web')}}/{{craft.documentHelper.pdf('_pdf/document.twig', 'file', 'pdf/example.pdf'  , entry, pdfOptionsDumb)}}">
+<a href="{{alias('@web')}}/{{craft.documentHelper.pdf('_pdf/document.twig', 'file', 'pdf/example.pdf', entry, pdfOptionsDumb)}}">
     <img src="{{alias('@web')}}{{ '/pdf/example.jpg' }}" />
 </a>
 ```
@@ -786,9 +786,9 @@ div {
 }
 ```
 
-#### RTL full example
+#### RTL full-example
 
-Full example of arabic text:
+Full example of Arabic text:
 
 ```
 <div dir="rtl" lang="ar" style="font-family: Arial;">هذا نص باللغة العربية</div>
