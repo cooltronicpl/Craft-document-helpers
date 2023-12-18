@@ -17,7 +17,7 @@
 - Restore `URLmode` and correct `startPage` settings in the plugin panel for the `master` branch that was missing in the previous release.
 - Correct the `URLMode` description in the README.md file.
 
-## 2.0.0 [CRITICAL] - 2023-12-18
+## 2.0.0 - 2023-12-18 [CRITICAL]
 
 ### Added
 
