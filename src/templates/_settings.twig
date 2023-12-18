@@ -214,11 +214,19 @@
     on: settings.autoBookmarks,
 }) }}
 			{{ forms.lightswitchField({
-    label: "Provided URL Rendering Attributees" | t,
+    label: "URL Render Additional Attributes" | t,
     id: 'URLTwigRender',
     name: 'URLTwigRender',
     on: settings.URLTwigRender,
     instructions: "If this is set it enables external URL rendering of `template`, `header` or `footer` of variables like `{{custom}}` or `{{qrimg}}` in external template." | t,
+}) }}
+			{{ forms.lightswitchField({
+    label: "URL Mode" | t,
+    id: 'URLmode',
+    name: 'URLmode',
+    value: settings. URLmode|default(null),
+    instructions: "If this is set it enables external URL rendering via `curl` instead of `file_get_contents`" | t,
+    errors: settings.getErrors('URmode')
 }) }}
 		</div>
 		<div id="content-metadata" class="tab-content">

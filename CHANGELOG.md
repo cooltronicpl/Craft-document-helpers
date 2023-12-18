@@ -1,5 +1,12 @@
 # PDF Generator for Craft 3 or 4
 
+## 2.0.1 - 2023-12-18
+
+### Fixed
+
+- Restore `URLmode` and correct `startPage` settings in the plugin panel for `master` branch that were missing in previous release.
+- Correct `URLmode` description in README.md file.
+
 ## 2.0.0 [CRITICAL] - 2023-12-18
 
 ### Added
@@ -10,7 +17,7 @@
 - `URLTwigRender` option to render Twig variables on parsed custom URLs as optional. This allows to use of attributes like `{{custom}}` or QR Code as `{{qrimg}}` from parsed custom URL.
 - `startPage` is the first page of the PDF to be generated. You can use this option to trim unnecessary pages from the beginning of the PDF.
 - `endPage` is the last page of the PDF to be generated. You can use this option to trim unnecessary pages from the end of the PDF.
-- `URLMode` option can be set to `curl`, to get via CURL instead of file_get_contents.
+- `URLmode` option can be set to `curl`, to get URLs via CURL instead of file_get_contents.
 
 ### Changed
 
