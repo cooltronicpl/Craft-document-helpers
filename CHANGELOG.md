@@ -1,5 +1,9 @@
 # PDF Generator for Craft 3 or 4
 
+## 2.0.3 - 2023-12-18
+
+- Fixed CHANGELOG.md.
+
 ## 2.0.2 - 2023-12-18
 
 ### Changed
@@ -10,6 +14,7 @@
 
 - Correct `endPage` settings in the plugin panel.
 - Fixed error to save stream with another encoding than `UTF-8` when setting `encoding` with enabled `URLPurify` in `DocumentHelperVariable`.
+
 ## 2.0.1 - 2023-12-18
 
 ### Fixed
