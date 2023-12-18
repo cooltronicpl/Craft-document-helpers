@@ -80,7 +80,7 @@ class Settings extends Model
     public $mirrorMargins = null;
     public $startPage = null;
     public $endPage = null;
-    public $URLmode = false;
+    public $URLMode = false;
 
     public function rules(): array
     {

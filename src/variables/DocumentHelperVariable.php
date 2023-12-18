@@ -514,7 +514,7 @@ class DocumentHelperVariable
      */
     private function getURL($url, $settings)
     {
-        if (isset($settings['URLmode']) && $settings['URLmode'] == "curl") {
+        if (isset($settings['URLMode']) && $settings['URLMode'] == "curl") {
             $ch = curl_init();
             curl_setopt($ch, CURLOPT_URL, $url);
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
@@ -531,7 +531,7 @@ class DocumentHelperVariable
             is_file(Craft::getAlias('@root') . $loader)) {
             require_once Craft::getAlias('@root') . $loader;
             $config = \HTMLPurifier_Config::createDefault();
-            if (isset($encoding) && !empty($settings['encoding'])) {
+            if (isset($settings['encoding']) && !empty($settings['encoding'])) {
                 $config->set('Core.Encoding', $settings['encoding']);
             } else {
                 $config->set('Core.Encoding', 'UTF-8');

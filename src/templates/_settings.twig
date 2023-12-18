@@ -180,7 +180,7 @@
     id: 'endPage',
     name: 'endPage',
     instructions: "The last page of the PDF to be generated. You can use this option to trim unnecessary pages from the end of the PDF. For example, `10` will generate a PDF with only 10 pages."|t,
-    value: settings. watermarkText|default(null),
+    value: settings. endPage|default(null),
     errors: settings.getErrors('endPage')
 }) }}
 			{{ forms.textField({
@@ -214,7 +214,7 @@
     on: settings.autoBookmarks,
 }) }}
 			{{ forms.lightswitchField({
-    label: "URL Render Additional Attributes" | t,
+    label: "Provided URL Rendering Attributes" | t,
     id: 'URLTwigRender',
     name: 'URLTwigRender',
     on: settings.URLTwigRender,
@@ -222,11 +222,11 @@
 }) }}
 			{{ forms.lightswitchField({
     label: "URL Mode" | t,
-    id: 'URLmode',
-    name: 'URLmode',
-    value: settings. URLmode|default(null),
+    id: '`URLMode`',
+    name: '`URLMode`',
+    value: settings. URLMode|default(null),
     instructions: "If this is set it enables external URL rendering via `curl` instead of `file_get_contents`" | t,
-    errors: settings.getErrors('URmode')
+    errors: settings.getErrors('URLMode')
 }) }}
 		</div>
 		<div id="content-metadata" class="tab-content">

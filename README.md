@@ -263,7 +263,7 @@ You can override the default options with `pdfOptions` as shown above. Here are 
 - `disableCopyright` (default: `null`) - This option requires the **Plus** plan and can be used to disable invisible copyright tags.
 - `URLPurify` (default: `null`) - Whether to enable an external library to sanitize the HTML provided by the URL in the `template` parameter. Set to `true` to enable this feature.
 - `URLTwigRender` (default: `null`) - Whether to render Twig variables on parsed custom URLs. This allows the use of attributes like `{{custom}}` or QR Code as `{{qrimg}}` from parsed custom URLs. Set to `true` to enable this feature.
-- `URLmode` (default: `null`) - This option can be set to `curl`, to get URLs via CURL instead of `file_get_contents()`.
+- `URLMode` (default: `null`) - This option can be set to `curl`, to get URLs via CURL instead of `file_get_contents()`.
 - `startPage` (default: `null`) - The first page of the PDF to be generated. You can use this option to trim unnecessary pages from the beginning of the PDF. For example, `startPage: 2` will skip the first page of the PDF.
 - `endPage` (default: `null`) - The last page of the PDF to be generated. You can use this option to trim unnecessary pages from the end of the PDF. For example, `endPage: 10` will generate a PDF with only 10 pages.
 - `protection` (default: `null`) - This option requires the **Plus** plan and can be used to restrict the actions that users can perform on the PDF file. You can pass an array of strings or a JSON string with the following values to enable the protection mode with the **Plus** plan (to make the PDF compatible with ISO, BSI, and DIN standards):

@@ -1,11 +1,21 @@
 # PDF Generator for Craft 3 or 4
 
+## 2.0.2 - 2023-12-18
+
+### Changed
+
+- Changed option from `URLmode` into `URLMode`.
+
+### Fixed
+
+- Correct `endPage` settings in the plugin panel.
+- Fixed error to save strean with other encoding than `UTF-8` when set `encoding` with enabled `URLPurify` in `DocumentHelperVariable`.
+
 ## 2.0.1 - 2023-12-18
 
 ### Fixed
 
-- Restore `URLmode` and correct `startPage` settings in the plugin panel for `master` branch that were missing in previous release.
-- Correct `URLmode` description in README.md file.
+- Correct `URLMode` description in README.md file.
 
 ## 2.0.0 [CRITICAL] - 2023-12-18
 
@@ -17,7 +27,7 @@
 - `URLTwigRender` option to render Twig variables on parsed custom URLs as optional. This allows to use of attributes like `{{custom}}` or QR Code as `{{qrimg}}` from parsed custom URL.
 - `startPage` is the first page of the PDF to be generated. You can use this option to trim unnecessary pages from the beginning of the PDF.
 - `endPage` is the last page of the PDF to be generated. You can use this option to trim unnecessary pages from the end of the PDF.
-- `URLmode` option can be set to `curl`, to get URLs via CURL instead of file_get_contents.
+- `URLMode` option can be set to `curl`, to get URLs via CURL instead of file_get_contents.
 
 ### Changed
 
@@ -34,12 +44,12 @@
 
 ### Removed
 
-[BREAKING] Discontinued the separate `craft3` branch for Craft CMS 3 and unified the codebase for both Craft CMS 3 and 4 in the `master` branch. This requires updating the plugin to the latest version to use it on either Craft CMS version.
+- [BREAKING] Discontinued the separate `craft3` branch for Craft CMS 3 and unified the codebase for both Craft CMS 3 and 4 in the `master` branch. This requires updating the plugin to the latest version to use it on either Craft CMS version.
 
 ## 1.3.2 - 2023-12-11
 
 ### Fixed
-
+[resources](resources)
 - Corrected spelling errors in the plugin settings panel descriptions.
 - Added checks for the existence of Twig or HTML files in the `template`, `header`, and `footer` parameters.
 - Added checks for the existence of external classes of optional QR code generator package.
