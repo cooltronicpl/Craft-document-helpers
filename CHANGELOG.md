@@ -15,6 +15,7 @@
 
 ### Fixed
 
+- Restore `URLmode` and correct `startPage` settings in the plugin panel for `master` branch that were missing in previous release.
 - Correct `URLMode` description in README.md file.
 
 ## 2.0.0 [CRITICAL] - 2023-12-18
