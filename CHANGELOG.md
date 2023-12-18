@@ -9,14 +9,13 @@
 ### Fixed
 
 - Correct `endPage` settings in the plugin panel.
-- Fixed error to save strean with other encoding than `UTF-8` when set `encoding` with enabled `URLPurify` in `DocumentHelperVariable`.
-
+- Fixed error to save stream with another encoding than `UTF-8` when setting `encoding` with enabled `URLPurify` in `DocumentHelperVariable`.
 ## 2.0.1 - 2023-12-18
 
 ### Fixed
 
-- Restore `URLmode` and correct `startPage` settings in the plugin panel for `master` branch that were missing in previous release.
-- Correct `URLMode` description in README.md file.
+- Restore `URLmode` and correct `startPage` settings in the plugin panel for the `master` branch that was missing in the previous release.
+- Correct the `URLMode` description in the README.md file.
 
 ## 2.0.0 [CRITICAL] - 2023-12-18
 
