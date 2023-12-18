@@ -1,6 +1,6 @@
 # Craft CMS PDF Generator (Versions 3.x and 4.x)
 
-Developed by [CoolTRONIC.pl sp. z o.o.](https://cooltronic.pl) and [Pawel Potacki](https://potacki.com). This plugin allows you to generate PDF files from Twig templates using the mPDF library. You can customize the PDF output with various options and save it as a file, an asset, or a string. You can also use URL or HTML code blocks as templates.
+Developed by [CoolTRONIC.pl sp. z o.o.](https://cooltronic.pl) and [Pawel Potacki](https://potacki.com). This plugin allows you to generate PDF files from Twig templates using the mPDF library. You can customize the PDF output with various options and save it as a file, an asset, or a string. You can also use URLs or HTML code blocks as templates.
 
 ![Icon](resources/pdf-black.png#gh-light-mode-only)
 ![Icon](resources/pdf-light.png#gh-dark-mode-only)
@@ -12,7 +12,7 @@ Developed by [CoolTRONIC.pl sp. z o.o.](https://cooltronic.pl) and [Pawel Potack
   - [`pdf` method Parameters](#pdf-method-parameters)
   - [Parameters `pdfAsset` method](#parameters-pdfasset-method)
   - [Securely Displaying PDF Documents in the Browser Without Saving to the /web Folder](#securely-displaying-pdf-documents-in-the-browser-without-saving-to-the-web-folder)
-  - [Variables in template](#variables-in-template)
+  - [Variables in the template](#variables-in-the-template)
   - [How to use custom templates by code block and URL](#how-to-use-custom-templates-by-code-block-and-url)
     - [How to use custom variables with code block](#how-to-use-custom-variables-with-code-block)
   - [Overriding Default Options](#overriding-default-options)
@@ -24,9 +24,9 @@ Developed by [CoolTRONIC.pl sp. z o.o.](https://cooltronic.pl) and [Pawel Potack
   - [Advanced `pdfAsset` Method Options](#advanced-pdfasset-method-options)
   - [Including Images in PDF](#including-images-in-pdf)
     - [Thumbnail of Generated PDF on Frontend](#thumbnail-of-generated-pdf-on-frontend)
-    - [Generating on backend and Displaying Thumbnails by PDF Generator by `assetThumb` option to add into Assets on `pdfAsset` method](#generating-on-backend-and-displaying-thumbnails-by-pdf-generator-by-assetthumb-option-to-add-into-assets-on-pdfasset-method)
-    - [Generating on backend and Displaying Dumb Thumbnails by PDF Generator by `dumbThumb` option to default `pdf` method](#generating-on-backend-and-displaying-dumb-thumbnails-by-pdf-generator-by-dumbthumb-option-to-default-pdf-method)
-    - [Generating on backend and Displaying Thumbnails of PDF Assets by external PDF Transform plugin](#generating-on-backend-and-displaying-thumbnails-of-pdf-assets-by-external-pdf-transform-plugin)
+    - [Generating on the backend and Displaying Thumbnails by PDF Generator by `assetThumb` option to add into Assets on `pdfAsset` method](#generating-on-backend-and-displaying-thumbnails-by-pdf-generator-by-assetthumb-option-to-add-into-assets-on-pdfasset-method)
+    - [Generating on backend and Displaying Dumb Thumbnails by PDF Generator by `dumbThumb` option to default `pdf` method](#generating-on-the-backend-and-displaying-dumb-thumbnails-by-pdf-generator-by-dumbthumb-option-to-default-pdf-method)
+    - [Generating on the backend and Displaying Thumbnails of PDF Assets by external PDF Transform plugin](#generating-on-the-backend-and-displaying-thumbnails-of-pdf-assets-by-external-pdf-transform-plugin)
     - [What if I cannot generate Thumbnails with enabled ImageMagick?](#what-if-i-cannot-generate-thumbnails-with-enabled-imagemagick)
   - [Custom Title of PDF Document](#custom-title-of-pdf-document)
   - [Custom Variables](#custom-variables)
@@ -71,7 +71,7 @@ composer require cooltronicpl/document-helpers
 
 The pdf method generates a PDF file from a Twig template and returns a URL to the file. The method accepts an array of parameters:
 
-- `template` - This is the location of the template file for the PDF, which should be located in the /templates directory. Also you can pass URL or HTML code block from 1.3.2 or 0.4.2.
+- `template` - This is the location of the template file for the PDF, which should be located in the /templates directory. Also, you can pass URL or HTML code block from 1.3.2 or 0.4.2.
 
 - `destination` - This indicates where the PDF file will be generated. It can be one of four options: `file`, `inline`, `download`, or `string`. To download multiple files, refer to the JavaScript example provided in the README.md file.
 
@@ -81,13 +81,13 @@ The pdf method generates a PDF file from a Twig template and returns a URL to th
 
 - `pdfOptions` - This parameter allows you to customize the generation of the PDF. The available options are described in the section on overriding default options.
 
-Method returns string with filename for anchors or string content for PDF files to send content as attachment.
+Method returns string with the filename for anchors or string content for PDF files to send content as an attachment.
 
 ```twig
 {{craft.documentHelper.pdf("template.twig", "file", "document.pdf", entry, pdfOptions)}}
 ```
 
-Example of `pdf` method:
+Example of the `pdf` method:
 
 ```twig
 <a href="{{alias('@web')}}/
@@ -102,15 +102,15 @@ The `pdfAsset` method generates a PDF file from a Twig template, saves it as an 
 
 - `template` - This is the location of the template file for the PDF, which should be located in the /templates directory. Also you can pass here now a URL or a HTML code block from 1.3.2 or 0.4.2.
 
-- `filename` - This is the name of temporary or / and final of generated PDF file.
+- `filename` - This is the name of the temporary or/and final generated PDF file.
 
 - `entry` - This represents the data that will be inputted into the template to generate the PDF. This data is contained within an 'entry' array.
 
 - `pdfOptions` - This parameter allows you to customize the generation of the PDF. The available options are described in the section on overriding default options.
 
-- `volumeHandle` - This parameter should contains volume handle name on which we need to add PDF as Craft CMS asset from system. The volume handle must have a `Base URL` in your test: `@web\pdffiles` in Craft CMS Filesystems, Assets settings.
+- `volumeHandle` - This parameter is required and specifies the Volume Handle of the PDF to be added as a Craft CMS asset from the system. The Volume Handle needs a `Base UR`L such as `@web\pdffiles` in the Craft CMS Filesystems, Assets settings for testing.
 
-Example of `pdfAsset` method:
+Example of the `pdfAsset` method:
 
 ```twig
 {% set asset = craft.documentHelper.pdfAsset('_pdf/document.twig', alias('@root')~'/example.pdf', entry, pdfOptions, 'pdffiles') %}
@@ -126,18 +126,18 @@ Example of `pdfAsset` method:
 You can securely display PDF documents in the browser without saving them to the /web folder as follows:
 
 ```twig
-						{% set pdfOptions = {
-						date: entry.dateUpdated|date('U'),
-						header: "_pdf/header.twig",
-						footer: "_pdf/footer.twig"
+                        {% set pdfOptions = {
+                        date: entry.dateUpdated|date('U'),
+                        header: "_pdf/header.twig",
+                        footer: "_pdf/footer.twig"
                         } %}
-				{% header "Content-Type: application/pdf" %}
+                {% header "Content-Type: application/pdf" %}
 {{craft.documentHelper.pdf('_pdf/document.twig', 'inline', '../book_example'  ~ '.pdf', entry, pdfOptions)}}
 
 ```
-## Variables in template
+## Variables in the template
 
-Within the PDF Twig template, you can access the passed `entry` in a generated twig template array:
+Within the PDF Twig template, you can access the passed `entry` in a generated Twig template array:
 
 ```twig
 {{entry.VAR}}
@@ -151,19 +151,20 @@ The title of the current entry can be accessed via:
 
 ## How to use custom templates by code block and URL
 
-You can use a URL or an HTML code block as a template for the PDF file. To do this, pass the URL or the HTML code block as the `template` parameter.
+You can use a URL or an HTML code block as a template for the PDF file. To do this, pass the URL or the HTML code block as the `template` parameter. 
 
-Example of using a URL as a template:
+When you encounter problems with URLs you can set `encoding`, proposed to set `UTF-8`. Example of using a URL as a template:
 
 ```
 {% set pdfOptions = {
-		
-	}
+        
+    }
 %} 
 <a href="{{alias('@web')}}{{craft.documentHelper.pdf('https://cooltronic.pl/', 'file', 'pdf/exampleURL.pdf'  , entry, pdfOptions)}}">URL Example</a>
 ```
 
-After installing custom URL Purifier (HTMLPurifier) package in plugin settings you can solve problems with scraping of external websites and enable `URLPurify` option. When you encouter problems try to install this package in `@root` path:
+After installing the custom URL Purifier (HTMLPurifier) package in plugin settings you can solve problems with scraping external websites and enable the `URLPurify` option. When you encounter problems try to install this package in the `@root` path:
+
 ```
 # Craft CMS 4
 composer require ezyang/htmlpurifier:^4.17 
@@ -176,13 +177,13 @@ Example of code block:
 ```
 {% set pdfOptions = {
 
-	}
+    }
 %}    
 {% set html %}
     <h1>This is a basic example</h1>
     <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod.</p>
-	<br>
-	<p>HTML Contents</p>
+    <br>
+    <p>HTML Contents</p>
 {% endset %}
 
 <a href="{{alias('@web')}}{{craft.documentHelper.pdf(html, 'file', 'pdf/exampleHTML.pdf'  , entry, pdfOptions)}}">HTML PDF</a>
@@ -190,25 +191,25 @@ Example of code block:
 
 ### How to use custom variables with code block
 
-You can pass custom variables to the PDF template using the `custom` or `qrimg` options in the `pdfOptions` array. The `custom` option allows you to pass any variable, while the `qrimg` option allows you to pass a QR code image from `qrdata` variable.
+You can pass custom variables to the PDF template using the `custom` or `qrimg` options in the `pdfOptions` array. The `custom` option allows you to pass any variable, while the `qrimg` option allows you to pass a QR code image from the `qrdata` variable.
 
 Example of using custom variables:
 
 ```
 {% set pdfOptions = {
-	qrdata: "https://cooltronic.pl"
+    qrdata: "https://cooltronic.pl"
     custom: entry.var
     }
 %}
 {% set pdf_content %}
     <h1>This is a basic example</h1>
     <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod.</p>
-	<br>
-	{% verbatim %}
+    <br>
+    {% verbatim %}
     <p>QR Code:</p>
-	<img src="{{qrimg}}" alt="QR Code"/>
+    <img src="{{qrimg}}" alt="QR Code"/>
     {{custom}}
-	{% endverbatim %}
+    {% endverbatim %}
 {% endset %}
 <a href="{{alias('@web')}}{{craft.documentHelper.pdf(pdf_content, 'file', 'pdf/html.pdf', entry , pdfOptions)}}">HTML QR Code & Custom PDF</a>
 ```
@@ -217,27 +218,27 @@ Example of using custom variables:
 
 You can override the default options with `pdfOptions` as shown above. Here are the available options:
 
-- `date` - This is disabled by default. If you provide a date (in timestamp format) that is older than the creation date of the file, the existing file will be overwritten.
-- `header` - The optional location of the template file for the header, which should be in the `/templates` directory. You can also use a URL or an HTML code block as a template.
-- `footer` - The optional location of the template file for the footer, which should be in the `/templates` directory. You can also use a URL or an HTML code block as a template.
-- `margin_top` - The top margin defaults to 30.
-- `margin_bottom` - The bottom margin defaults to 30.
-- `margin_left` - The left margin defaults to 15.
-- `margin_right` - The right margin defaults to 15.
-- `mirrorMargins` - This defaults to 0 but can be set to 1.
-- `pageNumbers` - This adds page numbers in the footer.
-- `title` - This replaces the default title of the generated PDF document.
-- `custom` - This allows you to add custom variable or variables.
-- `password` - This can be used to add password protection to your PDF. The password should be provided as a string.
-- `no_auto_page_break` - This disables automatic system page breaks. This can be useful if you need to manually add page breaks. For example, you can add a custom page to documents with more than one page break using <pagebreak>. This may fix page break issues in some cases, but not all.
-- `author` - This sets the author metadata. It should be provided as a string.
-- `keywords` - This sets the keyword metadata. It should be provided as a string in the following format: "keyword1, longer keyword2, keyword3".
-- `fonts`:
-  - `fontdata`, and `fontDir` - These allow you to set custom fonts described above.
-- `tempDir` - This sets the path to the temporary directory used for generating PDFs. We have tested this with the main /tmp directory on the server with success. This could potentially improve performance when generating multiple PDFs.
-- `landscape` - If this is set, the PDF will be generated in landscape mode.
-- `portrait` - If this is set, the PDF will be generated in portrait mode.
-- `format` This sets the paper size for the PDF. The default is "A4", but you can set other sizes compatible with MPDF. Other popular formats include:
+- `date` (default: `null`) - If you provide a date (in timestamp format) that is older than the creation date of the file, the existing file will be overwritten. Otherwise, the file will not be modified.
+- `header` (default: `null`) - The optional location of the template file for the header, which should be in the `/templates` directory. You can also use a URL or an HTML code block as a template. For example, `header: "_pdf/header.html"` or `header: "<h1>My Header</h1>"`.
+- `footer` (default: `null`) - The optional location of the template file for the footer, which should be in the `/templates` directory. You can also use a URL or an HTML code block as a template. For example, `footer: "_pdf/footer.twig"` or `footer: "<p>My Footer</p>"`.
+- `margin_top` (default: `30`) - The top margin is in millimetres.
+- `margin_bottom` (default: `30`) - The bottom margin is in millimetres.
+- `margin_left` (default: `15`) - The left margin is in millimetres.
+- `margin_right` (default: `15`) - The right margin is in millimetres.
+- `mirrorMargins` (default: `0`) - Whether to use different margins for odd and even pages. Set to `1` to enable this feature.
+- `pageNumbers` (default: `false`) - Whether to add page numbers in the footer. Set to `true` to enable this feature.
+- `title` (default: `null`) - This replaces the default title of the generated PDF document.
+- `custom` (default: `null`) - This allows you to add a custom variable or variables.
+- `password` (default: `null`) - This can be used to add password protection to your PDF. The password should be provided as a string.
+- `no_auto_page_break` (default: `null`) - This disables automatic system page breaks. This can be useful if you need to manually add page breaks. For example, you can add a custom page to documents with more than one-page break using `<pagebreak>`. This may fix page break issues in some cases.
+- `author` (default: `null`) - This sets the author metadata. It should be provided as a string.
+- `keywords` (default: `null`) - This sets the keyword metadata. It should be provided as a string in the following format: "keyword1, longer keyword2, keyword3".
+- `fonts` (default: `null`):
+  - `fontdata` (default: `null`), and `fontDir` (default: `null`) - These allow you to set custom fonts described above.
+- `tempDir` (default: `@runtime/temp/pdfgenerator`) - This sets the path to the temporary directory used for generating PDFs. We have tested this with the main /tmp directory on the server with success. This could potentially improve performance when generating multiple PDFs.
+- `landscape` (default: `null`) - If this is set, the PDF will be generated in landscape mode.
+- `portrait` (default: `null`) - If this is set, the PDF will be generated in portrait mode.
+- `format` (default: `A4`) - This sets the paper size for the PDF. The default is "A4", but you can set other sizes compatible with MPDF. Other popular formats include:
   - A3
   - A4 (default)
   - A5
@@ -246,20 +247,37 @@ You can override the default options with `pdfOptions` as shown above. Here are 
   - Executive (7,25 x 10,5 in)
   - B4
   - B5
-- `watermarkImage` - This option creates a watermark using the image file specified by the provided path.
-- `watermarkText` - This option creates a watermark using the text provided.
-- `autoToC` - This option automatically generates a Table of Contents using the H1-H6 tags in your document.
-- `autoBookmarks` - This option automatically generates bookmarks using the H1-H6 tags in your document.
-- `assetTitle` - This option allows you to set a custom title for the Asset in the Craft CMS system when using the `pdfAsset` method.
-- `assetFilename` - This option allows you to change the target filename of the file in the Craft CMS Asset when using the `pdfAsset` method.
-- `assetDelete` - This option enables the deletion of the internally generated file in the `@root` path. Please note that this operation is irreversible and may consume more resources. This is because the Asset is updated and the PDF is generated on every load when using the `pdfAsset` method.
-- `assetSiteId` - This option allows you to assign a custom `siteId` to the Asset of `pdfAsset` method. The `siteId` should be passed as a number, representing the ID of the site to which the generated asset should belong.
-- `assetThumb` - This option generates a thumbnail image of a Craft CMS image Asset using the `pdfAsset` method (requires ImageMagick). It can be accessed in the Twig template as `asset.assetThumb`.
-  - `assetThumbVolumeHandle`: This is an optional parameter that specifies the Volume Handle for the thumbnail. If not provided, the PDF Volume Handle is used. The volume handle must have a `Base URL` in your test: `@web\pdffiles` in Craft CMS Filesystems, Assets settings.
-- `dumbThumb` - This option generates a basic thumbnail image (without an Asset) using the `pdf` method (requires ImageMagick).
-- `qrdata` - This option allows you to generate a QR Code image from any data you provide. The image will be available on the Twig template with `{{qrimg}}` variable. Required to install optional package from plugin settings.
-- `encoding` - This can set encoding of input stream like URL, HTML or Twig template.
-- `URLPurify` - This enable external library to make HTML Purify provided URL in `template` when set to true.
+- `watermarkImage` (default: `null`) - This option creates a watermark using the image file specified by the provided path.
+- `watermarkText` (default: `null`) - This option creates a watermark using the text provided.
+- `autoToC` (default: `null`) - This option automatically generates a Table of Contents using the H1-H6 tags in your document.
+- `autoBookmarks` (default: `null`) - This option automatically generates bookmarks using the H1-H6 tags in your document.
+- `assetTitle` (default: `null`) - This option allows you to set a custom title for the Asset in the Craft CMS system when using the `pdfAsset` method.
+- `assetFilename` (default: `null`) - This option allows you to change the target filename of the file in the Craft CMS Asset when using the `pdfAsset` method.
+- `assetDelete` (default: `null`) - This option enables the deletion of the internally generated file in the `@root` path. Please note that this operation is irreversible and may consume more resources. This is because the Asset is updated and the PDF is generated on every load when using the `pdfAsset` method.
+- `assetSiteId` (default: ``null``)- This option allows you to assign a custom `siteId` to the Asset of the `pdfAsset` method. The `siteId` should be passed as a number, representing the ID of the site to which the generated asset should belong.
+- `assetThumb` (default: `null`) - This option generates a thumbnail image of a Craft CMS image Asset using the `pdfAsset` method (requires ImageMagick). It can be accessed in the Twig template as `asset.assetThumb`.
+  - `assetThumbVolumeHandle` (default: `null`): This parameter is optional and defines the Volume Handle of the thumbnail. It falls back to the PDF Volume Handle if not set. The Volume Handle needs a `Base URL` like `@web\pdffiles` in the Craft CMS Filesystems, Assets settings for testing.
+- `dumbThumb` (default: `null`) - This option generates a basic thumbnail image (without an Asset) using the `pdf` method (requires ImageMagick).
+- `qrdata` (default: `null`) - This option allows you to generate a QR Code image from any data you provide. The image will be available on the Twig template with `{{qrimg}}` variable. Required to install optional package from plugin settings.
+- `encoding` (default: `null`) - This can set encoding of the following codepages are supported by the `iconv()` function like `UTF-8`. [More info](https://mpdf.github.io/reference/codepages-glyphs/iconv.html).
+- `disableCopyright` (default: `null`) - This option requires the **Plus** plan and can be used to disable invisible copyright tags.
+- `URLPurify` (default: `null`) - Whether to enable an external library to sanitize the HTML provided by the URL in the `template` parameter. Set to `true` to enable this feature.
+- `URLTwigRender` (default: `null`) - Whether to render Twig variables on parsed custom URLs. This allows the use of attributes like `{{custom}}` or QR Code as `{{qrimg}}` from parsed custom URLs. Set to `true` to enable this feature.
+- `URLMode` (default: `null`) - This option can be set to `curl`, to get URLs via CURL instead of `file_get_contents()`.
+- `startPage` (default: `null`) - The first page of the PDF to be generated. You can use this option to trim unnecessary pages from the beginning of the PDF. For example, `startPage: 2` will skip the first page of the PDF.
+- `endPage` (default: `null`) - The last page of the PDF to be generated. You can use this option to trim unnecessary pages from the end of the PDF. For example, `endPage: 10` will generate a PDF with only 10 pages.
+- `protection` (default: `null`) - This option requires the **Plus** plan and can be used to restrict the actions that users can perform on the PDF file. You can pass an array of strings or a JSON string with the following values to enable the protection mode with the **Plus** plan (to make the PDF compatible with ISO, BSI, and DIN standards):
+  - `copy` - Copy text and graphics.
+  - `print` - Print in low resolution.
+  - `modify` - Modify the contents of the document.
+  - `annot-forms` - Add annotations and form fields.
+  - `fill-forms` - Fill in existing form fields.
+  - `extract` - Extract text and graphics.
+  - `assemble` - Combine pages and documents.
+  - `print-highres` - Print in high resolution.
+  - `no-user-password` - Open a document without password.
+  
+For example, `protection: ["copy", "no-user-password"]` or `protection: '["copy", "no-user-password"]'` will allow users to copy text and graphics and open the document without a password, but will disable all other actions.
 
 Both `assetThumb` and `dumbThumb` support the following optional customizations:
 
@@ -267,11 +285,12 @@ Both `assetThumb` and `dumbThumb` support the following optional customizations:
 - `thumbWidth` - This parameter specifies the width of the thumbnail in pixels. The default width is `210`.
 - `thumbHeight` - This parameter specifies the height of the thumbnail in pixels. The default height is `297`.
 - `thumbPage` - This parameter specifies the page to generate the thumbnail from. The default is the first page, which is numbered from `0`.
-- `thumbBgColor` - This parameter specifies the background color of the thumbnail. Options include `black`, `rgb(33,66,99)`, and `#123456`. The default color is `white`.
-- `thumbTrim` - This parameter, when set to `true`, trims your page and centers the content. The default value is `false`.
-- `thumbTrimFrameColor` - This parameter changes the color of the trim frame. Colors can be specified as `black` or in RGB format (e.g., `rgb(12,1,2)`) or in HEX format (e.g., `#662266`).
+- `thumbBgColor` - This parameter specifies the background colour of the thumbnail. Options include `black`, `rgb(33,66,99)`, and `#123456`. The default colour is `white`.
+- `thumbTrim` - This parameter, when set to `true`, trims your page and centres the content. The default value is `false`.
+- `thumbTrimFrameColor` - This parameter changes the colour of the trim frame. Colours can be specified as `black` or in RGB format (e.g., `rgb(12,1,2)`) or in HEX format (e.g., `#662266`).
+- `thumbBestfit` - This boolean value determines whether to fit the image within the given dimensions or not. If `true`, the image will be scaled down so that it fits within the given dimensions. If `false`, the image will be stretched or cropped to fill the given dimensions.
 
-All settings can be set globally in plugin settings page and be overwritten individually by `pdfOptions`.
+You can also choose these options globally by checking the options in the Plugin Settings and overwriting them in the `pdfOptions` parameter.
 
 ### Custom fonts
 
@@ -282,7 +301,7 @@ fontdata: { 'roboto' : {
             'R' : 'Roboto-Regular.ttf',
             'I' : 'Roboto-Italic.ttf'
         }},
-		fontDir: "{{craft.app.path.configPath}}/",
+        fontDir: "{{craft.app.path.configPath}}/",
 ```
 
 After the update of MPDF, which is used by our PDF Generator, we have resolved an issue with passed paths. Now, you must provide an absolute path on the server to the config directory. Alternatively, you can pass the main folder. For instance, on ISP Config 3.2 host, you can use: `fontDir`: `/var/www/clients/client0/web21/private/config/`.
@@ -303,15 +322,15 @@ You can generate multiple PDF files in a loop. For example, you can generate a P
 
 ```
 {% for item in craft.entries.section('xxx').orderBy('title asc').all() %}
-	{% set pdfOptions = {
-		date: entry.dateUpdated|date('U'),
-	} %}
-	<a href="
-	{{alias('@web')}}/
-	{{craft.documentHelper.pdf("_pdf/document.twig", "file",  'pdf/' ~ item.id ~ '.pdf' ,item, pdfOptions)}}
-	" download>
-		DOWNLOAD {{item.title}}
-	</a>
+    {% set pdfOptions = {
+        date: entry.dateUpdated|date('U'),
+    } %}
+    <a href="
+    {{alias('@web')}}/
+    {{craft.documentHelper.pdf("_pdf/document.twig", "file",  'pdf/' ~ item.id ~ '.pdf' ,item, pdfOptions)}}
+    " download>
+        DOWNLOAD {{item.title}}
+    </a>
 {% endfor %}
 ```
 
@@ -352,11 +371,11 @@ You can add generated PDF files to your Craft assets. To do this you need to spe
 {% endif %}
 ```
 
-In this example, a timestamp is added to the file URL to ensure the file is refreshed when it changes, beneficial for various caching solutions like [Varnish Cache & Preload](https://plugins.craftcms.com/varnishcache), Blitz, or CDNs like Cloudflare.
+In this example, a timestamp is added to the file URL to ensure the file is refreshed when it changes, beneficial for various caching solutions like [CDN Cache & Preload](https://plugins.craftcms.com/varnishcache), Blitz, or CDNs like Cloudflare.
 
 ### Advanced `pdfAsset` Method Options
 
-By default, the title of the PDF is based on the filename. However, you can override this along with other settings using pdfOptions:
+By default, the title of the PDF is based on the filename. However, you can override this along with other settings using `pdfOptions`:
 
 ```twig
 {% set pdfOptions = {
@@ -373,9 +392,9 @@ In this example:
 
 - assetTitle sets a custom title.
 - assetFilename sets a custom filename.
-- assetDelete when set to true, the file in @root path is deleted and regenerated every time this code runs.
-- assetSiteId sets the site ID of the generated PDF to site with 2 id.
-  You can also use string variables for assetTitle and assetFilename, such as the entry title:
+- assetDelete when set to true, the file in the `@root` path is deleted and regenerated every time this code runs.
+- assetSiteId sets the site ID of the generated PDF to the site with another id.
+  You can also use string variables for `assetTitle` and `assetFilename`, such as the entry title:
 
 ```twig
 {% set pdfOptions = {
@@ -413,9 +432,9 @@ You can also include an image in a PDF document without a plugin, like this:
 
 ```
 {% set image = entry.photoFromCMS.first() %}
-	{% if image is not null %}
-		<img src="{{image.url}}" alt="">
-	{% endif %}
+    {% if image is not null %}
+        <img src="{{image.url}}" alt="">
+    {% endif %}
 ```
 
 #### Thumbnail of Generated PDF on Frontend
@@ -428,19 +447,19 @@ Here's an example:
 <script src="{{alias('@web')}}/pdfThumbnails.js" data-pdfjs-src="{{alias('@web')}}/pdf_js/build/"></script>
 <script src="{{alias('@web')}}/pdf_js/build/pdf.js"></script>
 <script src="{{alias('@web')}}/pdf_js/build/pdf.worker.js"></script>
-				{% header "Cache-Control: no-cache" %}
+                {% header "Cache-Control: no-cache" %}
 <a href="{{alias('@web')}}{{version("/" ~ craft.documentHelper.pdf('_pdf/document.twig', 'file', 'pdf/example.pdf'  , entry, pdfOptions))}}">
 <img class="img-responsive" data-pdf-thumbnail-file="{{alias('@web')}}/pdf/example.pdf" src="{{alias('@web')}}/pdfjs_placeholder.png">
 ```
 
 #### Generating on backend and Displaying Thumbnails by PDF Generator by `assetThumb` option to add into Assets on `pdfAsset` method
 
-To display Image Thumbnail added into Craft CMS Twig template you may use following options:
+To display the Image Thumbnail added to the Craft CMS Twig template you may use the following options:
 
 ```twig
 {% set pdfOptionsAsset = {
-	assetThumb: true
-	}
+    assetThumb: true
+    }
 %}
 {% set asset = craft.documentHelper.pdfAsset('_pdf/document.twig', alias('@root')~'/test.pdf', entry, pdfOptionsAsset, 'pdfFiles') %}
 {% if asset %}
@@ -456,34 +475,34 @@ To display Image Thumbnail added into Craft CMS Twig template you may use follow
 {% else %}
 ```
 
-If you want add image into another Volume than PDF file you may override PDF options with option `assetThumbVolumeHandle`, in this example this will be set into `pdfimages` volume handle:
+If you want to add an image into another Volume than the PDF file you may override PDF options with option `assetThumbVolumeHandle`, in this example this will be set into the `pdfimages` volume handle:
 
 ```twig
 {% set pdfOptionsAsset = {
-	assetThumb: true,
+    assetThumb: true,
     assetThumbVolumeHandle: "pdfimages"
-	}
+    }
 %}
 ```
 
-#### Generating on backend and Displaying Dumb Thumbnails by PDF Generator by `dumbThumb` option to default `pdf` method
+#### Generating on the backend and Displaying Dumb Thumbnails by PDF Generator by `dumbThumb` option to default `pdf` method
 
-To add thumbnails generated with old `pdf` method you may use following code:
+To add thumbnails generated with the old `pdf` method you may use the following code:
 
 ```
 {% set pdfOptionsDumb = {
-	date: entry.dateUpdated|date('U'),
-	dumbThumb: true,
-	}
+    date: entry.dateUpdated|date('U'),
+    dumbThumb: true,
+    }
 %}
 <a href="{{alias('@web')}}/{{craft.documentHelper.pdf('_pdf/document.twig', 'file', 'pdf/example.pdf'  , entry, pdfOptionsDumb)}}">
     <img src="{{alias('@web')}}{{ '/pdf/example.jpg' }}" />
 </a>
 ```
 
-#### Generating on backend and Displaying Thumbnails of PDF Assets by external PDF Transform plugin
+#### Generating on the backend and Displaying Thumbnails of PDF Assets by external PDF Transform plugin
 
-To generate an image thumbnail of a PDF asset, you can use the [PDF Transform](https://plugins.craftcms.com/pdf-transform) plugin. Please note, this feature requires ImageMagick.
+To generate an image thumbnail of a PDF asset, you can use the [PDF Transform](https://plugins.craftcms.com/pdf-transform) plugin. Please note, that the feature requires ImageMagick.
 
 Here's an example of how to generate and display a thumbnail:
 
@@ -506,7 +525,7 @@ If you encounter the following error with PDF Transform:
 attempt to perform an operation not allowed by the security policy `PDF' @ error/constitute.c/IsCoderAuthorized/421
 ```
 
-On our plugin error is in your Craft CMS in `/runtime/logs/web.log` and image is not generated in `pdf` or `pdfAsset`:
+On our plugin error is in your Craft CMS in `/runtime/logs/web.log` and the image is not generated in `pdf` or `pdfAsset`:
 
 ```
 Imagick Error: attempt to perform an operation not allowed by the security policy `PDF' @ error/constitute.c/IsCoderAuthorized/421
@@ -514,7 +533,7 @@ Imagick Error: attempt to perform an operation not allowed by the security polic
 
 This means ImageMagick's security policy is preventing operations on PDF files. To fix this, you'll need to modify the policy.xml file located at `/etc/ImageMagick-6/policy.xml` or `/etc/ImageMagick-7/policy.xml`, depending on your ImageMagick version.
 
-Find and modify the policy related to PDFs to allow the desired operation. Be cautious, as changing this file can have security implications. Make sure you understand the risks and consequences. Here's an example of how to change a policy from disallowing all operations to allowing read and write operations:
+Find and modify the policy related to PDFs to allow the desired operation. Be cautious, as changing this file can have security implications. Make sure you understand the risks and consequences. Here's an example of how to change a policy from disallowing all operations to allowing read-and-write operations:
 
 ```xml
 <!-- Before -->
@@ -528,7 +547,7 @@ Find and modify the policy related to PDFs to allow the desired operation. Be ca
 </policymap>
 ```
 
-Then restart your PHP FPM service if you are using. If you're unsure about modifying this file, consider reaching out to your hosting provider's support team for assistance.
+Then restart your PHP FPM service if you are using it. If you're unsure about modifying this file, consider reaching out to your hosting provider's support team for assistance.
 
 ### Custom Title of PDF Document
 
@@ -536,8 +555,8 @@ To set a custom title for your PDF, use the `title` option in the `pdfOptions` a
 
 ```
 {% set pdfOptions = {
-	...,
-	title: "My awesome Title"
+    ...,
+    title: "My awesome Title"
 } %}
 ```
 
@@ -551,8 +570,8 @@ To pass a string or number to the PDF template, set it as a `custom` variable in
 
 ```
 {% set pdfOptions = {
-	...,
-	custom: variable
+    ...,
+    custom: variable
 } %}
 ```
 
@@ -568,8 +587,8 @@ If you want to pass an array to the PDF template, define the array in the `custo
 
 ```twig
 {% set pdfOptions = {
-	...,
-		custom: {
+    ...,
+        custom: {
        slug: entry.slug,
        created: entry.dateCreated,
        ...
@@ -608,8 +627,8 @@ You can set the PDF Generator plugin to only generate a new PDF file when the da
 
 ```
 {% set pdfOptions = {
-		date: entry.dateUpdated|date('U'),
-	} %}
+        date: entry.dateUpdated|date('U'),
+    } %}
 ```
 
 ### Filename Characters
@@ -634,7 +653,7 @@ With this plugin, your PDF will have a timestamp and any caching policy problems
 
 ### Downloading Multiple PDF Files with JavaScript on Any Page
 
-You can download multiple PDF files with JavaScript on any page. To do this, you can use this example with `pdf` method to specify entries for which you want to generate PDF files.
+You can download multiple PDF files with JavaScript on any page. To do this, you can use this example with the `pdf` method to specify entries for which you want to generate PDF files.
 
 ```
 <script>
@@ -680,7 +699,7 @@ for (var i = files.length - 1; i >= 0; i--) {
 
 #### Example with pdfAsset method
 
-You can download multiple PDF files with JavaScript on any page. To do this, you can use the `pdfs` parameter looped through `pdfAsset` method to specify an array of entries, in this example items of channel section `xxx` for which you want to generate PDF files.
+You can download multiple PDF files with JavaScript on any page. To do this, you can use the `pdfs` parameter looped through the `pdfAsset` method to specify an array of entries, in this example items of channel section `xxx` for which you want to generate PDF files.
 
 ```twig
 {% set pdfs = [] %}
@@ -706,7 +725,7 @@ Navigate to the PDF Generator plugin, and click on the "Optional functions to en
 
 ### Display QRCode
 
-Prepare the `qrdata` string that contains the information you want to encode in the QRCode. The format of the `qrdata` string depends on the type of information you want to attach. You need to install optional package in Plugin Settings `Optional` pane. Here are some common formats:
+Prepare the `qrdata` string that contains the information you want to encode in the QRCode. The format of the `qrdata` string depends on the type of information you want to attach. You need to install an optional package in the Plugin Settings `Optional` pane. Here are some common formats:
 
 - For a website link, you can just use the URL of the website, such as `https://cooltronic.pl/`
 - For a plain text, you can use any message you want, such as `Hello, world!`
@@ -717,9 +736,9 @@ Example:
 
 ```
 {% set pdfOptions = {
-	...
-	qrdata: "https://cooltronic.pl"
-	...
+    ...
+    qrdata: "https://cooltronic.pl"
+    ...
 }
 %}    
 ```
@@ -732,7 +751,7 @@ In the Twig template, insert the QRCode image where you want by using this code:
 
 Where `{{qrimg}}` is the variable that holds the image from the package [PHP QRCode generator](https://php-qrcode.readthedocs.io/).
 
-You can install package manually when you encounter problems in automatic installation for Craft CMS 3.x (you need 3.4) and for 4.x (you need 4.3) version of optional package for display QR Code generation. This is example to how install to your main Craft (`@root`) installation directory:
+You can install the package manually when you encounter problems in automatic installation for Craft CMS 3 (you need 3.4) and for 4 (you need 4.3) version of the optional package for display QR Code generation. This is an example of to how install to your main Craft (`@root`) installation directory:
 
 ```
 # Craft CMS 4
@@ -743,7 +762,7 @@ composer require chillerlan/php-qrcode:^3.4
 
 ### RTL Text Direction
 
-The PDF Generator plugin supports right-to-left (RTL) text direction. To enable RTL text direction set HTML `dir` attribute in your HTML Twig template markup. For example:
+The PDF Generator plugin supports right-to-left (RTL) text direction. To enable RTL text direction set the HTML `dir` attribute in your HTML Twig template markup. For example:
 
 ```
 <div dir="rtl">This is some text in a right-to-left language.</div>
@@ -759,7 +778,7 @@ To specify a language in mPDF, you can use the `lang` attribute in your HTML. Fo
 
 #### Font
 
-In order for mPDF to display the correct characters, you'll also need to use a font that supports the characters of the language you're using. mPDF comes with several fonts that support a wide range of characters. You can set the font using the CSS font-family property. For example, to use the `Arial` font:
+For mPDF to display the correct characters, you'll also need to use a font that supports the characters of the language you're using. mPDF comes with several fonts that support a wide range of characters. You can set the font using the CSS font-family property. For example, to use the `Arial` font:
 
 ```
 div {
@@ -769,7 +788,7 @@ div {
 
 #### RTL full example
 
-Full example on arabic text:
+Full example of arabic text:
 
 ```
 <div dir="rtl" lang="ar" style="font-family: Arial;">هذا نص باللغة العربية</div>
@@ -809,9 +828,9 @@ Replace 'My text watermark example' with the actual text you want to use as a wa
 
 ### Generate PDF Table of Contents
 
-You have the ability to create your own Table of Contents as per the guidelines in the [mPDF ToC documentantion](https://mpdf.github.io/what-else-can-i-do/table-of-contents.html).
+You can create your Table of Contents as per the guidelines in the [mPDF ToC specification](https://mpdf.github.io/what-else-can-i-do/table-of-contents.html).
 
-Additionally, we can enable automatic generation of a Table of Contents from H1-H6 tags present in your PDF document. You can activate this feature by setting the `autoToC` option to true.
+Additionally, we can enable the automatic generation of a Table of Contents from H1-H6 tags present in your PDF document. You can activate this feature by setting the `autoToC` option to true.
 
 For instance:
 
@@ -825,7 +844,7 @@ For instance:
 
 Manually adding bookmarks can be done with the bookmark tag `<bookmark content="Text" />`. The content attribute is used to set the text of the bookmark. You can also use the optional `level` attribute to set the nesting level of the bookmark.
 
-Additionally, we can enable automatic generation of a Bookmarks from H1-H6 tags present in your PDF document. You can activate this feature by setting the `autoBookmarks` option to true. For do that set:
+Additionally, we can enable the automatic generation of Bookmarks from H1-H6 tags present in your PDF document. You can activate this feature by setting the `autoBookmarks` option to true. To do that set:
 
 ```
 {% set pdfOptions = {
@@ -835,8 +854,9 @@ Additionally, we can enable automatic generation of a Bookmarks from H1-H6 tags 
 
 ## Requirements
 
-Craft CMS >= 3.0.0 for 0.x branch
-Craft CMS >= 4.0.0 for 1.x branch
+- This plugin supports Craft CMS `3.0` or above, including `4.0` or above, starting from version `2.0.0` of the plugin in the `master` branch.
+- For Craft CMS version `3.x`, we used version `0.x` of branch `craft3` of the plugin (up to version `0.4.x`) which is deprecated. Please install version `2.0` or above instead. 
+- For Craft CMS version `4.x`, we used version `1.x` of branch `master` of the plugin (up to version `1.3.x`) which is deprecated. Please install version `2.0` or above instead.
 
 ## Support
 

@@ -1,5 +1,34 @@
 # PDF Generator for Craft 3 or 4
 
+## 2.0.0 [CRITICAL] - 2023-12-18
+
+### Added
+
+- `thumbBestfit` option to adjust thumbnail size with best-fit mode when using `dumbThumb` or `assetThumb` options. This improves the quality and appearance of thumbnails.
+- `protection` mode and helper options to enhance password protection of PDFs with ISO, DIN, and BSI standards (**Plus** Plan required). This enhances the security and privacy of documents.
+- Option to remove the plugin’s invisible watermark from generated documents (**Plus** Plan required). This improves the aesthetics and professionalism of documents.
+- `URLTwigRender` option to render Twig variables on parsed custom URLs as optional. This allows to use of attributes like `{{custom}}` or QR Code as `{{qrimg}}` from parsed custom URL.
+- `startPage` is the first page of the PDF to be generated. You can use this option to trim unnecessary pages from the beginning of the PDF.
+- `endPage` is the last page of the PDF to be generated. You can use this option to trim unnecessary pages from the end of the PDF.
+- `URLMode` option can be set to `curl`, to get via CURL instead of file_get_contents.
+
+### Changed
+
+- [BREAKING] Merged two Craft CMS branches `craft3` and `master` into one package with version `2.0.0`. This requires updating the plugin to use it on Craft CMS 3.x and 4.x.
+- Improved the layout and design of the settings control panel tabs. This improves the usability and responsiveness of the settings control panel.
+- Refactored code of `DocumentHelperVariable.php` to remove duplicate code and improve readability. This improves the maintainability and compatibility of the code.
+- Implemented **Plus** functionality in the plugin to restrict some new features for paying users. These features include the new `protection` mode and the option to remove the plugin’s watermark. Please consider upgrading to the **Plus** plan to use them.
+
+### Fixed
+
+- [SECURITY] Bug in the functions when parsing URL content with unset `URLPurify` option. This bug could allow malicious users to inject arbitrary code into your website by sending specially crafted URLs. This fix prevents this vulnerability by sanitizing the input before passing without setting `URLPurify`.
+- Missing `encoding` setting in the plugin panel for Craft CMS 3.x branch.
+- Improper handle of a plugin into `document-helpers` which is used in the Plugin Store.
+
+### Removed
+
+[BREAKING] Discontinued the separate `craft3` branch for Craft CMS 3 and unified the codebase for both Craft CMS 3 and 4 in the `master` branch. This requires updating the plugin to the latest version to use it on either Craft CMS version.
+
 ## 1.3.2 - 2023-12-11
 
 ### Fixed

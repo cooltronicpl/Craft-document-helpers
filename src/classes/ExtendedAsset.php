@@ -4,7 +4,7 @@
  *
  * Class ExtendedAsset
  *
- * PDF Generator plugin for Craft CMS 3 or Craft CMS 4.
+ * PDF Generator plugin for Craft CMS 4.
  *
  * @link      https://cooltronic.pl
  * @link      https://potacki.com
@@ -20,7 +20,7 @@
   * @author    CoolTRONIC.pl sp. z o.o. <github@cooltronic.pl>
   * @author    Pawel Potacki
   * @since     1.2.2
-  * @since     0.3.2
+  * 
   */
 class ExtendedAsset extends craft\elements\Asset {
     public $assetThumb;

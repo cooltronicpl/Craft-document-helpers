@@ -2,7 +2,7 @@
 /**
  *
  * Class DocumentHelper
- * 
+ *
  * PDF Generator plugin for Craft CMS 3 or Craft CMS 4
  *
  * @link      https://cooltronic.pl
@@ -13,12 +13,12 @@
 
 namespace cooltronicpl\documenthelpers;
 
+use cooltronicpl\documenthelpers\controller\PluginInstallController;
+use cooltronicpl\documenthelpers\models\Settings;
 use cooltronicpl\documenthelpers\variables\DocumentHelperVariable;
+use Craft;
 use craft\base\Plugin;
 use craft\web\twig\variables\CraftVariable;
-use cooltronicpl\documenthelpers\models\Settings;
-use cooltronicpl\documenthelpers\controller\PluginInstallController;
-use Craft;
 use yii\base\Event;
 
 /**
@@ -40,51 +40,23 @@ class DocumentHelper extends Plugin
      */
     public static $plugin;
 
+    const EDITION_LITE = 'lite';
+    const EDITION_PLUS = 'plus';
+    const EDITION_PRO = 'pro';
+
+    public static function editions(): array
+    {
+        return [
+            self::EDITION_LITE,
+            self::EDITION_PLUS,
+            self::EDITION_PRO,
+        ];
+    }
     // Public Properties
     // =========================================================================
 
-    /**
-     * @var string
-     */
-    public string $schemaVersion = '1.0.0';
-
     // Public Methods
     // =========================================================================
-    public function hasCpSection()
-    {
-        return false;
-    }
-
-    public function hasSettings()
-    {
-        return true;
-    }
-
-    public $controllerMap = [
-        'install' => PluginInstallController::class,
-    ];
-
-    protected function settingsHtml(): string
-    {
-        // Get the settings model
-        $settings = $this->getSettings();
-
-        return \Craft::$app->getView()->renderTemplate(
-            'documenthelpers/_settings',
-            [
-                'settings' => $settings,
-            ]
-        );
-    }
-
-    /**
-     * @return Settings
-     */
-    protected function createSettingsModel(): Settings
-    {
-        return new Settings();
-    }
-    
     /**
      * {@inheritdoc}
      */
@@ -101,8 +73,67 @@ class DocumentHelper extends Plugin
                 $variable->set('documentHelper', DocumentHelperVariable::class);
             }
         );
-        Craft::setAlias('@documenthelpers', __DIR__);
+        Craft::setAlias('@document-helpers', __DIR__);
         parent::init();
+    }
+
+    public function isPlusEdition()
+    {
+        return $this->is(self::EDITION_PLUS);
+    }
+
+    public function hasCpSection()
+    {
+        return false;
+    }
+
+    public function hasSettings()
+    {
+        return true;
+    }
+
+    public $controllerMap = [
+        'install' => PluginInstallController::class,
+    ];
+
+    public function rules()
+    {
+        $rules = parent::rules();
+        $attributes = ['protection', 'disableCopyright', 'protectionCopy',
+            'protectionPrint', 'protectionModify', 'protectionAnnotForms',
+            'protectionExtract', 'protectionAssemble', 'protectionFillForms',
+            'protectionPrintHighres', 'protectionNoUserPassword'];
+
+        foreach ($attributes as $attribute) {
+            $rules[] = [$attribute, function ($attribute, $params, $validator) {
+                if (!$this->isPlusEdition()) {
+                    $this->$attribute = false;
+                }
+            }];
+        }
+    }
+
+    // Protected Methods
+    // =========================================================================
+
+    protected function settingsHtml(): string
+    {
+        $settings = $this->getSettings();
+
+        return \Craft::$app->getView()->renderTemplate(
+            'document-helpers/_settings',
+            [
+                'settings' => $settings,
+            ]
+        );
+    }
+
+    /**
+     * @return Settings
+     */
+    protected function createSettingsModel(): Settings
+    {
+        return new Settings();
     }
 
 }

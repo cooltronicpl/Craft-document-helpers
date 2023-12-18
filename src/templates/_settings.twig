@@ -1,6 +1,15 @@
-{% extends "documenthelpers/_layouts/cpp.twig" %}
+{% extends "document-helpers/_layouts/cpp.twig" %}
 
 {% import "_includes/forms" as forms %}
+
+{% set edition = craft.app.plugins.getPlugin('document-helpers').edition %}
+{% if edition == 'plus' %}
+    {% set isEnabledPlus = true %}
+    {% set isDisabledPlus = false %}
+{% else %}
+    {% set isEnabledPlus = false %}
+    {% set isDisabledPlus = true %}
+{% endif %}
 
 {% set title = 'PDF Generator' %}
 
@@ -8,14 +17,25 @@
 
 {% set tabs = {
     general: {label: 'General'|t, url: '#general'},
-    thumb: {label: 'Thumbnails (ImageMagick)'|t, url: "#thumb" },
-    optional: {label: 'Optional functions to enable'|t, url: '#optional'}
+    metadata: {label: 'Metadata'|t, url: "#metadata"},
+    protect: {label: 'Protection'|t, url: "#protect" },
+    asset: {label: 'Assets'|t, url: "#asset"},
+    thumb: {label: 'Thumbnails'|t, url: "#thumb" },
+    optional: {label: 'Optional functions'|t, url: '#optional'}
 } %}
 {% block content %}
 
 	<div class="tab-contents">
 
 		<div id="content-general" class="tab-content">
+        						<h2>
+				Edition
+			</h2>
+			<p>
+				You have
+				<strong>{{ craft.app.plugins.getPlugin('document-helpers').edition|upper }}</strong>
+				plan active</p>
+
 			<h2>Welcome! General Settings</h2>
 
 			<p>The general settings section is optional in configuring your PDF Generator default values of plugin. Here, you can set default options for your generated PDFs.</p>
@@ -24,7 +44,6 @@
 				<a href="https://github.com/cooltronicpl/Craft-document-helpers#overriding-default-options">here</a>.</p>
 
 			<p>You can override default value in the Twig functions individually for every variable in `pdfOptions`.</p>
-
 			{{ forms.textField({
     label: "Header template" | t,
     id: 'header',
@@ -101,15 +120,6 @@
     errors: settings.getErrors('encoding')
 }) }}
 
-			{{ forms.textField({
-    label: "Password" | t,
-    id: 'password',
-    name: 'password',
-    instructions: "This can be used to add password protection to your PDF."|t,
-    value: settings. password|default(null),
-    errors: settings.getErrors('password')
-}) }}
-
 			{{ forms.lightswitchField({
     label: "No automatic page break" | t,
     id: 'no_auto_page_break',
@@ -118,23 +128,6 @@
     on: settings.no_auto_page_break,
 
 }) }}
-
-			{{ forms.textField({
-    label: "Author" | t,
-    id: 'author',
-    name: 'author',
-    instructions: "This sets the author metadata. It should be provided as a string."|t,
-    value: settings. author|default(null),
-    errors: settings.getErrors('author')
-}) }}
-			{{ forms.textField({
-    label: "Keywords" | t,
-    id: 'keywords',
-    name: 'keywords',
-    instructions: "This sets the keyword metadata. It should be provided as a string in the following format: `keyword1, longer keyword2, keyword3`."|t,
-    value: settings. keywords|default(null),
-    errors: settings.getErrors('keywords')
-}) }}
 			{{ forms.textField({
     label: "Temporary directory" | t,
     id: 'tempDir',
@@ -142,6 +135,14 @@
     instructions: "This sets the path to the temporary directory used for generating PDFs. We have tested this with the main /tmp directory on the server with success. This could potentially improve performance when generating multiple PDFs."|t,
     value: settings. tempDir|default(null),
     errors: settings.getErrors('tempDir')
+}) }}
+			{{ forms.lightswitchField({
+    label: "Mirror margins" | t,
+    id: 'mirrorMargins',
+    name: 'mirrorMargins',
+    instructions: "Whether to use different margins for odd and even pages." | t,
+    on: settings.mirrorMargins,
+
 }) }}
 			{{ forms.lightswitchField({
     label: "Landscape" | t,
@@ -165,6 +166,22 @@
     instructions: "This sets the paper size for the PDF. The default is A4, but you can set other sizes compatible with MPDF. Other popular formats include: A3, A4 (default), A5, Letter (8,5 x 11 in), Legal (8,5 x 14 in), Executive (7,25 x 10,5 in), B4, B5"|t,
     value: settings. format|default(null),
     errors: settings.getErrors('format')
+}) }}
+			{{ forms.textField({
+    label: "Start page" | t,
+    id: 'startPage',
+    name: 'startPage',
+    instructions: "The first page of the PDF to be generated. You can use this option to trim unnecessary pages from the beginning of the PDF. For example `2` will skip the first page of the PDF."|t,
+    value: settings. startPage|default(null),
+    errors: settings.getErrors('startPage')
+}) }}
+			{{ forms.textField({
+    label: "End page" | t,
+    id: 'endPage',
+    name: 'endPage',
+    instructions: "The last page of the PDF to be generated. You can use this option to trim unnecessary pages from the end of the PDF. For example, `10` will generate a PDF with only 10 pages."|t,
+    value: settings. watermarkText|default(null),
+    errors: settings.getErrors('endPage')
 }) }}
 			{{ forms.textField({
     label: "Watermark image" | t,
@@ -196,6 +213,42 @@
     instructions: "This option automatically generates bookmarks using the H1-H6 tags in your document."|t,
     on: settings.autoBookmarks,
 }) }}
+			{{ forms.lightswitchField({
+    label: "Provided URL Rendering Attributees" | t,
+    id: 'URLTwigRender',
+    name: 'URLTwigRender',
+    on: settings.URLTwigRender,
+    instructions: "If this is set it enables external URL rendering of `template`, `header` or `footer` of variables like `{{custom}}` or `{{qrimg}}` in external template." | t,
+}) }}
+		</div>
+		<div id="content-metadata" class="tab-content">
+			{{ forms.textField({
+    label: "Author" | t,
+    id: 'author',
+    name: 'author',
+    instructions: "This sets the author metadata. It should be provided as a string."|t,
+    value: settings. author|default(null),
+    errors: settings.getErrors('author')
+}) }}
+			{{ forms.textField({
+    label: "Keywords" | t,
+    id: 'keywords',
+    name: 'keywords',
+    instructions: "This sets the keyword metadata. It should be provided as a string in the following format: `keyword1, longer keyword2, keyword3`."|t,
+    value: settings. keywords|default(null),
+    errors: settings.getErrors('keywords')
+}) }}
+			{{ forms.lightswitchField({
+    label: "Disable Copyright (Plus)" | t,
+    id: 'disableCopyright',
+    name: 'disableCopyright',
+    instructions: "This option disables copyrights."|t,
+    on: settings.disableCopyright,
+    disabled: isDisabledPlus
+
+}) }}
+		</div>
+		<div id="content-asset" class="tab-content">
 			{{ forms.textField({
     label: "Asset title" | t,
     id: 'assetTitle',
@@ -246,9 +299,9 @@
 			{{ forms.textField({
     label: "Asset thumb volume handle" | t,
     id: 'assetThumbVolumeHandle',
-    name: 'assetThumbVolumeHandle'|default(null),
+    name: 'assetThumbVolumeHandle',
     instructions: "This is an optional parameter that specifies the Volume Handle for the thumbnail. If not provided, the PDF Volume Handle is used. The volume handle must have a `Base URL` in your test: `@web\pdffiles` in Craft CMS Filesystems, Assets settings."|t,
-    value: settings. assetThumbVolumeHandle,
+    value: settings. assetThumbVolumeHandle|default(null),
     errors: settings.getErrors('assetThumbVolumeHandle')
 }) }}
 			{{ forms.lightswitchField({
@@ -296,6 +349,13 @@
     value: settings. thumbPage|default(null),
     errors: settings.getErrors('thumbPage')
 }) }}
+	{{ forms.lightswitchField({
+    label: "Thumb Best Fit" | t,
+    id: 'thumbBestfit',
+    name: 'thumbBestfit',
+    instructions: "This boolean value that determines whether to fit the image within the given dimensions or not. If on, the image will be scaled down so that it fits within the given dimensions. If off, the image will be stretched or cropped to fill the given dimensions." | t,
+    on: settings.thumbBestfit,
+}) }}
 			{{ forms.textField({
     label: "Thumb background color" | t,
     id: 'thumbBgColor',
@@ -321,6 +381,108 @@
     errors: settings.getErrors('thumbTrimFrameColor')
 }) }}
 		</div>
+		<div id="content-protect" class="tab-content">
+
+			{{ forms.textField({
+    label: "Password" | t,
+    id: 'password',
+    name: 'password',
+    instructions: "You can set a password that will be required to open or modify the PDF file."|t,
+    value: settings. password|default(null),
+    errors: settings.getErrors('password')
+}) }}
+
+			{{ forms.lightswitchField({
+    label: "Protection mode (Plus)" | t,
+    id: 'protection',
+    name: 'protection',
+    instructions: "You can enable the protection mode to restrict the actions that can be performed on the PDF file."|t,
+    on: settings.protection,
+    disabled: isDisabledPlus
+
+}) }}
+			<p>The protection mode allows you to choose from the following values to make the PDF file compatible with ISO or DIN standards:</p>
+
+			{{ forms.lightswitchField({
+    label: "Allow copy (Plus)" | t,
+    id: 'protectionCopy',
+    name: 'protectionCopy',
+    instructions: "This option allows the user to copy text and graphics from the PDF file." | t,
+    on: settings.protectionCopy,
+    disabled: isDisabledPlus
+}) }}
+			{{ forms.lightswitchField({
+    label: "Allow print (Plus)" | t,
+    id: 'protectionPrint',
+    name: 'protectionPrint',
+    instructions: "This option allows the user to print the PDF file in low resolution." | t,
+    on: settings.protectionPrint,
+    disabled: isDisabledPlus
+}) }}
+			{{ forms.lightswitchField({
+    label: "Allow print in highres (Plus)" | t,
+    id: 'protectionPrintHighres',
+    name: 'protectionPrintHighres',
+    instructions: "This option allows the user to print the PDF file in high resolution." | t,
+    on: settings.protectionPrintHighres,
+    disabled: isDisabledPlus
+
+}) }}
+			{{ forms.lightswitchField({
+    label: "Allow modify contents (Plus)" | t,
+    id: 'protectionModify',
+    name: 'protectionModify',
+    instructions: "This option allows the user to modify the contents of the PDF file." | t,
+    on: settings.protectionModify,
+    disabled: isDisabledPlus
+
+}) }}
+			{{ forms.lightswitchField({
+    label: "Allow annotations and forms fields (Plus)" | t,
+    id: 'protectionAnnotForms',
+    name: 'protectionAnnotForms',
+    instructions: "This option allows the user to add annotations and form fields to the PDF file." | t,
+    on: settings.protectionAnnotForms,
+    disabled: isDisabledPlus
+
+}) }}
+			{{ forms.lightswitchField({
+    label: "Allow extracting content (Plus)" | t,
+    id: 'protectionExtract',
+    name: 'protectionExtract',
+    instructions: "This option allows the user to extract text and graphics from the PDF file." | t,
+    on: settings.protectionExtract,
+    disabled: isDisabledPlus
+
+}) }}
+			{{ forms.lightswitchField({
+    label: "Allow assemble - combining pages (Plus)" | t,
+    id: 'protectionAssemble',
+    name: 'protectionAssemble',
+    instructions: "This option allows the user to combine pages and documents in the PDF file." | t,
+    on: settings.protectionAssemble,
+    disabled: isDisabledPlus
+
+}) }}
+			{{ forms.lightswitchField({
+    label: "Allow fill forms (Plus)" | t,
+    id: 'protectionFillForms',
+    name: 'protectionFillForms',
+    instructions: "This option allows the user to fill in existing form fields in the PDF file." | t,
+    on: settings.protectionFillForms,
+    disabled: isDisabledPlus
+
+}) }}
+			{{ forms.lightswitchField({
+    label: "Enable user reading without provided password (Plus)" | t,
+    id: 'protectionNoUserPassword',
+    name: 'protectionNoUserPassword',
+    instructions: "This option allows the user to open the PDF file without a password." | t,
+    on: settings.protectionNoUserPassword,
+    disabled: isDisabledPlus
+
+}) }}
+		</div>
 		<div id="content-optional" class="tab-content">
 			<h2>
 				Install optional packages
@@ -331,7 +493,15 @@
 			<p>
 				<a hrf="https://github.com/chillerlan/php-qrcode">chillerlan/php-qrcode</a>
 				for QR Code generation</p>
-			<a href="{{ actionUrl('documenthelpers/install/install-package', { package: 'chillerlan/php-qrcode' , version: "4.3"}) }}" class="btn btngroup-btn-first">Install package for QR Code generation</a>
+{% set craftVersion = craft.app.getVersion() %}
+
+{% if craftVersion starts with '3.' %}
+  {% set qrVersion = '3.4' %}
+{% elseif craftVersion starts with '4.' %}
+  {% set qrVersion = '4.3' %}
+{% endif %}
+
+<a href="{{ actionUrl('document-helpers/install/install-package', { package: 'chillerlan/php-qrcode' , version: qrVersion }) }}" class="btn btngroup-btn-first">Install package for QR Code generation</a>
 
 			{{forms.textField({
     label: "QR Data to generate" | t,
@@ -344,13 +514,18 @@
 			<p>
 				<a href="https://github.com/ezyang/htmlpurifier">ezyang/htmlpurifier</a>
 				for HTML (URL) purifier for problems with scraped websites on some URLs.</p>
-			<a href="{{ actionUrl('documenthelpers/install/install-package', { package: 'ezyang/htmlpurifier' , version: "4.17"}) }}" class="btn btngroup-btn-first">Install package for scraped URL HTML purify</a>
+{% if craftVersion starts with '3.' %}
+  {% set purifierVersion = '4.13' %}
+{% elseif craftVersion starts with '4.' %}
+  {% set purifierVersion = '4.17' %}
+{% endif %}
+			<a href="{{ actionUrl('document-helpers/install/install-package', { package: 'ezyang/htmlpurifier' , version: purifierVersion}) }}" class="btn btngroup-btn-first">Install package for scraped URL HTML purify</a>
 			{{ forms.lightswitchField({
     label: "Provided URL (HTML) Purfiy" | t,
     id: 'URLPurify',
     name: 'URLPurify',
     on: settings.URLPurify,
-    instructions: "If this is set it enables URL Purification by external library." | t,
+    instructions: "If this is set it enables external URL Purification by external library." | t,
 }) }}
 			{{forms.textField({
     label: "Custom PHP Path" | t,
@@ -362,28 +537,46 @@
 }) }}
 		</div>
 	</div>
-	<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
-
-	{# Write your JavaScript #}
-	<script>
-		$(document).ready(function () { // Hide all tab content divs by default
+{% endblock %}
+{% html at head %}
+<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+{% endhtml %}
+	{% js at endBody %}
+$(document).ready(function () {
 $('.tab-content').hide();
 
-// Show the first tab content div
 $('.tab-content:first').show();
 
-// When a tab is clicked
-$('.scrollable a').click(function () { // Get the ID of the tab
+$('.scrollable a').click(function () {
 
 var tabId = $(this).attr('id').replace('settings-tab-', '');
-// Hide all tab content divs
 $('.tab-content').hide();
 
-// Show the clicked tab's content div and select current tab
 $('#settings-content-' + tabId).show();
 $('.sel').removeClass('sel');
 $(this).addClass('sel');
 });
 });
-	</script>
-{% endblock %}
+var fields = [
+"protection",
+"protectionCopy",
+"protectionPrint",
+"protectionModify",
+"protectionAnnotForms",
+"protectionExtract",
+"protectionAssemble",
+"protectionFillForms",
+"protectionPrintHighres",
+"protectionNoUserPassword",
+"disableCopyright"
+];
+if ({{isDisabledPlus}}==true) {
+for (var field of fields) {
+var lightswitchField = document.getElementById("settings-"+field);
+lightswitchField.disabled = true;
+lightswitchField.classList.remove("on");
+var lightswitchFieldContainer = document.getElementById("settings-"+field+"-field");
+lightswitchFieldContainer.classList.add("disabled");
+}
+}
+{% endjs %}

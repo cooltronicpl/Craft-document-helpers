@@ -61,10 +61,26 @@ class Settings extends Model
     public $thumbBgColor = null;
     public $thumbTrim = null;
     public $thumbTrimFrameColor = null;
+    public $thumbBestfit = false;
     public $phpPath = null;
     public $encoding = null;
     public $URLPurify = null;
-    
+    public $protection = null;
+    public $protectionCopy = false;
+    public $protectionPrint = false;
+    public $protectionModify = false;
+    public $protectionAnnotForms = false;
+    public $protectionExtract = false;
+    public $protectionAssemble = false;
+    public $protectionFillForms = false;
+    public $protectionPrintHighres = false;
+    public $protectionNoUserPassword = false;
+    public $disableCopyright = false;
+    public $URLTwigRender = false;
+    public $mirrorMargins = null;
+    public $startPage = null;
+    public $endPage = null;
+
     public function rules(): array
     {
         return [
@@ -74,6 +90,15 @@ class Settings extends Model
             [['assetDelete'], 'boolean'],
             [['autoToC'], 'boolean'],
             [['autoBookmarks'], 'boolean'],
+            [['disableCopyright'], 'boolean'],
+            [['thumbBestfit'], 'boolean'],
+            [['URLTwigRender'], 'boolean'],
+            [['startPage'], 'integer'],
+            [['endPage'], 'integer'],
+            [['margin_top'], 'integer'],
+            [['margin_bottom'], 'integer'],
+            [['margin_left'], 'integer'],
+            [['margin_right'], 'integer'],
         ];
     }
 }

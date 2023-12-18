@@ -13,6 +13,8 @@
 
 namespace cooltronicpl\documenthelpers\controller;
 
+use cooltronicpl\documenthelpers\classes\ExtendedAsset;
+use cooltronicpl\documenthelpers\classes\ExtendedAssetv3;
 use Craft;
 use craft\helpers\StringHelper;
 use craft\helpers\UrlHelper;
@@ -31,13 +33,11 @@ class PluginInstallController extends Controller
 
     public function actionInstallPackage()
     {
-        // Check if the package parameter is set
         $package = Craft::$app->request->getParam('package');
         $version = Craft::$app->request->getParam('version');
-
         if ($package && $version) {
             $root = Craft::getAlias('@root');
-            $composer = Craft::getAlias('@documenthelpers') . '/' . 'resources/composer.phar';
+            $composer = Craft::getAlias('@document-helpers') . '/' . 'resources/composer.phar';
             $php = $this->getPHPExecutable();
             if (isset($_SERVER["WINDIR"])) {
                 exec("cd " . StringHelper::toString($root) . " && " . StringHelper::toString($php) . " " . StringHelper::toString($composer) . " require " . StringHelper::toString($package) . ":^" . StringHelper::toString($version), $out, $retval);
@@ -61,37 +61,55 @@ class PluginInstallController extends Controller
             } else {
                 Craft::$app->session->setError(StringHelper::toString("Error when installing $package: ".StringHelper::toString($out)." Exec() retval: " . StringHelper::toString($retval)));
             }
-            return $this->redirect(UrlHelper::cpUrl('settings/plugins/documenthelpers'));
         }
+        else {
+            Craft::$app->session->setError(StringHelper::toString("No composer package or version specified. Package: " . StringHelper::toString($package) . ". Version: " . StringHelper::toString($version)));
+
+        }
+        return $this->redirect(UrlHelper::cpUrl('settings/plugins/document-helpers'));
     }
 
     private function getPHPExecutable()
     {
-        $plugin = Craft::$app->plugins->getPlugin('documenthelpers');
-        // Get the settings
-        $settings = $plugin->getSettings();
-        $settings = $settings->toArray();
+        $plugin = Craft::$app->plugins->getPlugin('document-helpers');
+        $settings = $plugin->getSettings()->toArray();;
         $phpPath = $settings['phpPath'];
         if (isset($phpPath) && @defined($phpPath) && !empty($phpPath) ) {
             return $phpPath;
         }
+        $craftVersion = Craft::$app->getVersion();
+        if (version_compare($craftVersion, '4.0', '>=')) {
+            exec("which php8.0", $out, $ret);
+            if ($ret == 0) {
+                return $out;
+            }
+            exec("which php8.1", $out, $ret);
+            if ($ret == 0) {
+                return $out;
+            }
+            exec("which php8.2", $out, $ret);
+            if ($ret == 0) {
+                return $out;
+            }
+            exec("which php8.3", $out, $ret);
+            if ($ret == 0) {
+                return $out;
+            }
+        } elseif (version_compare($craftVersion, '3.0', '>=')) {
+            exec("which php7.2", $out, $ret);
+            if ($ret == 0) {
+                return $out;
+            }
+            exec("which php7.3", $out, $ret);
+            if ($ret == 0) {
+                return $out;
+            }
+            exec("which php7.4", $out, $ret);
+            if ($ret == 0) {
+                return $out;
+            }
+        }
 
-        exec("which php8.0", $out, $ret);
-        if ($ret == 0) {
-            return $out;
-        }
-        exec("which php8.1", $out, $ret);
-        if ($ret == 0) {
-            return $out;
-        }
-		exec("which php8.2", $out, $ret);
-        if ($ret == 0) {
-            return $out;
-        }
-		exec("which php8.3", $out, $ret);
-        if ($ret == 0) {
-            return $out;
-        }
         if (@defined(PHP_BINARY) && str_contains(PHP_BINARY, 'php')) {
             return PHP_BINARY;
         }
@@ -102,7 +120,6 @@ class PluginInstallController extends Controller
 
         $paths = explode(PATH_SEPARATOR, getenv('PATH'));
         foreach ($paths as $path) {
-            // we need this for XAMPP (Windows)
             if (strstr($path, 'php.exe') && isset($_SERVER["WINDIR"]) && file_exists($path) && is_file($path)) {
                 return $path;
             } else {
@@ -119,7 +136,7 @@ class PluginInstallController extends Controller
             }
         }
 
-        return "php"; // not found
+        return "php";
     }
 
 }

@@ -15,8 +15,15 @@
 namespace cooltronicpl\documenthelpers\variables;
 
 use cooltronicpl\documenthelpers\classes\ExtendedAsset;
+use cooltronicpl\documenthelpers\classes\ExtendedAssetv3;
+use cooltronicpl\documenthelpers\DocumentHelper as DocumentHelpers;
 use Craft;
 use craft\helpers\FileHelper;
+use craft\helpers\StringHelper;
+use Twig\Error\LoaderError;
+use Twig\Error\RuntimeError;
+use Twig\Error\SyntaxError;
+use yii\base\Exception;
 
 /**
  * @author    CoolTRONIC.pl sp. z o.o. <github@cooltronic.pl>
@@ -27,13 +34,13 @@ class DocumentHelperVariable
 {
     /**
      * Fuction generates PDF with settings
-     * @param string $template twig template.
-     * @param string $destination type of generated document.
-     * @param string $filename the filename.
-     * @param array $variables Craft vars to parse.
-     * @param array $attributes optional atts passed to funtcion
+     * @param string $template Input content as path of Twig template, URL or Code block
+     * @param string $destination type of generated document
+     * @param string $filename Generated PDF filename
+     * @param array $variables Craft variables to parse into template
+     * @param array $attributes Optional attributes passed to funtcion as `pdfOptions` which is merged and overwriten over global plugin Settings
      *
-     * @return string
+     * @return string Filename, contents of PDF file, or null on error
      */
     public function pdf($template, $destination, $filename, $variables, $attributes)
     {
@@ -46,10 +53,8 @@ class DocumentHelperVariable
 
         $defaultConfig = (new \Mpdf\Config\ConfigVariables())->getDefaults();
         $defaultFontConfig = (new \Mpdf\Config\FontVariables())->getDefaults();
-        $plugin = Craft::$app->plugins->getPlugin('documenthelpers');
-        // Get the settings
-        $settings = $plugin->getSettings();
-        $settings = $settings->toArray();
+        $plugin = Craft::$app->plugins->getPlugin('document-helpers');
+        $settings = $plugin->getSettings()->toArray();
         foreach ($settings as $key => $value) {
             if ($value === '') {
                 $settings[$key] = null;
@@ -68,7 +73,7 @@ class DocumentHelperVariable
             if (class_exists('chillerlan\\QRCode\\QRCode')) {
                 $settings['qrdata'] = (new \chillerlan\QRCode\QRCode)->render($settings['qrdata']);
             } else {
-                $settings['qrdata'] = Craft::getAlias('@documenthelpers') . '/' . "resources/QR.jpg";
+                $settings['qrdata'] = Craft::getAlias('@document-helpers') . '/' . "resources/QR.jpg";
             }
         }
 
@@ -78,80 +83,18 @@ class DocumentHelperVariable
             'title' => $variables['title'] ?? null,
             'qrimg' => $settings['qrdata'] ?? null,
         ];
-        if (file_exists(Craft::getAlias('@templates') . '/' . $template) && is_file(Craft::getAlias('@templates') . '/' . $template)) {
-            $html = Craft::$app->getView()->renderTemplate($template, $vars);
+        if (isset($template)) {
+            $html = $this->generateContent($template, $vars, $settings);
         }
-        elseif (filter_var($template, FILTER_VALIDATE_URL)) {
-            $html = file_get_contents($template);
-            if (isset($settings['URLPurify']) && $settings['URLPurify'] == true && file_exists(Craft::getAlias('@root') . '/vendor/ezyang/htmlpurifier/library/HTMLPurifier.autoload.php') && is_file(Craft::getAlias('@root') . '/vendor/ezyang/htmlpurifier/library/HTMLPurifier.autoload.php')) {
-                require_once Craft::getAlias('@root') . '/vendor/ezyang/htmlpurifier/library/HTMLPurifier.autoload.php';
-                $config = \HTMLPurifier_Config::createDefault();
-                if (isset($settings['encoding'])) {
-                    $config->set('Core.Encoding', $settings['encoding']);
-                }
-                $config->set('HTML.Allowed', 'img[src|alt|width|height]');
-                $config->set('URI.DisableExternalResources', false);
-                $purifier = new \HTMLPurifier($config);
-                $html = $purifier->purify($html);
-
-            }
-        } elseif ($template != strip_tags($template)) {
-            $html = Craft::$app->getView()->renderString($template, $vars);
-        } 
-        else {
-            $html = "<h1>Error in retriving a template, contents:<br> ".$template."</h1>";
+        if (isset($settings['header'])) {
+            $html_header = $this->generateContent($settings['header'], $vars, $settings);
         }
-        if(isset($settings['header'])){
-            if (file_exists(Craft::getAlias('@templates') . '/' . $settings['header']) && is_file(Craft::getAlias('@templates') . '/' . $settings['header'])) {
-                $html_header = Craft::$app->getView()->renderTemplate($settings['header'], $vars);
-            }
-            elseif (filter_var($settings['header'], FILTER_VALIDATE_URL)) {
-                $html_header = file_get_contents($settings['header']);
-                if (isset($settings['URLPurify']) && $settings['URLPurify'] == true && file_exists(Craft::getAlias('@root') . '/vendor/ezyang/htmlpurifier/library/HTMLPurifier.autoload.php') && is_file(Craft::getAlias('@root') . '/vendor/ezyang/htmlpurifier/library/HTMLPurifier.autoload.php')) {
-                    require_once Craft::getAlias('@root') . '/vendor/ezyang/htmlpurifier/library/HTMLPurifier.autoload.php';
-                    $config = \HTMLPurifier_Config::createDefault();
-                    if (isset($settings['encoding'])) {
-                        $config->set('Core.Encoding', $settings['encoding']);
-                    }
-                    $config->set('HTML.Allowed', 'img[src|alt|width|height]');
-                    $config->set('URI.DisableExternalResources', false);
-                    $purifier = new \HTMLPurifier($config);
-                    $html = $purifier->purify($html);
-    
-                }
-            } elseif ($settings['header'] != strip_tags($settings['header'])) {
-                $html_header = Craft::$app->getView()->renderString($settings['header'], $vars);
-            } 
-            else {
-                $html_header = "<h1>Error in retriving a template of header, contents:<br> ".$settings['header']."</h1>";
-            }
+        if (isset($settings['footer'])) {
+            $html_footer = $this->generateContent($settings['footer'], $vars, $settings);
         }
-        if(isset($settings['footer'])){
-            if (file_exists(Craft::getAlias('@templates') . '/' . $settings['footer']) && is_file(Craft::getAlias('@templates') . '/' . $settings['footer'])) {
-                $html_footer = Craft::$app->getView()->renderTemplate($settings['footer'], $vars);
-            }
-            elseif (filter_var($settings['footer'], FILTER_VALIDATE_URL)) {
-                $html_footer = file_get_contents($settings['footer']);
-                if (isset($settings['URLPurify']) && $settings['URLPurify'] == true && file_exists(Craft::getAlias('@root') . '/vendor/ezyang/htmlpurifier/library/HTMLPurifier.autoload.php') && is_file(Craft::getAlias('@root') . '/vendor/ezyang/htmlpurifier/library/HTMLPurifier.autoload.php')) {
-                    require_once Craft::getAlias('@root') . '/vendor/ezyang/htmlpurifier/library/HTMLPurifier.autoload.php';
-                    $config = \HTMLPurifier_Config::createDefault();
-                    if (isset($settings['encoding'])) {
-                        $config->set('Core.Encoding', $settings['encoding']);
-                    }
-                    $config->set('HTML.Allowed', 'img[src|alt|width|height]');
-                    $config->set('URI.DisableExternalResources', false);
-                    $purifier = new \HTMLPurifier($config);
-                    $html_footer = $purifier->purify($html);
-    
-                }
-            } elseif ($settings['footer'] != strip_tags($settings['footer'])) {
-                $html_footer = Craft::$app->getView()->renderString($settings['footer'], $vars);
-            } 
-            else {
-                $html_footer = "<h1>Error in retriving a template of header, contents:<br> ".$settings['header']."</h1>";
-            }
+        if (isset($settings['mirrorMargins']) && $settings['mirrorMargins'] == true) {
+            $settings['mirrorMargins'] = 1;
         }
-
         $arrParameters = [
             'margin_top' => $settings['margin_top'] ?? 30,
             'margin_left' => $settings['margin_left'] ?? 15,
@@ -169,16 +112,16 @@ class DocumentHelperVariable
         $pdf = new \Mpdf\Mpdf(
             $arrParameters
         );
-        if (isset($settings['URLPurify']) && $settings['URLPurify'] == true && file_exists(Craft::getAlias('@root') . '/vendor/ezyang/htmlpurifier/library/HTMLPurifier.autoload.php') && is_file(Craft::getAlias('@root') . '/vendor/ezyang/htmlpurifier/library/HTMLPurifier.autoload.php')) {
-            $pdf->allow_charset_conversion = true;
-            $html = iconv('UTF-8', 'UTF-8//IGNORE', $html);
-        }
-        else{
-            $html = iconv('UTF-8', 'UTF-8//IGNORE', $html);
-        }
-        if (isset($settings['encoding'])) {
+        if (isset($settings['encoding']) && !empty($settings['encoding']) && $settings['encoding'] == "utf-8" || isset($settings['encoding']) && !empty($settings['encoding']) && $settings['encoding'] == "UTF-8") {
+            $pdf->charset_in = 'UTF-8';
+            $pdf->allow_charset_conversion = false;
+        } elseif (isset($settings['encoding']) && !empty($settings['encoding'])) {
             $pdf->charset_in = $settings['encoding'];
+            $pdf->allow_charset_conversion = true;
+        } else {
+            $pdf->allow_charset_conversion = false;
         }
+
         if (isset($settings['header'])) {
             $pdf_string = $pdf->SetHTMLHeader($html_header);
         }
@@ -216,25 +159,77 @@ class DocumentHelperVariable
                 'H6' => 5,
             );
         }
-        $pdf_string = $pdf->WriteHTML($html);
+        if (isset($html)) {
+            $pdf_string = $pdf->WriteHTML($html);
+        } else {
+            $pdf_string = $pdf->WriteHTML("<p>No provided template variable</p>");
+        }
         if (isset($settings['title'])) {
             $pdf->SetTitle($settings['title']);
         } elseif (isset($variables['title'])) {
             $pdf->SetTitle($variables['title']);
         }
-        if (isset($settings['author'])) {
+        if (DocumentHelpers::getInstance()->isPlusEdition() && $settings['disableCopyright'] && isset($settings['author'])) {
             $pdf->SetAuthor($settings['author']);
+        } elseif (isset($settings['author'])) {
+            $pdf->SetAuthor($settings['author'] . " by CoolTRONIC.pl PDF Generator");
+        } elseif (DocumentHelpers::getInstance()->isPlusEdition() && $settings['disableCopyright']) {
+            $pdf->SetAuthor("");
         } else {
             $pdf->SetAuthor("Made by CoolTRONIC.pl PDF Generator https://cooltronic.pl");
         }
-        $pdf->SetCreator("Made by CoolTRONIC.pl PDF Generator https://cooltronic.pl");
-        if (isset($settings['keywords'])) {
+        if (DocumentHelpers::getInstance()->isPlusEdition()) {
+            $pdf->SetCreator("Made by CoolTRONIC.pl PDF Generator Plus https://cooltronic.pl");
+        } else {
+            $pdf->SetCreator("Made by CoolTRONIC.pl PDF Generator Standard https://cooltronic.pl");
+        }
+        if (DocumentHelpers::getInstance()->isPlusEdition() && $settings['disableCopyright'] && isset($settings['keywords'])) {
+            $pdf->SetKeywords($settings['keywords']);
+        } elseif (isset($settings['keywords'])) {
             $pdf->SetKeywords($settings['keywords'] . ", PDF Generator, CoolTRONIC.pl, https://cooltronic.pl");
+        } elseif (DocumentHelpers::getInstance()->isPlusEdition() && $settings['disableCopyright']) {
+            $pdf->SetKeywords("");
         } else {
             $pdf->SetKeywords("PDF Generator, CoolTRONIC.pl, https://cooltronic.pl");
         }
         if (isset($settings['password'])) {
-            $pdf->SetProtection(array(), 'UserPassword', $settings['password']);
+            if (DocumentHelpers::getInstance()->isPlusEdition() && isset($settings['protection'])) {
+                $userPassword = 'UserPassword';
+                if ($settings['protection'] == 1) {
+                    $settings['protection'] = array();
+                    $protectionOptions = array(
+                        "copy" => $settings['protectionCopy'],
+                        "modify" => $settings['protectionModify'],
+                        "print" => $settings['protectionPrint'],
+                        "annot-forms" => $settings['protectionAnnotForms'],
+                        "extract" => $settings['protectionExtract'],
+                        "assemble" => $settings['protectionAssemble'],
+                        "print-highres" => $settings['protectionPrintHighres'],
+                        "no-user-password" => $settings['protectionNoUserPassword'],
+                    );
+                    foreach ($protectionOptions as $key => $value) {
+                        if ($value == 1) {
+                            array_push($settings['protection'], $key);
+                        }
+                    }
+                }
+                if ($this->is_json($settings['protection'])) {
+                    $settings['protection'] = json_decode($settings['protection'], true);
+                }
+                if (is_array($settings['protection']) && !empty($settings['protection'])) {
+                    foreach ($settings['protection'] as $key => $value) {
+                        if ($value == "no-user-password") {
+                            unset($settings['protection'][$key]);
+                            $userPassword = '';
+                        }
+                    }
+                    $pdf->SetProtection($settings['protection'], $userPassword, $settings['password']);
+                } else {
+                    $pdf->SetProtection(array(), 'UserPassword', $settings['password']);
+                }
+            } else {
+                $pdf->SetProtection(array(), 'UserPassword', $settings['password']);
+            }
         }
 
         switch ($destination) {
@@ -254,73 +249,79 @@ class DocumentHelperVariable
                 $output = \Mpdf\Output\Destination::FILE;
                 break;
         }
+        if (isset($settings['startPage']) || isset($settings['endPage'])) {
+            $dir = StringHelper::toString(pathinfo($filename));
+            $basename = StringHelper::toString(basename($filename));
+            $tempPath = StringHelper::toString(FileHelper::normalizePath($runtimePath . '/temp/pdfgenerator'));
+            if (!is_dir($tempPath . '/' . $dir)) {
+                FileHelper::createDirectory($tempPath . '/' . $dir);
+            }
+            $pdf->Output($tempPath . '/' . $dir . '/' . $basename, 'F');
+            $mpdf = new \Mpdf\Mpdf();
+            if (isset($settings['startPage']) && filter_var($settings['startPage'], FILTER_VALIDATE_INT) !== false) {
+                $startPage = $settings['startPage'];
+            } else {
+                $startPage = 1;
+            }
+            if (isset($settings['endPage']) && filter_var($settings['endPage'], FILTER_VALIDATE_INT) !== false) {
+                $mpdf->setSourceFile($tempPath . '/' . $dir . '/' . $basename);
+                $endPage = $settings['endPage'];
+            } else {
+                $endPage = $mpdf->setSourceFile($tempPath . '/' . $dir . '/' . $basename);
+            }
+            for ($i = $startPage; $i <= $endPage; $i++) {
+                $tplId = $mpdf->importPage($startPage);
+                $mpdf->useTemplate($tplId);
+                $mpdf->AddPage();
+            }
+            $pdf = $mpdf;
+            unset($mpdf);
+        }
         $return = $pdf->Output($filename, $output);
+
         if (isset($settings['dumbThumb'])) {
             if (isset($settings['thumbType'])) {
                 $assetType = $settings['thumbType'];
-            } else { $assetType = "jpg";}
-            // Get the pathinfo
+            } else {
+                $assetType = "jpg";
+            }
             $infoDumb = pathinfo($filename);
-
-            // Get the filename without extension
             $dumbThumbFilename = $infoDumb['filename'];
-
-            // Get the directory path
             $dumpDir = $infoDumb['dirname'];
             if (!file_exists($dumpDir . DIRECTORY_SEPARATOR . $dumbThumbFilename . '.' . $assetType)) {
-                if (isset($settings['thumbWidth'])) {
-                    $cols = $settings['thumbWidth'];
-                } else { $cols = 210;}
-                if (isset($settings['thumbHeight'])) {
-                    $rows = $settings['thumbHeight'];
-                } else { $rows = 297;}
-                if (isset($settings['thumbBgColor'])) {$thumbBgColor = $settings['thumbBgColor'];} else { $thumbBgColor = 'white';}
-                if (isset($settings['thumbPage'])) {$thumbPage = $settings['thumbPage'];} else { $thumbPage = 0;}
-                if (isset($settings['thumbTrim'])) {$thumbTrim = $settings['thumbTrim'];} else { $thumbTrim = false;}
-                if (isset($settings['thumbTrimFrameColor'])) {$thumbTrimFrameColor = $settings['thumbTrimFrameColor'];} else { $thumbTrimFrameColor = false;}
-                try {
-                    $thumb = new GenerateThumbConfiguration(
-                        pdfPath: $filename,
-                        savePath: $dumpDir . DIRECTORY_SEPARATOR . $dumbThumbFilename . '.' . $assetType,
-                        format: $assetType,
-                        cols: $cols,
-                        rows: $rows,
-                        bgColor: $thumbBgColor,
-                        page: $thumbPage,
-                        trim: $thumbTrim,
-                        frameColor: $thumbTrimFrameColor
-                    );
-                    $thumbGenerator = new GenerateThumb();
-                    $thumbGenerator->convert($thumb);
-                } catch (\Exception $e) {
-                    // Log the error message
-                    Craft::error('Error generating thumbnail: ' . $e->getMessage());
-                }
+                $this->makeThumb($filename, $dumpDir . DIRECTORY_SEPARATOR . $dumbThumbFilename . '.' . $assetType, $assetType, $settings);
             }
         }
+        unset($pdf);
+
         if ($destination == 'file') {
             return $filename;
         }
         if ($destination == 'download') {
-            unset($pdf);
             return $filename;
         }
         if ($destination == 'inline') {
-            unset($pdf);
             return $return;
         }
         if ($destination == 'string') {
-            unset($pdf);
             return $return;
         }
         return null;
     }
-
+    /**
+     * Fuction generates PDF added to Assets
+     * @param string $template Input content as path of Twig template, URL or Code block
+     * @param string $tempFilename Temporary filename
+     * @param array $variables Craft variables to parse into template
+     * @param array $attributes Optional attributes passed to funtcion as `pdfOptions` which is merged and overwriten over global plugin Settings
+     * @param string $volumeHandle Volume handle when PDF should be saved
+     *
+     * @return ExtendedAsset CraftCMS (4.x) or ExtendedAssetv3 (3.x) Asset with optional field assetThumb which is an Asset of image of generated ExtendedAsseet associated with PDF
+     */
     public function pdfAsset($template, $tempFilename, $variables, $attributes, $volumeHandle)
     {
-        $plugin = Craft::$app->plugins->getPlugin('documenthelpers');
-        $settings = $plugin->getSettings();
-        $settings = $settings->toArray();
+        $plugin = Craft::$app->plugins->getPlugin('document-helpers');
+        $settings = $plugin->getSettings()->toArray();
         foreach ($settings as $key => $value) {
             if ($value === '') {
                 $settings[$key] = null;
@@ -330,19 +331,19 @@ class DocumentHelperVariable
             }
         }
         $settings = array_merge($settings, $attributes);
+
         // Generate the PDF using the existing pdf method
         $pdfPath = $this->pdf($template, 'file', $tempFilename, $variables, $attributes);
         $info = pathinfo($pdfPath);
-        $plugin = Craft::$app->plugins->getPlugin('documenthelpers');
+        $plugin = Craft::$app->plugins->getPlugin('document-helpers');
         if (isset($settings['assetFilename'])) {
             $filename = $settings['assetFilename'];
         } else {
             $filename = $info['basename'];
         }
+
         // Set the volume ID of the asset
         $volumeId = Craft::$app->volumes->getVolumeByHandle($volumeHandle)->id;
-
-        // Find the existing asset
         $assetQuery = \craft\elements\Asset::find();
         $assetQuery->filename = $filename;
         $assetQuery->volumeId = $volumeId;
@@ -366,13 +367,10 @@ class DocumentHelperVariable
 
             // Find the folder where the asset will be stored
             $folder = Craft::$app->assets->getRootFolderByVolumeId($volumeId);
-
-            // Get the ID of the folder
             $folderId = $folder->id;
             $tempCopyInfo = pathinfo($pdfPath);
             $tempName = $tempCopyInfo['basename'];
             $tempDirName = $tempCopyInfo['dirname'];
-            // Add these lines
             $copyFilename = $tempDirName . '/copy_' . $tempName;
             if (!copy($tempFilename, $copyFilename)) {
                 Craft::error('Failed to copy file: ' . $tempFilename);
@@ -380,17 +378,9 @@ class DocumentHelperVariable
 
             // Set the temporary file path of the asset to the path of the generated PDF
             $asset->tempFilePath = $copyFilename;
-
-            // Set the filename of the asset to the basename of the generated PDF
             $asset->filename = $filename;
-
-            // Set the new folder ID of the asset to the ID of the folder
             $asset->newFolderId = $folderId;
-
-            // Set the scenario of the asset to create
             $asset->setScenario(\craft\elements\Asset::SCENARIO_DEFAULT);
-            // Save the asset
-
             $result = Craft::$app->getElements()->saveElement($asset);
             // Check if the asset was saved successfully
             if (!$result) {
@@ -402,56 +392,25 @@ class DocumentHelperVariable
         if (isset($settings['assetThumb'])) {
             if (isset($settings['thumbType'])) {
                 $assetType = $settings['thumbType'];
-            } else { $assetType = "jpg";}
+            } else {
+                $assetType = "jpg";
+            }
             if (isset($settings['assetFilename'])) {
                 $finalNameThumb = $settings['assetFilename'] . '.' . $assetType;
             } else {
                 $finalNameThumb = $info['basename'] . '.' . $assetType;
             }
-            // Get the pathinfo
             $infoThumb = pathinfo($tempFilename);
-
-            // Get the filename without extension
             $fileTempName = $infoThumb['filename'];
-
-            // Get the directory path
             $dirTemp = $infoThumb['dirname'];
-            if (isset($settings['thumbWidth'])) {
-                $cols = $settings['thumbWidth'];
-            } else { $cols = 210;}
-            if (isset($settings['thumbHeight'])) {
-                $rows = $settings['thumbHeight'];
-            } else { $rows = 297;}
-            if (isset($settings['thumbBgColor'])) {$thumbBgColor = $settings['thumbBgColor'];} else { $thumbBgColor = 'white';}
-            if (isset($settings['thumbPage'])) {$thumbPage = $settings['thumbPage'];} else { $thumbPage = 0;}
-            if (isset($settings['thumbTrim'])) {$thumbTrim = $settings['thumbTrim'];} else { $thumbTrim = false;}
-            if (isset($settings['thumbTrimFrameColor'])) {$thumbTrimFrameColor = $settings['thumbTrimFrameColor'];} else { $thumbTrimFrameColor = false;}
-            try {
-                $thumb = new GenerateThumbConfiguration(
-                    pdfPath: $pdfPath,
-                    savePath: $dirTemp . DIRECTORY_SEPARATOR . $fileTempName . '.' . $assetType,
-                    format: $assetType,
-                    cols: $cols,
-                    rows: $rows,
-                    bgColor: $thumbBgColor,
-                    page: $thumbPage,
-                    trim: $thumbTrim,
-                    frameColor: $thumbTrimFrameColor
-                );
-                $thumbGenerator = new GenerateThumb();
-                $thumbGenerator->convert($thumb);
-            } catch (\Exception $e) {
-                // Log the error message
-                Craft::error('Error generating thumbnail: ' . $e->getMessage());
-            }
+            $this->makeThumb($pdfPath, $dirTemp . DIRECTORY_SEPARATOR . $fileTempName . '.' . $assetType, $assetType, $settings);
 
             if (isset($settings['assetThumbVolumeHandle'])) {
-                $thumbVolumeHandle = $settings['assetThumbVolumeHandle'];
-                $thumbVolumeId = Craft::$app->volumes->getVolumeByHandle($settings['assetThumbVolumeId'])->id;
+                $thumbVolumeId = Craft::$app->volumes->getVolumeByHandle($settings['assetThumbVolumeHandle'])->id;
             } else {
-                $thumbVolumeHandle = $volumeHandle;
                 $thumbVolumeId = Craft::$app->volumes->getVolumeByHandle($volumeHandle)->id;
             }
+
             // Find the existing asset
             $assetQueryThumb = \craft\elements\Asset::find();
             $assetQueryThumb->filename = $finalNameThumb;
@@ -473,17 +432,11 @@ class DocumentHelperVariable
                 }
 
                 $assetThumb->volumeId = $thumbVolumeId;
-
                 $folder = Craft::$app->assets->getRootFolderByVolumeId($thumbVolumeId);
-
                 $folderId = $folder->id;
-
                 $assetThumb->tempFilePath = $dirTemp . DIRECTORY_SEPARATOR . $fileTempName . '.' . $assetType;
-
                 $assetThumb->filename = $finalNameThumb;
-
                 $assetThumb->newFolderId = $folderId;
-
                 $assetThumb->setScenario(\craft\elements\Asset::SCENARIO_DEFAULT);
 
                 try {
@@ -497,11 +450,19 @@ class DocumentHelperVariable
                 }
             }
         }
-        $extendedAsset = new ExtendedAsset();
+
+        $craftVersion = Craft::$app->getVersion();
+        if (version_compare($craftVersion, '4.0', '>=')) {
+            $extendedAsset = new ExtendedAsset();
+        } elseif (version_compare($craftVersion, '3.0', '>=')) {
+            $extendedAsset = new ExtendedAssetv3();
+        }
         foreach ($asset->getAttributes() as $name => $value) {
             $extendedAsset->$name = $value;
         }
-        if (isset($settings['assetThumb'])) {$extendedAsset->assetThumb = $assetThumb;}
+        if (isset($settings['assetThumb'])) {
+            $extendedAsset->assetThumb = $assetThumb;
+        }
 
         if (isset($settings['assetDelete'])) {
             if (file_exists($tempFilename)) {
@@ -522,8 +483,173 @@ class DocumentHelperVariable
                 }
             }
         }
+        unset($asset);
+        unset($assetThumb);
 
         return $extendedAsset;
     }
 
+    /**
+     * Fuction checking string is JSON
+     * @param string $string input string
+     * @return boolean
+     */
+    private function is_json($string)
+    {
+        if (is_string($string)) {
+            json_decode($string);
+            if (json_last_error() == JSON_ERROR_NONE) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Fuction getting URL
+     * @param string $url input URL
+     * @param boolean $isPurify sets HTMLPurifier method when possible
+     * @param string $encoding sets encoding of output stream
+     * @return boolean
+     */
+    private function getURL($url, $settings)
+    {
+        if (isset($settings['URLmode']) && $settings['URLmode'] == "curl") {
+            $ch = curl_init();
+            curl_setopt($ch, CURLOPT_URL, $url);
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+            curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);
+            $html = curl_exec($ch);
+            curl_close($ch);
+        } else {
+            $html = file_get_contents($url);
+        }
+        $loader = '/vendor/ezyang/htmlpurifier/library/HTMLPurifier.autoload.php';
+        if (isset($settings['URLPurify']) &&
+            $settings['URLPurify'] == true &&
+            file_exists(Craft::getAlias('@root') . $loader) &&
+            is_file(Craft::getAlias('@root') . $loader)) {
+            require_once Craft::getAlias('@root') . $loader;
+            $config = \HTMLPurifier_Config::createDefault();
+            if (isset($encoding) && !empty($settings['encoding'])) {
+                $config->set('Core.Encoding', $settings['encoding']);
+            } else {
+                $config->set('Core.Encoding', 'UTF-8');
+            }
+            $config->set('HTML.Allowed', 'img[src|alt|width|height]');
+            $config->set('URI.DisableExternalResources', false);
+            $purifier = new \HTMLPurifier($config);
+            $html = $purifier->purify($html);
+        } elseif (isset($settings['encoding']) && !empty($settings['encoding'])) {
+            $html = mb_convert_encoding($html, $settings['encoding'], mb_detect_encoding($html));
+        } else {
+            $html = mb_convert_encoding($html, 'UTF-8', mb_detect_encoding($html));
+        }
+        return $html;
+    }
+
+    /**
+     * Fuction which is running generating Thumbnails (required ImageMagick)
+     * @param string $filneame input filename
+     * @param string $savePath Path thumbnails
+     * @param string $type sets type of image ie. jpg, png, webp, avif
+     * @param array $setting Plugin settings from control panel or parsed in $attributes array from `pdfOptions`
+     * @return boolean When true image is genated
+     */
+    private function makeThumb($filename, $savePath, $type, $settings)
+    {
+        if (isset($settings['thumbWidth'])) {
+            $cols = $settings['thumbWidth'];
+        } else {
+            $cols = 210;
+        }
+        if (isset($settings['thumbHeight'])) {
+            $rows = $settings['thumbHeight'];
+        } else {
+            $rows = 297;
+        }
+        if (isset($settings['thumbBgColor'])) {
+            $thumbBg = $settings['thumbBgColor'];
+        } else {
+            $thumbBg = 'white';
+        }
+        if (isset($settings['thumbPage'])) {
+            $thumbPage = $settings['thumbPage'];
+        } else {
+            $thumbPage = 0;
+        }
+        if (isset($settings['thumbTrim'])) {
+            $thumbTrim = $settings['thumbTrim'];
+        } else {
+            $thumbTrim = false;
+        }
+        if (isset($settings['thumbTrimFrameColor'])) {
+            $thumbTrimFrame = $settings['thumbTrimFrameColor'];
+        } else {
+            $thumbTrimFrame = false;
+        }
+        if (isset($settings['thumbBestfit']) && $settings['thumbBestfit']) {
+            $bestfit = $settings['thumbBestfit'];
+        } else {
+            $bestfit = false;
+        }
+        try {
+            $thumb = new GenerateThumbConfiguration(
+                $filename,
+                $savePath,
+                $type,
+                $thumbTrim,
+                $cols,
+                $rows,
+                $bestfit,
+                $thumbBg,
+                $thumbPage,
+                $thumbTrimFrame
+            );
+            $thumbGenerator = new GenerateThumb();
+            $thumbGenerator->convert($thumb);
+            return true;
+        } catch (\Exception $e) {
+            Craft::error('Error generating thumbnail: ' . StringHelper::toString($e->getMessage()));
+        }
+        return false;
+    }
+    /**
+     * Fuction which is running generating content from input content from Twig template, URL or HTML code block
+     * @param string $input_content Input content as path of Twig template, URL or Code block
+     * @param string $vars Variables like entry from Craft CMS
+     * @param array $settings Settings parsed from `pdfOptions` or plugin Settings
+     * @return string $html_content Returned HTML Content
+     */
+    private function generateContent($input_content, $vars, $settings)
+    {
+        if (file_exists(Craft::getAlias('@templates') . '/' . $input_content) && is_file(Craft::getAlias('@templates') . '/' . $input_content)) {
+            try {
+                $html_content = Craft::$app->getView()->renderTemplate($input_content, $vars);
+            } catch (LoaderError | RuntimeError | SyntaxError | Exception $e) {
+                $html_content = "<p>Error in retriving a Twig template. Error: " . StringHelper::toString($e) . "  Not compatibile \$template path:<br> " . StringHelper::toString($input_content) . "</p>";
+            }
+        } elseif (filter_var($input_content, FILTER_VALIDATE_URL)) {
+            $html_content = $this->getURL($input_content, $settings);
+            if (!isset($html_content)) {
+                $html_content = "<p>Error in getting a URL template from $input_content URL. </p>";
+            }
+            if (isset($settings['URLTwigRender']) && $settings['URLTwigRender'] == true) {}
+            try {
+                $html_content = Craft::$app->getView()->renderString($html_content, $vars);
+            } catch (LoaderError | SyntaxError $e) {
+                $html_content = "<p>Error in retriving a URL template. Error: " . StringHelper::toString($e) . " contents:<br> " . StringHelper::toString($html_content) . "</p>";
+            }
+
+        } elseif (strip_tags($input_content) != $input_content) {
+            try {
+                $html_content = Craft::$app->getView()->renderString($input_content, $vars);
+            } catch (LoaderError | SyntaxError $e) {
+                $html_content = "<p>Error in retriving a code block template. Error: " . StringHelper::toString($e) . " contents:<br> " . StringHelper::toString($input_content) . "</p>";
+            }
+        } else {
+            $html_content = "<p>Error in retriving a template of header. Not compatibile type of \$template, contents:<br> " . $input_content . "</p>";
+        }
+        return $html_content;
+    }
 }
