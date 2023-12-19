@@ -4,11 +4,11 @@
 
 {% set edition = craft.app.plugins.getPlugin('document-helpers').edition %}
 {% if edition == 'plus' %}
-    {% set isEnabledPlus = true %}
-    {% set isDisabledPlus = false %}
+	{% set isEnabledPlus = true %}
+	{% set isDisabledPlus = false %}
 {% else %}
-    {% set isEnabledPlus = false %}
-    {% set isDisabledPlus = true %}
+	{% set isEnabledPlus = false %}
+	{% set isDisabledPlus = true %}
 {% endif %}
 
 {% set title = 'PDF Generator' %}
@@ -28,119 +28,83 @@
 	<div class="tab-contents">
 
 		<div id="content-general" class="tab-content">
-        						<h2>
+			<h2>
 				Edition
 			</h2>
 			<p>
-				You have
+				You are using the
 				<strong>{{ craft.app.plugins.getPlugin('document-helpers').edition|upper }}</strong>
-				plan active</p>
+				plan of the PDF Generator plugin.</p>
 
 			<h2>Welcome! General Settings</h2>
 
-			<p>The general settings section is optional in configuring your PDF Generator default values of plugin. Here, you can set default options for your generated PDFs.</p>
+			<p>The general settings section allows you to configure the default values of the plugin for generating PDFs. You can customize the options for each PDF according to your needs.</p>
 
-			<p>More about values which can you set is
-				<a href="https://github.com/cooltronicpl/Craft-document-helpers#overriding-default-options">here</a>.</p>
+			<p>For more information about the available options, please visit
+				<a href="https://github.com/cooltronicpl/Craft-document-helpers#overriding-default-options">this page</a>.</p>
 
-			<p>You can override default value in the Twig functions individually for every variable in `pdfOptions`.</p>
+			<p>You can override the default values in the Twig functions by passing a `pdfOptions` variable with the desired options.</p>
 			{{ forms.textField({
-    label: "Header template" | t,
-    id: 'header',
-    name: 'header',
-    instructions: " This is path of the header Twig template."|t,
-    value: settings. header|default(null),
-    errors: settings.getErrors('header')
-}) }}
+label: "Header template" | t,
+id: 'header',
+name: 'header',
+instructions: "This is the path of the Twig template that will be used as the header of the PDF."|t,
+value: settings. header|default(null),
+errors: settings.getErrors('header')
 
-			{{ forms.textField({
-    label: "Footer template" | t,
-    id: 'footer',
-    name: 'footer',
-    instructions: " This is path of the footer Twig template."|t,
-    value: settings. header|default(null),
-    errors: settings.getErrors('footer')
-}) }}
-			{{ forms.textField({
-    label: "Margin top" | t,
-    id: 'margin_top',
-    name: 'margin_top',
-    instructions: "The top margin defaults to 30."|t,
-    value: settings. margin_top|default(null),
-    errors: settings.getErrors('margin_top')
-}) }}
-			{{ forms.textField({
-    label: "Margin bottom" | t,
-    id: 'margin_bottom',
-    name: 'margin_bottom',
-    instructions: "The bottom margin defaults to 30."|t,
-    value: settings. margin_bottom|default(null),
-    errors: settings.getErrors('margin_bottom')
 }) }}
 
 			{{ forms.textField({
-    label: "Margin left" | t,
-    id: 'margin_left',
-    name: 'margin_left',
-    instructions: "The left margin defaults to 15."|t,
-    value: settings. margin_left|default(null),
-    errors: settings.getErrors('margin_left')
+label: "Footer template" | t,
+id: 'footer',
+name: 'footer',
+instructions: "This is the path of the Twig template that will be used as the footer of the PDF."|t,
+value: settings. header|default(null),
+errors: settings.getErrors('footer')
+
 }) }}
-			{{ forms.textField({
-    label: "Margin right" | t,
-    id: 'margin_right',
-    name: 'margin_right',
-    instructions: "The right margin defaults to 15."|t,
-    value: settings. margin_right|default(null),
-    errors: settings.getErrors('margin_right')
-}) }}
-			{{ forms.textField({
-    label: "Page numbers" | t,
-    id: 'pageNumbers',
-    name: 'pageNumbers',
-    instructions: "This adds page numbers in the footer."|t,
-    value: settings. pageNumbers|default(null),
-    errors: settings.getErrors('pageNumbers')
-}) }}
+			{{ forms.textField({ label: "Margin top" | t, id: 'margin_top', name: 'margin_top', instructions: "This is the top margin of the PDF in millimeters. The default value is 30."|t, value: settings. margin_top|default(null), errors: settings.getErrors('margin_top') }) }}
+			{{ forms.textField({ label: "Margin bottom" | t, id: 'margin_bottom', name: 'margin_bottom', instructions: "This is the bottom margin of the PDF in millimeters. The default value is 30."|t, value: settings. margin_bottom|default(null), errors: settings.getErrors('margin_bottom') }) }}
 
 			{{ forms.textField({
-    label: "Title" | t,
-    id: 'title',
-    name: 'title',
-    instructions: "This replaces the default title of the generated PDF document."|t,
-    value: settings. title|default(null),
-    errors: settings.getErrors('title')
+label: "Margin left" | t,
+id: 'margin_left',
+name: 'margin_left',
+instructions: "This is the left margin of the PDF in millimeters. The default value is 15."|t,
+value: settings. margin_left|default(null),
+errors: settings.getErrors('margin_left')
+
 }) }}
+			{{ forms.textField({ label: "Margin right" | t, id: 'margin_right', name: 'margin_right', instructions: "This is the right margin of the PDF in millimeters. The default value is 15."|t, value: settings. margin_right|default(null), errors: settings.getErrors('margin_right') }) }}
+			{{ forms.textField({ label: "Page numbers" | t, id: 'pageNumbers', name: 'pageNumbers', instructions: "This is the format of the page numbers that will be added in the footer of the PDF. For example, you can use '{PAGENO}/{nbpg}' to show the current page and the total number of pages."|t, value: settings. pageNumbers|default(null), errors: settings.getErrors('pageNumbers') }) }}
+
 			{{ forms.textField({
-    label: "Encoding" | t,
-    id: 'encoding',
-    name: 'encoding',
-    instructions: "This can be used to set encoding of input of your PDF."|t,
-    value: settings. encoding|default(null),
-    errors: settings.getErrors('encoding')
+label: "Title" | t,
+id: 'title',
+name: 'title',
+instructions: "This is the title of the PDF document that will be shown in the metadata and the browser tab."|t,
+value: settings. title|default(null),
+errors: settings.getErrors('title')
+
 }) }}
+			{{ forms.textField({ label: "Encoding" | t, id: 'encoding', name: 'encoding', instructions: "This is the encoding of the input of your PDF. The default value is 'UTF-8'."|t, value: settings. encoding|default(null), errors: settings.getErrors('encoding') }) }}
 
 			{{ forms.lightswitchField({
-    label: "No automatic page break" | t,
-    id: 'no_auto_page_break',
-    name: 'no_auto_page_break',
-    instructions: "This disables automatic system page breaks. This can be useful if you need to manually add page breaks. For example, you can add a custom page to documents with more than one page break using <pagebreak>. This may fix page break issues in some cases, but not all." | t,
-    on: settings.no_auto_page_break,
+label: "No automatic page break" | t,
+id: 'no_auto_page_break',
+name: 'no_auto_page_break',
+instructions: "This option disables the automatic system page breaks. You can use this option if you want to manually add page breaks with the <pagebreak> tag. This can help you control the layout of your PDFs better." | t,
+on: settings.no_auto_page_break,
 
 }) }}
-			{{ forms.textField({
-    label: "Temporary directory" | t,
-    id: 'tempDir',
-    name: 'tempDir',
-    instructions: "This sets the path to the temporary directory used for generating PDFs. We have tested this with the main /tmp directory on the server with success. This could potentially improve performance when generating multiple PDFs."|t,
-    value: settings. tempDir|default(null),
-    errors: settings.getErrors('tempDir')
-}) }}
+			{{ forms.textField({ label: "Temporary directory" | t,id: 'tempDir', name: 'tempDir', instructions: "This is the path of the temporary directory that will be used for generating PDFs. You can use the main /tmp directory on the server for better performance. This can be useful if you are generating multiple PDFs at once."|t, value: settings. tempDir|default(null), errors: settings.getErrors('tempDir') }) }}
+			on: settings.no_auto_page_break,
+
 			{{ forms.lightswitchField({
     label: "Mirror margins" | t,
     id: 'mirrorMargins',
     name: 'mirrorMargins',
-    instructions: "Whether to use different margins for odd and even pages." | t,
+    instructions: "This option enables different margins for odd and even pages. This can be useful for printing double-sided documents." | t,
     on: settings.mirrorMargins,
 
 }) }}
@@ -148,7 +112,7 @@
     label: "Landscape" | t,
     id: 'landscape',
     name: 'landscape',
-    instructions: " If this is set, the PDF will be generated in landscape mode." | t,
+    instructions: "This option sets the orientation of the PDF to landscape. This can be useful for documents with wide tables or charts." | t,
     on: settings.landscape,
 
 }) }}
@@ -156,14 +120,14 @@
     label: "Portrait" | t,
     id: 'portrait',
     name: 'portrait',
-    instructions: "If this is set, the PDF will be generated in portrait mode." | t,
+    instructions: "This option sets the orientation of the PDF to portrait. This is the default option for most documents." | t,
     on: settings.portrait,
 }) }}
 			{{ forms.textField({
     label: "Format" | t,
     id: 'format',
     name: 'format',
-    instructions: "This sets the paper size for the PDF. The default is A4, but you can set other sizes compatible with MPDF. Other popular formats include: A3, A4 (default), A5, Letter (8,5 x 11 in), Legal (8,5 x 14 in), Executive (7,25 x 10,5 in), B4, B5"|t,
+    instructions: "This option sets the paper size for the PDF. The default value is A4, but you can use other sizes compatible with MPDF. Some popular formats are: A3, A4 (default), A5, Letter (8.5 x 11 in), Legal (8.5 x 14 in), Executive (7.25 x 10.5 in), B4, B5."|t,
     value: settings. format|default(null),
     errors: settings.getErrors('format')
 }) }}
@@ -171,7 +135,7 @@
     label: "Start page" | t,
     id: 'startPage',
     name: 'startPage',
-    instructions: "The first page of the PDF to be generated. You can use this option to trim unnecessary pages from the beginning of the PDF. For example `2` will skip the first page of the PDF."|t,
+    instructions: "This option sets the first page of the PDF to be generated. You can use this option to skip unnecessary pages from the beginning of the PDF. For example, `2` will skip the first page of the PDF."|t,
     value: settings. startPage|default(null),
     errors: settings.getErrors('startPage')
 }) }}
@@ -179,7 +143,7 @@
     label: "End page" | t,
     id: 'endPage',
     name: 'endPage',
-    instructions: "The last page of the PDF to be generated. You can use this option to trim unnecessary pages from the end of the PDF. For example, `10` will generate a PDF with only 10 pages."|t,
+    instructions: "This option sets the last page of the PDF to be generated. You can use this option to skip unnecessary pages from the end of the PDF. For example, `10` will generate a PDF with only the first 10 pages."|t,
     value: settings. endPage|default(null),
     errors: settings.getErrors('endPage')
 }) }}
@@ -187,7 +151,7 @@
     label: "Watermark image" | t,
     id: 'watermarkImage',
     name: 'watermarkImage',
-    instructions: "This option creates a watermark using the image file specified by the provided path."|t,
+    instructions: "This option adds a watermark to the PDF using the image file specified by the path. The image file must be accessible by the server."|t,
     value: settings. watermarkImage|default(null),
     errors: settings.getErrors('watermarkImage')
 }) }}
@@ -195,7 +159,7 @@
     label: "Watermark text" | t,
     id: 'watermarkText',
     name: 'watermarkText',
-    instructions: "This option creates a watermark using the text provided."|t,
+    instructions: "This option adds a watermark to the PDF using the text provided. You can use HTML tags to style the text."|t,
     value: settings. watermarkText|default(null),
     errors: settings.getErrors('watermarkText')
 }) }}
@@ -203,14 +167,14 @@
     label: "Automatic Table of Contents" | t,
     id: 'autoToC',
     name: 'autoToC',
-    instructions: "This option automatically generates a Table of Contents using the H1-H6 tags in your document."|t,
+    instructions: "This option creates a Table of Contents for the PDF using the H1-H6 tags in your document. The Table of Contents will be inserted at the beginning of the PDF."|t,
     on: settings.autoToC,
 }) }}
 			{{ forms.lightswitchField({
     label: "Automatic bookmarks" | t,
     id: 'autoBookmarks',
     name: 'autoBookmarks',
-    instructions: "This option automatically generates bookmarks using the H1-H6 tags in your document."|t,
+    instructions: "This option creates bookmarks for the PDF using the H1-H6 tags in your document. The bookmarks will be shown in the sidebar of the PDF viewer."|t,
     on: settings.autoBookmarks,
 }) }}
 			{{ forms.lightswitchField({
@@ -218,14 +182,14 @@
     id: 'URLTwigRender',
     name: 'URLTwigRender',
     on: settings.URLTwigRender,
-    instructions: "If this is set it enables external URL rendering of `template`, `header` or `footer` of variables like `{{custom}}` or `{{qrimg}}` in external template." | t,
+    instructions: "This option enables rendering of Twig variables like `{{custom}}` or `{{qrimg}}` in external URLs for `template`, `header` or `footer`. This can be useful for adding dynamic content to your PDFs." | t,
 }) }}
 			{{ forms.lightswitchField({
     label: "URL Mode" | t,
-    id: '`URLMode`',
-    name: '`URLMode`',
+    id: 'URLMode',
+    name: 'URLMode',
     value: settings. URLMode|default(null),
-    instructions: "If this is set it enables external URL rendering via `curl` instead of `file_get_contents`" | t,
+    instructions: "This option enables getting external URLs via `curl` instead of `file_get_contents`. This can improve the performance and reliability of fetching external URLs." | t,
     errors: settings.getErrors('URLMode')
 }) }}
 		</div>
@@ -234,7 +198,7 @@
     label: "Author" | t,
     id: 'author',
     name: 'author',
-    instructions: "This sets the author metadata. It should be provided as a string."|t,
+    instructions: "This option sets the author name for the PDF metadata. You can enter any string as the author name."|t,
     value: settings. author|default(null),
     errors: settings.getErrors('author')
 }) }}
@@ -242,15 +206,15 @@
     label: "Keywords" | t,
     id: 'keywords',
     name: 'keywords',
-    instructions: "This sets the keyword metadata. It should be provided as a string in the following format: `keyword1, longer keyword2, keyword3`."|t,
+    instructions: "This option sets the keywords for the PDF metadata. You can enter a comma-separated list of keywords that describe the content of the PDF."|t,
     value: settings. keywords|default(null),
     errors: settings.getErrors('keywords')
 }) }}
 			{{ forms.lightswitchField({
-    label: "Disable Copyright (Plus)" | t,
+    label: "Disable copyrights - Remove watermark (Plus)" | t,
     id: 'disableCopyright',
     name: 'disableCopyright',
-    instructions: "This option disables copyrights."|t,
+    instructions: "This option removes the plugin's invisible watermark from the PDF. This option is only available for the Plus plan users."|t,
     on: settings.disableCopyright,
     disabled: isDisabledPlus
 
@@ -261,7 +225,7 @@
     label: "Asset title" | t,
     id: 'assetTitle',
     name: 'assetTitle',
-    instructions: "This option allows you to set a custom title for the Asset in the Craft CMS system when using the `pdfAsset` method."|t,
+    instructions: "This option sets the title for the Asset in the Craft CMS system when you use the `pdfAsset` method. You can enter any string as the asset title."|t,
     value: settings. assetTitle|default(null),
     errors: settings.getErrors('assetTitle')
 }) }}
@@ -269,22 +233,22 @@
     label: "Asset filename" | t,
     id: 'assetFilename',
     name: 'assetFilename',
-    instructions: "This option allows you to change the target filename of the file in the Craft CMS Asset when using the `pdfAsset` method."|t,
+    instructions: "This option sets the filename for the Asset in the Craft CMS system when you use the `pdfAsset` method. You can enter any string as the asset filename."|t,
     value: settings. assetFilename|default(null),
     errors: settings.getErrors('assetFilename') 
 }) }}
 			{{ forms.lightswitchField({
-    label: "Asset delete" | t,
+    label: "Delete temporary file" | t,
     id: 'assetDelete',
     name: 'assetDelete',
     on: settings.assetDelete,
-    instructions: "If this set it enables the deletion of the internally generated file in the `@root` path. Please note that this operation is irreversible and may consume more resources. This is because the Asset is updated and the PDF is generated on every load when using the `pdfAsset` method." | t,
+    instructions: "This option deletes the temporary file that is generated in the `@root` path when you use the `pdfAsset` method. This option can save disk space, but it may also increase the resource consumption. This is because the Asset and the PDF are regenerated on every load when you use the `pdfAsset` method." | t,
 }) }}
 			{{ forms.textField({
-    label: "assetSiteId" | t,
+    label: "Asset site ID" | t,
     id: 'assetSiteId',
     name: 'assetSiteId',
-    instructions: "This option allows you to assign a custom `siteId` to the Asset of `pdfAsset` method. The `siteId` should be passed as a number, representing the ID of the site to which the generated asset should belong."|t,
+    instructions: "This option sets the site ID for the Asset when you use the `pdfAsset` method. You can enter a numeric value that corresponds to the ID of the site that you want the Asset to belong to."|t,
     value: settings. assetSiteId|default(null),
     errors: settings.getErrors('assetSiteId')
 }) }}
@@ -292,28 +256,28 @@
 		</div>
 		<div id="content-thumb" class="tab-content">
 
-			<h2>Thumbanils with configured ImageMagick</h2>
+			<h2>Thumbnails with configured ImageMagick</h2>
 
-			<p>It requires ImageMagick properly configured on your server (host)
-				<a href="https://github.com/cooltronicpl/Craft-document-helpers#what-if-i-cannot-generate-thumbnails-with-enabled-imagemagick">more about it</a>.</p>
+			<p>To generate thumbnails, you need to have ImageMagick properly configured on your server (host). For more details, please visit
+				<a href="https://github.com/cooltronicpl/Craft-document-helpers#what-if-i-cannot-generate-thumbnails-with-enabled-imagemagick">this page</a>.</p>
 
 			{{ forms.lightswitchField({
-    label: "Asset thumb" | t,
+    label: "Asset thumbnail" | t,
     id: 'assetThumb',
     name: 'assetThumb',
     on: settings.assetThumb,
-    instructions: "If this set it generates a thumbnail image of a Craft CMS image Asset using the `pdfAsset` method (requires ImageMagick). It can be accessed in the Twig template as `asset.assetThumb`." | t,
+    instructions: "This option generates a thumbnail image of a Craft CMS image Asset using the `pdfAsset` method (requires ImageMagick). You can access the thumbnail image in the Twig template as `asset.assetThumb`." | t,
 }) }}
 			{{ forms.textField({
-    label: "Asset thumb volume handle" | t,
+    label: "Asset thumbnail volume handle" | t,
     id: 'assetThumbVolumeHandle',
     name: 'assetThumbVolumeHandle',
-    instructions: "This is an optional parameter that specifies the Volume Handle for the thumbnail. If not provided, the PDF Volume Handle is used. The volume handle must have a `Base URL` in your test: `@web\pdffiles` in Craft CMS Filesystems, Assets settings."|t,
+    instructions: "This option sets the volume handle for the thumbnail image. If not provided, the PDF volume handle is used. The volume handle must have a `Base URL` in your test: `@web\pdffiles` in Craft CMS Filesystems, Assets settings."|t,
     value: settings. assetThumbVolumeHandle|default(null),
     errors: settings.getErrors('assetThumbVolumeHandle')
 }) }}
 			{{ forms.lightswitchField({
-    label: "Asset dumb thumb" | t,
+    label: "Dumb thumbnail" | t,
     id: 'dumbThumb',
     name: 'dumbThumb',
     on: settings.dumbThumb,
@@ -326,65 +290,65 @@
 			</p>
 
 			{{ forms.textField({
-    label: "Thumb type" | t,
+    label: "Thumbnail type" | t,
     id: 'thumbType',
     name: 'thumbType',
-    instructions: "This parameter allows you to choose the format of the thumbnail. Options include `jpg`, `gif`, `webp`, `avif`, and `png`. The default format is `jpg`."|t,
+    instructions: "This option sets the format of the thumbnail image. You can choose from `jpg`, `gif`, `webp`, `avif`, and `png`. The default format is `jpg`."|t,
     value: settings. thumbType|default(null),
     errors: settings.getErrors('thumbType')
 }) }}
 			{{ forms.textField({
-    label: "Thumb width" | t,
+    label: "Thumbnail width" | t,
     id: 'thumbWidth',
     name: 'thumbWidth',
-    instructions: "This parameter specifies the width of the thumbnail in pixels. The default width is `210`."|t,
+    instructions: "This option sets the width of the thumbnail image in pixels. The default width is `210`."|t,
     value: settings. thumbWidth|default(null),
     errors: settings.getErrors('thumbWidth')
 }) }}
 			{{ forms.textField({
-    label: "Thumb height" | t,
+    label: "Thumbnail height" | t,
     id: 'thumbHeight',
     name: 'thumbHeight',
-    instructions: "This parameter specifies the height of the thumbnail in pixels. The default height is `297`."|t,
+    instructions: "This option sets the height of the thumbnail image in pixels. The default height is `297`."|t,
     value: settings. thumbHeight|default(null),
     errors: settings.getErrors('thumbHeight')
 }) }}
 			{{ forms.textField({
-    label: "Thumb page" | t,
+    label: "Thumbnail page" | t,
     id: 'thumbPage',
     name: 'thumbPage',
-    instructions: "This parameter specifies the page to generate the thumbnail from. The default is the first page, which is numbered from `0`."|t,
+    instructions: "This option sets the page number to generate the thumbnail image from. The default is the first page, which is numbered from `0`."|t,
     value: settings. thumbPage|default(null),
     errors: settings.getErrors('thumbPage')
 }) }}
-	{{ forms.lightswitchField({
-    label: "Thumb Best Fit" | t,
+			{{ forms.lightswitchField({
+    label: "Thumbnail best fit" | t,
     id: 'thumbBestfit',
     name: 'thumbBestfit',
-    instructions: "This boolean value that determines whether to fit the image within the given dimensions or not. If on, the image will be scaled down so that it fits within the given dimensions. If off, the image will be stretched or cropped to fill the given dimensions." | t,
+    instructions: "This option determines whether to fit the image within the given dimensions or not. If on, the image will be scaled down to fit the aspect ratio of the original image. If off, the image will be stretched or cropped to fill the given dimensions." | t,
     on: settings.thumbBestfit,
 }) }}
 			{{ forms.textField({
-    label: "Thumb background color" | t,
+    label: "Thumbnail background color" | t,
     id: 'thumbBgColor',
     name: 'thumbBgColor',
-    instructions: "This parameter specifies the background color of the thumbnail. Options include `black`, `rgb(33,66,99)`, and `#123456`. The default color is `white`."|t,
+    instructions: "This option sets the background color of the thumbnail image. You can use color names or codes, such as `black`, `rgb(33,66,99)`, or `#123456`. The default color is `white`."|t,
     value: settings. thumbBgColor|default(null),
     errors: settings.getErrors('thumbBgColor')
 }) }}
 			{{ forms.textField({
-    label: "Thumb trim" | t,
+    label: "Thumbnail trim" | t,
     id: 'thumbTrim',
     name: 'thumbTrim',
-    instructions: "This parameter, when set to `true`, trims your page and centers the content. The default value is `false`."|t,
+    instructions: "This option trims the page and centers the content of the thumbnail image. The default value is `false`, which means no trimming."|t,
     value: settings. thumbTrim|default(null),
     errors: settings.getErrors('thumbTrim')
 }) }}
 			{{ forms.textField({
-    label: "Thumb trim frame color" | t,
+    label: "Thumbnail trim frame color" | t,
     id: 'thumbTrimFrameColor',
     name: 'thumbTrimFrameColor',
-    instructions: "This parameter changes the color of the trim frame. Colors can be specified as `black` or in RGB format (e.g., `rgb(12,1,2)`) or in HEX format (e.g., `#662266`)."|t,
+    instructions: "This option sets the color of the trim frame of the thumbnail image. You can use color names or codes, such as `black`, `rgb(12,1,2)`, or `#662266`. The default color is `white`."|t,
     value: settings. thumbTrimFrameColor|default(null),
     errors: settings.getErrors('thumbTrimFrameColor')
 }) }}
@@ -395,7 +359,7 @@
     label: "Password" | t,
     id: 'password',
     name: 'password',
-    instructions: "You can set a password that will be required to open or modify the PDF file."|t,
+    instructions: "This option sets a password for the PDF file. The user will need to enter the password to open or modify the PDF file."|t,
     value: settings. password|default(null),
     errors: settings.getErrors('password')
 }) }}
@@ -404,18 +368,18 @@
     label: "Protection mode (Plus)" | t,
     id: 'protection',
     name: 'protection',
-    instructions: "You can enable the protection mode to restrict the actions that can be performed on the PDF file."|t,
+    instructions: "This option enables the protection mode for the PDF file. The protection mode allows you to restrict the actions that can be performed on the PDF file according to ISO or DIN standards. This option is only available for the Plus plan users."|t,
     on: settings.protection,
     disabled: isDisabledPlus
 
 }) }}
-			<p>The protection mode allows you to choose from the following values to make the PDF file compatible with ISO or DIN standards:</p>
+			<p>The protection mode supports the following options:</p>
 
 			{{ forms.lightswitchField({
     label: "Allow copy (Plus)" | t,
     id: 'protectionCopy',
     name: 'protectionCopy',
-    instructions: "This option allows the user to copy text and graphics from the PDF file." | t,
+    instructions: "This option allows the user to copy text and graphics from the PDF file to the clipboard. This option is only available for the Plus plan users." | t,
     on: settings.protectionCopy,
     disabled: isDisabledPlus
 }) }}
@@ -423,15 +387,15 @@
     label: "Allow print (Plus)" | t,
     id: 'protectionPrint',
     name: 'protectionPrint',
-    instructions: "This option allows the user to print the PDF file in low resolution." | t,
+    instructions: "This option allows the user to print the PDF file in low resolution (150 dpi). This option is only available for the Plus plan users." | t,
     on: settings.protectionPrint,
     disabled: isDisabledPlus
 }) }}
 			{{ forms.lightswitchField({
-    label: "Allow print in highres (Plus)" | t,
+    label: "Allow print in high resolution (Plus)" | t,
     id: 'protectionPrintHighres',
     name: 'protectionPrintHighres',
-    instructions: "This option allows the user to print the PDF file in high resolution." | t,
+    instructions: "This option allows the user to print the PDF file in high resolution (300 dpi or more). This option is only available for the Plus plan users." | t,
     on: settings.protectionPrintHighres,
     disabled: isDisabledPlus
 
@@ -440,16 +404,16 @@
     label: "Allow modify contents (Plus)" | t,
     id: 'protectionModify',
     name: 'protectionModify',
-    instructions: "This option allows the user to modify the contents of the PDF file." | t,
+    instructions: "This option allows the user to modify the contents of the PDF file, such as adding or deleting text, images, or pages. This option is only available for the Plus plan users." | t,
     on: settings.protectionModify,
     disabled: isDisabledPlus
 
 }) }}
 			{{ forms.lightswitchField({
-    label: "Allow annotations and forms fields (Plus)" | t,
+    label: "Allow annotations and form fields (Plus)" | t,
     id: 'protectionAnnotForms',
     name: 'protectionAnnotForms',
-    instructions: "This option allows the user to add annotations and form fields to the PDF file." | t,
+    instructions: "This option allows the user to add annotations and form fields to the PDF file, such as comments, highlights, or signatures. This option is only available for the Plus plan users." | t,
     on: settings.protectionAnnotForms,
     disabled: isDisabledPlus
 
@@ -458,16 +422,16 @@
     label: "Allow extracting content (Plus)" | t,
     id: 'protectionExtract',
     name: 'protectionExtract',
-    instructions: "This option allows the user to extract text and graphics from the PDF file." | t,
+    instructions: "This option allows the user to extract text and graphics from the PDF file to other applications or files. This option is only available for the Plus plan users." | t,
     on: settings.protectionExtract,
     disabled: isDisabledPlus
 
 }) }}
 			{{ forms.lightswitchField({
-    label: "Allow assemble - combining pages (Plus)" | t,
+    label: "Allow assembling pages (Plus)" | t,
     id: 'protectionAssemble',
     name: 'protectionAssemble',
-    instructions: "This option allows the user to combine pages and documents in the PDF file." | t,
+    instructions: "This option allows the user to assemble pages and documents in the PDF file, such as inserting, deleting, rotating, or reordering pages. This option is only available for the Plus plan users." | t,
     on: settings.protectionAssemble,
     disabled: isDisabledPlus
 
@@ -476,16 +440,16 @@
     label: "Allow fill forms (Plus)" | t,
     id: 'protectionFillForms',
     name: 'protectionFillForms',
-    instructions: "This option allows the user to fill in existing form fields in the PDF file." | t,
+    instructions: "This option allows the user to fill in the existing form fields in the PDF file. This option is only available for the Plus plan users." | t,
     on: settings.protectionFillForms,
     disabled: isDisabledPlus
 
 }) }}
 			{{ forms.lightswitchField({
-    label: "Enable user reading without provided password (Plus)" | t,
+    label: "Allow reading without password (Plus)" | t,
     id: 'protectionNoUserPassword',
     name: 'protectionNoUserPassword',
-    instructions: "This option allows the user to open the PDF file without a password." | t,
+    instructions: "This option allows the user to open the PDF file without entering a password. This option is only available for the Plus plan users." | t,
     on: settings.protectionNoUserPassword,
     disabled: isDisabledPlus
 
@@ -498,48 +462,51 @@
 			<p>
 				The optional packages are additional features that you can enable or disable in the plugin settings. They provide more functionality and customization for the PDF generation process. The optional packages are:
 			</p>
-			<p>
-				<a hrf="https://github.com/chillerlan/php-qrcode">chillerlan/php-qrcode</a>
-				for QR Code generation</p>
-{% set craftVersion = craft.app.getVersion() %}
+			<ul>
+				<li>
+				<a href="https://github.com/chillerlan/php-qrcode">chillerlan/php-qrcode</a>
+				for QR Code generation</li>
+				<li>
+				<a href="https://github.com/ezyang/htmlpurifier">ezyang/htmlpurifier</a>
+				for HTML (URL) purification for problems with scraped websites on some URLs.</li>
+			</ul>
+			{% set craftVersion = craft.app.getVersion() %}
 
-{% if craftVersion starts with '3.' %}
-  {% set qrVersion = '3.4' %}
-{% elseif craftVersion starts with '4.' %}
-  {% set qrVersion = '4.3' %}
-{% endif %}
+			{% if craftVersion starts with '3.' %}
+				{% set qrVersion = '3.4' %}
+			{% elseif craftVersion starts with '4.' %}
+				{% set qrVersion = '4.3' %}
+			{% endif %}
 
-<a href="{{ actionUrl('document-helpers/install/install-package', { package: 'chillerlan/php-qrcode' , version: qrVersion }) }}" class="btn btngroup-btn-first">Install package for QR Code generation</a>
+			<a href="{{ actionUrl('document-helpers/install/install-package', { package: 'chillerlan/php-qrcode' , version: qrVersion }) }}" class="btn btngroup-btn-first">Install QR Code package</a>
 
 			{{forms.textField({
     label: "QR Data to generate" | t,
     id: 'qrdata',
     name: 'qrdata'|default(null),
-    instructions: "This option allows you to generate a QR Code image from any data you provide. The image will be available on the Twig template with `{{qrimg}}` variable. Required optional package from plugin settings."|t,
+    instructions: "This option allows you to generate a QR Code image from any data you enter. The image will be available in the Twig template with `{{qrimg}}` variable. You need to install the QR Code package from the plugin settings to use this option."|t,
     value: settings.qrdata|default(null),
     errors: settings.getErrors('qrdata')
 }) }}
-			<p>
-				<a href="https://github.com/ezyang/htmlpurifier">ezyang/htmlpurifier</a>
-				for HTML (URL) purifier for problems with scraped websites on some URLs.</p>
-{% if craftVersion starts with '3.' %}
-  {% set purifierVersion = '4.13' %}
-{% elseif craftVersion starts with '4.' %}
-  {% set purifierVersion = '4.17' %}
-{% endif %}
-			<a href="{{ actionUrl('document-helpers/install/install-package', { package: 'ezyang/htmlpurifier' , version: purifierVersion}) }}" class="btn btngroup-btn-first">Install package for scraped URL HTML purify</a>
+			
+			{% if craftVersion starts with '3.' %}
+				{% set purifierVersion = '4.13' %}
+			{% elseif craftVersion starts with '4.' %}
+				{% set purifierVersion = '4.17' %}
+			{% endif %}
+			<a href="{{ actionUrl('document-helpers/install/install-package', { package: 'ezyang/htmlpurifier' , version: purifierVersion}) }}" class="btn btngroup-btn-first">Install HTML Purifier package</a>
 			{{ forms.lightswitchField({
-    label: "Provided URL (HTML) Purfiy" | t,
+    label: "Purify URL (input HTML)" | t,
     id: 'URLPurify',
     name: 'URLPurify',
     on: settings.URLPurify,
-    instructions: "If this is set it enables external URL Purification by external library." | t,
+    instructions: "This option enables purification of the HTML content from external URLs by using an external library. This can help you avoid problems with scraped websites on some URLs." | t,
 }) }}
 			{{forms.textField({
-    label: "Custom PHP Path" | t,
+    label: "Custom PHP binary path" | t,
     id: 'phpPath',
     name: 'phpPath',
-    instructions: "This option allows you to set custom php binary path or name like '\/usr\/bin\/php' or 'php', or 'php8.0' which can resolve problem with not installable packages during to problems php path or misconfiguration."|t,
+    instructions: "This option lets you specify the custom PHP binary path, such as '\/usr\/bin\/php', 'php', or 'php8.0'. This can help you avoid issues with installing packages that depend on the PHP path."|t,
     value: settings.phpPath|default(null),
     errors: settings.getErrors('phpPath')
 }) }}
@@ -549,7 +516,7 @@
 {% html at head %}
 <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
 {% endhtml %}
-	{% js at endBody %}
+{% js at endBody %}
 $(document).ready(function () {
 $('.tab-content').hide();
 
@@ -578,7 +545,9 @@ var fields = [
 "protectionNoUserPassword",
 "disableCopyright"
 ];
-if ({{isDisabledPlus}}==true) {
+if (
+{% if isDisabledPlus %}true{% else %}false
+{% endif %}==true) {
 for (var field of fields) {
 var lightswitchField = document.getElementById("settings-"+field);
 lightswitchField.disabled = true;

@@ -1,10 +1,21 @@
 # PDF Generator for Craft 3 or 4
 
+## 2.0.4 - 2023-12-19
+
+### Fixed
+
+- Fixed a bug that prevented users from setting options in settings when the **Plus** Plan was active. Now you can customize your PDFs with the advanced features of the **Plus** Plan.
+
+### Changed
+
+- Changed `URLMode` option in plugin settings panel.
+- Refactored descriptions and instructions in plugin settings panel for clarity and consistency.
+
 ## 2.0.3 - 2023-12-18
 
 ### Fixed
 
-- Fixed CHANGELOG.md.
+- Fixed a typo in the CHANGELOG.md file.
 
 ## 2.0.2 - 2023-12-18
 
@@ -21,7 +32,7 @@
 
 ### Fixed
 
-- Restore `URLmode` and correct `startPage` settings in the plugin panel for the `master` branch that was missing in the previous release.
+- Restore `URLMode` and correct `startPage` settings in the plugin panel for the `master` branch that was missing in the previous release.
 - Correct the `URLMode` description in the README.md file.
 
 ## 2.0.0 - 2023-12-18 [CRITICAL]
