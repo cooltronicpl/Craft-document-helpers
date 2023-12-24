@@ -13,12 +13,9 @@
 
 namespace cooltronicpl\documenthelpers\controller;
 
-use cooltronicpl\documenthelpers\classes\ExtendedAsset;
-use cooltronicpl\documenthelpers\classes\ExtendedAssetv3;
 use Craft;
-use craft\helpers\StringHelper;
-use craft\helpers\UrlHelper;
 use craft\web\Controller;
+use yii\web\Response;
 
 /**
  * Class PluginInstallController
@@ -31,112 +28,196 @@ use craft\web\Controller;
 class PluginInstallController extends Controller
 {
 
-    public function actionInstallPackage()
+    public function actionTogglePackage()
     {
+        $plugin = Craft::$app->plugins->getPlugin('document-helpers');
+        $settings = $plugin->getSettings()->toArray();
+        $phpPath = $settings['phpPath'];
+        if (isset($phpPath) && @defined($phpPath) && !empty($phpPath)) {
+            $php = $phpPath;
+        } else {
+            $php = $this->getPHPExecutable();
+        }
+        $composer = Craft::getAlias('@document-helpers') . '/' . 'resources/composer.phar';
+        $installed = Craft::$app->request->getParam('installed');
         $package = Craft::$app->request->getParam('package');
         $version = Craft::$app->request->getParam('version');
-        if ($package && $version) {
-            $root = Craft::getAlias('@root');
-            $composer = Craft::getAlias('@document-helpers') . '/' . 'resources/composer.phar';
-            $php = $this->getPHPExecutable();
-            if (isset($_SERVER["WINDIR"])) {
-                exec("cd " . StringHelper::toString($root) . " && " . StringHelper::toString($php) . " " . StringHelper::toString($composer) . " require " . StringHelper::toString($package) . ":^" . StringHelper::toString($version), $out, $retval);
-                Craft::info("PDF Generator - Command Installer: " . "cd " . StringHelper::toString($php) . " " . StringHelper::toString($composer) . " require " . StringHelper::toString($package) . ":^" . StringHelper::toString($version) . " Output: " . StringHelper::toString($out) . " Returned value: " . StringHelper::toString($retval) . " for package: " . $package);
-            } else {
-                exec("cd " . StringHelper::toString($root) . " && chmod +x " . StringHelper::toString($composer) ." && " . StringHelper::toString($php) . " " . StringHelper::toString($composer) . " require " . StringHelper::toString($package) . ":^" . StringHelper::toString($version), $out, $retval);
-                Craft::info("PDF Generator - Command Installer: " . "cd " . StringHelper::toString($root) . " && chmod +x " . StringHelper::toString($composer) ." && " . StringHelper::toString($php) . " " . StringHelper::toString($composer) . " require " . StringHelper::toString($package) . ":^" . StringHelper::toString($version));
+        $outputContent = '';
+        $success = false;
+        $outputChmod = '';
+        if (isset($package) && isset($version) && isset($installed)) {
+            $command = ($installed == '0') ? 'require' : 'remove';
+            if ($command == "require") {
+                $composerCommand = sprintf(
+                    '%s %s %s %s:^%s',
+                    escapeshellarg($php),
+                    escapeshellarg($composer),
+                    escapeshellarg($command),
+                    escapeshellarg($package),
+                    escapeshellarg($version)
+                );
+            } elseif ($command == "remove") {
+                $composerCommand = sprintf(
+                    '%s %s %s %s',
+                    escapeshellarg($php),
+                    escapeshellarg($composer),
+                    escapeshellarg($command),
+                    escapeshellarg($package)
+                );
             }
-            if($retval == 0) {
-                if (isset($_SERVER["WINDIR"]))
-                    exec("cd " .  StringHelper::toString($root) . " && " . StringHelper::toString($php) . " " . StringHelper::toString($composer) . " show | findstr /C:\"$package\"", $out2, $retval2);
-                else
-                    exec("cd " .  StringHelper::toString($root) . ' && if grep -Ewq "' .  StringHelper::toString($package) . '" composer.json; then echo "true"; else echo "false"; fi', $out2, $retval2);
-                if (StringHelper::toString($out2)=="true")
-                    Craft::$app->session->setNotice(StringHelper::toString("Optional package $package is installed."));
-                elseif (strpos(StringHelper::toString($out2), "$package") !== false)
-                    Craft::$app->session->setNotice(StringHelper::toString("Optional package $package is installed."));
-                else
-                    Craft::$app->session->setError(StringHelper::toString("Error when installing $package: " . StringHelper::toString($out) . " Exec() retval: " . StringHelper::toString($retval) . "Out2 status: ". StringHelper::toString($out2) ." Exec() retval2: " . StringHelper::toString($retval2)));
-
-            } else {
-                Craft::$app->session->setError(StringHelper::toString("Error when installing $package: ".StringHelper::toString($out)." Exec() retval: " . StringHelper::toString($retval)));
+            if (!isset($_SERVER["WINDIR"])) {
+                $outputChmod = $this->processCommand("chmod +x " . escapeshellarg($composer));
             }
-        }
-        else {
-            Craft::$app->session->setError(StringHelper::toString("No composer package or version specified. Package: " . StringHelper::toString($package) . ". Version: " . StringHelper::toString($version)));
+            $outputContent = $this->processCommand($composerCommand);
 
+        } else {
+            $response = Craft::$app->getResponse();
+            $response->format = Response::FORMAT_JSON;
+            $response->data = ['success' => false, 'installed' => ($installed == 0), 'message' => "Bad input parameters for $package!"];
+            return $response;
         }
-        return $this->redirect(UrlHelper::cpUrl('settings/plugins/document-helpers'));
+        Craft::info("PDF Generator - PluginInstall Command: " . $composerCommand . " Output: " . json_encode($outputContent) . " Returned value for package: " . (is_array($package) ? implode('', $package) : $package));
+
+        if (isset($_SERVER["WINDIR"])) {
+            $out2 = $this->processCommand(escapeshellarg($php) . " " . escapeshellarg($composer) . " show | findstr /C:\"" . escapeshellarg($package) . "\"");
+        } else {
+            $out2 = $this->processCommand(escapeshellarg($php) . " " . escapeshellarg($composer) . " show | grep " . escapeshellarg($package));
+        }
+        $success = ($installed == '0' && !empty($out2)) || ($installed == '1' && empty($out2));
+
+        $response = Craft::$app->getResponse();
+        $response->format = Response::FORMAT_JSON;
+        $response->data = [
+            'success' => $success,
+            'installed' => ($installed == 0),
+            'message' => $success
+            ? "Package $package has been " . (($installed == 0) ? "installed " : "uninstalled ") . "successfully. \n $outputContent"
+            : "Package " . (($installed == 0) ? "install " : "uninstall ") . "unsuccessful. Try to do it manually, more info in the Plugin Documentation. \n $outputContent",
+        ];
+        Craft::debug('PDF Generator - Debugging Info:');
+        Craft::debug('$installed: ' . json_encode($installed));
+        Craft::debug('$out2: ' . json_encode($out2));
+        Craft::debug('$outputContent: ' . json_encode($outputContent));
+        Craft::debug('$outputChmod: ' . json_encode($outputChmod));
+        Craft::debug('$success: ' . json_encode($success));
+        return $response;
     }
 
     private function getPHPExecutable()
     {
-        $plugin = Craft::$app->plugins->getPlugin('document-helpers');
-        $settings = $plugin->getSettings()->toArray();;
-        $phpPath = $settings['phpPath'];
-        if (isset($phpPath) && @defined($phpPath) && !empty($phpPath) ) {
-            return $phpPath;
-        }
+
         $craftVersion = Craft::$app->getVersion();
         if (version_compare($craftVersion, '4.0', '>=')) {
             exec("which php8.0", $out, $ret);
             if ($ret == 0) {
-                return $out;
+                return (is_array($out) ? implode('', $out) : $out);
             }
             exec("which php8.1", $out, $ret);
             if ($ret == 0) {
-                return $out;
+                return (is_array($out) ? implode('', $out) : $out);
             }
             exec("which php8.2", $out, $ret);
             if ($ret == 0) {
-                return $out;
+                return (is_array($out) ? implode('', $out) : $out);
             }
             exec("which php8.3", $out, $ret);
             if ($ret == 0) {
-                return $out;
+                return (is_array($out) ? implode('', $out) : $out);
             }
         } elseif (version_compare($craftVersion, '3.0', '>=')) {
             exec("which php7.2", $out, $ret);
             if ($ret == 0) {
-                return $out;
+                return (is_array($out) ? implode('', $out) : $out);
             }
             exec("which php7.3", $out, $ret);
             if ($ret == 0) {
-                return $out;
+                return (is_array($out) ? implode('', $out) : $out);
             }
             exec("which php7.4", $out, $ret);
             if ($ret == 0) {
-                return $out;
+                return (is_array($out) ? implode('', $out) : $out);
+            }
+            exec("which php8.0", $out, $ret);
+            if ($ret == 0) {
+                return (is_array($out) ? implode('', $out) : $out);
+            }
+            exec("which php8.1", $out, $ret);
+            if ($ret == 0) {
+                return (is_array($out) ? implode('', $out) : $out);
+            }
+            exec("which php8.2", $out, $ret);
+            if ($ret == 0) {
+                return (is_array($out) ? implode('', $out) : $out);
+            }
+            exec("which php8.3", $out, $ret);
+            if ($ret == 0) {
+                return (is_array($out) ? implode('', $out) : $out);
             }
         }
 
         if (@defined(PHP_BINARY) && str_contains(PHP_BINARY, 'php')) {
-            return PHP_BINARY;
+            return (is_array(PHP_BINARY) ? implode('', PHP_BINARY) : PHP_BINARY);
         }
 
         if (isset($_SERVER["_"]) && str_contains($_SERVER["_"], 'php')) {
-            return $_SERVER["_"];
+            return (is_array($_SERVER["_"]) ? implode('', $_SERVER["_"]) : $_SERVER["_"]);
         }
 
         $paths = explode(PATH_SEPARATOR, getenv('PATH'));
         foreach ($paths as $path) {
             if (strstr($path, 'php.exe') && isset($_SERVER["WINDIR"]) && file_exists($path) && is_file($path)) {
-                return $path;
+                return (is_array($path) ? implode('', $path) : $path);
             } else {
                 $php_executable = $path . DIRECTORY_SEPARATOR . "php" . (isset($_SERVER["WINDIR"]) ? ".exe" : "");
                 if (file_exists($php_executable) && is_file($php_executable)) {
-                    return $php_executable;
+                    return (is_array($php_executable) ? implode('', $php_executable) : $php_executable);
                 }
             }
         }
         if (php_ini_loaded_file() !== null) {
             $php_executable = dirname(php_ini_loaded_file()) . DIRECTORY_SEPARATOR . "php" . (isset($_SERVER["WINDIR"]) ? ".exe" : "");
             if (file_exists($php_executable) && is_file($php_executable)) {
-                return $php_executable;
+                return (is_array($php_executable) ? implode('', $php_executable) : $php_executable);
             }
         }
 
         return "php";
+    }
+
+    private function processCommand($command)
+    {
+        $root = Craft::getAlias('@root');
+    
+        $descriptors = [
+            0 => ['pipe', 'r'],
+            1 => ['pipe', 'w'],
+            2 => ['pipe', 'w'],
+        ];
+    
+        $process = proc_open($command, $descriptors, $pipes, $root);
+    
+        if (!is_resource($process)) {
+            return ['output' => '', 'returnValue' => false];
+        }
+    
+        fclose($pipes[0]);
+    
+        $stdout = stream_get_contents($pipes[1]);
+        fclose($pipes[1]);
+    
+        $stderr = stream_get_contents($pipes[2]);
+        fclose($pipes[2]);
+        $return="";
+
+        $returnValue = proc_close($process);
+        if (!empty($stdout))
+        {
+            $return = $stdout; 
+        } elseif (!empty($stderr))
+        {
+            $return = $stderr; 
+        }
+        return $return;
     }
 
 }

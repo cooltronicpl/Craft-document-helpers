@@ -18,8 +18,10 @@ use cooltronicpl\documenthelpers\classes\ExtendedAsset;
 use cooltronicpl\documenthelpers\classes\ExtendedAssetv3;
 use cooltronicpl\documenthelpers\DocumentHelper as DocumentHelpers;
 use Craft;
+use craft\errors\ElementNotFoundException;
 use craft\helpers\FileHelper;
 use craft\helpers\StringHelper;
+use Mpdf\MpdfException;
 use Twig\Error\LoaderError;
 use Twig\Error\RuntimeError;
 use Twig\Error\SyntaxError;
@@ -38,12 +40,14 @@ class DocumentHelperVariable
      * @param string $destination type of generated document
      * @param string $filename Generated PDF filename
      * @param array $variables Craft variables to parse into template
-     * @param array $attributes Optional attributes passed to funtcion as `pdfOptions` which is merged and overwriten over global plugin Settings
-     *
+     * @param array $attributes Optional attributes passed to function as `pdfOptions` which is merged and overwritten over global plugin Settings
      * @return string Filename, contents of PDF file, or null on error
+     * @throws Exception
+     * @throws MpdfException
      */
     public function pdf($template, $destination, $filename, $variables, $attributes)
     {
+        ini_set('pcre.backtrack_limit', 10000000);
         $runtimePath = Craft::$app->getPath()->getRuntimePath();
         $pdfGeneratorPath = FileHelper::normalizePath($runtimePath . '/temp/pdfgenerator');
 
@@ -92,6 +96,17 @@ class DocumentHelperVariable
         if (isset($settings['footer'])) {
             $html_footer = $this->generateContent($settings['footer'], $vars, $settings);
         }
+        if (DocumentHelpers::getInstance()->isPlusEdition() && isset($settings['convertImgToCMYK']) && $settings['convertImgToCMYK'] == true) {
+            if (isset($html)) {
+                $html = $this->convertImgToCMYK($html);
+            }
+            if (isset($html_header)) {
+                $html_header = $this->convertImgToCMYK($html_header);
+            }
+            if (isset($html_footer)) {
+                $html_footer = $this->convertImgToCMYK($html_footer);
+            }
+        }
         if (isset($settings['mirrorMargins']) && $settings['mirrorMargins'] == true) {
             $settings['mirrorMargins'] = 1;
         }
@@ -112,6 +127,11 @@ class DocumentHelperVariable
         $pdf = new \Mpdf\Mpdf(
             $arrParameters
         );
+        if (isset($settings['log'])) {
+            $logger = new \Monolog\Logger('name');
+            $logger->pushHandler(new \Monolog\Handler\StreamHandler($settings["log"], \Monolog\Logger::DEBUG));
+            $pdf->setLogger($logger);
+        }
         if (isset($settings['encoding']) && !empty($settings['encoding']) && $settings['encoding'] == "utf-8" || isset($settings['encoding']) && !empty($settings['encoding']) && $settings['encoding'] == "UTF-8") {
             $pdf->charset_in = 'UTF-8';
             $pdf->allow_charset_conversion = false;
@@ -121,7 +141,39 @@ class DocumentHelperVariable
         } else {
             $pdf->allow_charset_conversion = false;
         }
-
+        if (isset($settings['colorspace'])) {
+            $pdf->restrictColorSpace = $settings['colorspace'];
+        }
+        if (DocumentHelpers::getInstance()->isPlusEdition() && isset($settings['generateMode'])) {
+            switch ($settings['generateMode']) {
+                case 'pdfx':
+                case 'PDFX':
+                    $pdf->PDFX = true;
+                    break;
+                case 'pdfxa':
+                case 'pdfxauto':
+                case 'pdfxAuto':
+                case 'PDFXAuto':
+                case 'PDFXauto':
+                    $pdf->PDFX = true;
+                    $pdf->PDFXauto = true;
+                    break;
+                case 'pdfa':
+                case 'PDFA':
+                    $pdf->PDFA = true;
+                    break;
+                case 'pdfaa':
+                case 'pdfaauto':
+                case 'pdfaAuto':
+                case 'PDFAAuto':
+                case 'PDFAauto':
+                    $pdf->PDFA = true;
+                    $pdf->PDFAauto = true;
+                    break;
+                default:
+                    break;
+            }
+        }
         if (isset($settings['header'])) {
             $pdf_string = $pdf->SetHTMLHeader($html_header);
         }
@@ -181,7 +233,7 @@ class DocumentHelperVariable
         if (DocumentHelpers::getInstance()->isPlusEdition()) {
             $pdf->SetCreator("Made by CoolTRONIC.pl PDF Generator Plus https://cooltronic.pl");
         } else {
-            $pdf->SetCreator("Made by CoolTRONIC.pl PDF Generator Standard https://cooltronic.pl");
+            $pdf->SetCreator("Made by CoolTRONIC.pl PDF Generator Lite https://cooltronic.pl");
         }
         if (DocumentHelpers::getInstance()->isPlusEdition() && $settings['disableCopyright'] && isset($settings['keywords'])) {
             $pdf->SetKeywords($settings['keywords']);
@@ -231,7 +283,9 @@ class DocumentHelperVariable
                 $pdf->SetProtection(array(), 'UserPassword', $settings['password']);
             }
         }
-
+        if (isset($settings['disableCompression']) && $settings['disableCompression'] == true) {
+            $pdf->SetCompression(false);
+        }
         switch ($destination) {
             case 'file':
                 $output = \Mpdf\Output\Destination::FILE;
@@ -308,15 +362,20 @@ class DocumentHelperVariable
         }
         return null;
     }
+
     /**
      * Fuction generates PDF added to Assets
      * @param string $template Input content as path of Twig template, URL or Code block
      * @param string $tempFilename Temporary filename
      * @param array $variables Craft variables to parse into template
-     * @param array $attributes Optional attributes passed to funtcion as `pdfOptions` which is merged and overwriten over global plugin Settings
+     * @param array $attributes Optional attributes passed to function as `pdfOptions` which is merged and overwritten over global plugin Settings
      * @param string $volumeHandle Volume handle when PDF should be saved
-     *
-     * @return ExtendedAsset CraftCMS (4.x) or ExtendedAssetv3 (3.x) Asset with optional field assetThumb which is an Asset of image of generated ExtendedAsseet associated with PDF
+     * @return ExtendedAsset|ExtendedAssetv3|null Asset with optional field asset.assetThumb (when Asset Thumbnail is enabled and generated) or null on error
+     * @throws CrossReferenceException
+     * @throws Exception
+     * @throws MpdfException
+     * @throws \Throwable
+     * @throws ElementNotFoundException
      */
     public function pdfAsset($template, $tempFilename, $variables, $attributes, $volumeHandle)
     {
@@ -384,8 +443,8 @@ class DocumentHelperVariable
             $result = Craft::$app->getElements()->saveElement($asset);
             // Check if the asset was saved successfully
             if (!$result) {
-                return false;
-                Craft::error("Can't find asset: " . $filename . ', in volume: ' . $volumeHandle);
+                Craft::error("Can't find asset: " . StringHelper::toString($filename) . ', in volume: ' . StringHelper::toString($volumeHandle));
+                return null;
             }
         }
 
@@ -442,11 +501,11 @@ class DocumentHelperVariable
                 try {
                     $resultThumb = Craft::$app->getElements()->saveElement($assetThumb);
                 } catch (\Exception $e) {
-                    Craft::error('Error relocating thumbnail: ' . $e->getMessage());
+                    Craft::error('Error relocating thumbnail: ' . StringHelper::toString($e->getMessage()));
                 }
                 if (!isset($resultThumb)) {
-                    return false;
-                    Craft::error("Can't find assetThumb: " . $dirTemp . DIRECTORY_SEPARATOR . $fileTempName . '.' . $assetType . " and save it into: " . $filename . '.' . $assetType . ", in volume: " . $assetVolumeHandle);
+                    Craft::error("Can't find assetThumb: " . StringHelper::toString($dirTemp . DIRECTORY_SEPARATOR . $fileTempName . '.' . $assetType) . " and save it into: " . StringHelper::toString($filename . '.' . $assetType) . ", in volume: " . StringHelper::toString(isset($settings['assetThumbVolumeHandle']) ? $settings['assetThumbVolumeHandle'] : $volumeHandle));
+                    return null;
                 }
             }
         }
@@ -467,18 +526,18 @@ class DocumentHelperVariable
         if (isset($settings['assetDelete'])) {
             if (file_exists($tempFilename)) {
                 if (unlink($tempFilename)) {
-                    Craft::info("Deleted (unlink) temporary PDF file on path: " . $tempFilename);
+                    Craft::info("Deleted (unlink) temporary PDF file on path: " . StringHelper::toString($tempFilename));
                 } else {
-                    Craft::error("Deletion error (unlink) of temporary PDF file on path: " . $tempFilename);
+                    Craft::error("Deletion error (unlink) of temporary PDF file on path: " . StringHelper::toString($tempFilename));
                 }
             }
 
             if (isset($settings['assetThumb'])) {
                 if (file_exists($dirTemp . DIRECTORY_SEPARATOR . $fileTempName . '.' . $assetType)) {
                     if (unlink($dirTemp . DIRECTORY_SEPARATOR . $fileTempName . '.' . $assetType)) {
-                        Craft::info("Deleted (unlink) temporary PDF Thumb file on path: " . $dirTemp . DIRECTORY_SEPARATOR . $fileTempName . '.' . $assetType);
+                        Craft::info("Deleted (unlink) temporary PDF Thumb file on path: " . StringHelper::toString($dirTemp . DIRECTORY_SEPARATOR . $fileTempName . '.' . $assetType));
                     } else {
-                        Craft::error("Deletion error (unlink) of temporary PDF Thumb on path: " . $dirTemp . DIRECTORY_SEPARATOR . $fileTempName . '.' . $assetType);
+                        Craft::error("Deletion error (unlink) of temporary PDF Thumb on path: " . StringHelper::toString($dirTemp . DIRECTORY_SEPARATOR . $fileTempName . '.' . $assetType));
                     }
                 }
             }
@@ -486,6 +545,7 @@ class DocumentHelperVariable
         unset($asset);
         unset($assetThumb);
 
+        /** @var ExtendedAsset|ExtendedAssetv3 $extendedAsset */
         return $extendedAsset;
     }
 
@@ -510,7 +570,7 @@ class DocumentHelperVariable
      * @param string $url input URL
      * @param boolean $isPurify sets HTMLPurifier method when possible
      * @param string $encoding sets encoding of output stream
-     * @return boolean
+     * @return string HTML Contents of URL
      */
     private function getURL($url, $settings)
     {
@@ -521,6 +581,22 @@ class DocumentHelperVariable
             curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);
             $html = curl_exec($ch);
             curl_close($ch);
+        } elseif (isset($settings['URLMode']) && $settings['URLMode'] == "simplehtml") {
+            $loader = '/vendor/simplehtmldom/simplehtmldom/simple_html_dom.php';
+            if (file_exists(Craft::getAlias('@root') . $loader) &&
+                is_file(Craft::getAlias('@root') . $loader)) {
+                require_once Craft::getAlias('@root') . $loader;
+                if (class_exists('simple_html_dom')) {
+                    $simple = new \simple_html_dom();
+                    $simple->load_file($url);
+                    $html = $simple->save();
+                    unset($simple);
+                } else {
+                    $html = "<p>Cannot parse URLMode with `simplehtml`, because simplehtmldom/simplehtmldom is not initialized but files exist (installed).</p>";
+                }
+            } else {
+                $html = "<p>Cannot parse URLMode with `simplehtml`, because simplehtmldom/simplehtmldom is not installed.</p>";
+            }
         } else {
             $html = file_get_contents($url);
         }
@@ -549,12 +625,12 @@ class DocumentHelperVariable
     }
 
     /**
-     * Fuction which is running generating Thumbnails (required ImageMagick)
-     * @param string $filneame input filename
+     * Function which is running generating Thumbnails (required ImageMagick)
+     * @param string $filename input filename
      * @param string $savePath Path thumbnails
-     * @param string $type sets type of image ie. jpg, png, webp, avif
-     * @param array $setting Plugin settings from control panel or parsed in $attributes array from `pdfOptions`
-     * @return boolean When true image is genated
+     * @param string $type sets type of image: jpg, png, webp, avif, gif
+     * @param array $settings Plugin settings from control panel or parsed in $attributes array from `pdfOptions`
+     * @return boolean When true image is generated
      */
     private function makeThumb($filename, $savePath, $type, $settings)
     {
@@ -604,7 +680,8 @@ class DocumentHelperVariable
                 $bestfit,
                 $thumbBg,
                 $thumbPage,
-                $thumbTrimFrame
+                $thumbTrimFrame,
+                $settings
             );
             $thumbGenerator = new GenerateThumb();
             $thumbGenerator->convert($thumb);
@@ -615,11 +692,11 @@ class DocumentHelperVariable
         return false;
     }
     /**
-     * Fuction which is running generating content from input content from Twig template, URL or HTML code block
+     * Function which is running generating content from input content from Twig template, URL or HTML code block
      * @param string $input_content Input content as path of Twig template, URL or Code block
      * @param string $vars Variables like entry from Craft CMS
      * @param array $settings Settings parsed from `pdfOptions` or plugin Settings
-     * @return string $html_content Returned HTML Content
+     * @return string Returned HTML Content
      */
     private function generateContent($input_content, $vars, $settings)
     {
@@ -632,13 +709,12 @@ class DocumentHelperVariable
         } elseif (filter_var($input_content, FILTER_VALIDATE_URL)) {
             $html_content = $this->getURL($input_content, $settings);
             if (!isset($html_content)) {
-                $html_content = "<p>Error in getting a URL template from $input_content URL. </p>";
+                $html_content = "<p>Error in getting a URL HTML template from $input_content URL. </p>";
             }
-            if (isset($settings['URLTwigRender']) && $settings['URLTwigRender'] == true) {}
             try {
                 $html_content = Craft::$app->getView()->renderString($html_content, $vars);
             } catch (LoaderError | SyntaxError $e) {
-                $html_content = "<p>Error in retriving a URL template. Error: " . StringHelper::toString($e) . " contents:<br> " . StringHelper::toString($html_content) . "</p>";
+                $html_content = "<p>Error in inserting Twig vars into HTML URL template. Error: " . StringHelper::toString($e) . " contents:<br> " . StringHelper::toString($html_content) . "</p>";
             }
 
         } elseif (strip_tags($input_content) != $input_content) {
@@ -651,5 +727,59 @@ class DocumentHelperVariable
             $html_content = "<p>Error in retriving a template of header. Not compatibile type of \$template, contents:<br> " . $input_content . "</p>";
         }
         return $html_content;
+    }
+
+    private function convertImgToCMYK($html_input)
+    {
+        $loader = '/vendor/simplehtmldom/simplehtmldom/simple_html_dom.php';
+        if (file_exists(Craft::getAlias('@root') . $loader) &&
+            is_file(Craft::getAlias('@root') . $loader)) {
+            require_once Craft::getAlias('@root') . $loader;
+
+            if (class_exists('simple_html_dom')) {
+                $html = new \simple_html_dom();
+                $html->load($html_input);
+                foreach ($html->find('img') as $img) {
+                    try {
+                        $src = $img->src;
+                        if (class_exists('\Imagick') === false) {
+                            Craft::error('Cannot parse img tags and convert to CMYK. Imagick is not installed.');
+                            return $html_input;
+                        }
+                        $image = new \Imagick();
+                        if (filter_var($src, FILTER_VALIDATE_URL)) {
+                            $imageBlob = file_get_contents($src);
+                        } else {
+                            $imageBlob = base64_decode($src);
+                        }
+                        $image->readImageBlob($imageBlob);
+                        $imageFormat = strtolower($image->getImageFormat());
+                        $supportedFormats = ['jpeg', 'png', 'webp', 'avif', 'gif', 'bmp', 'tiff'];
+                        if (in_array($imageFormat, $supportedFormats)) {
+                            $image->transformImageColorspace(\Imagick::COLORSPACE_CMYK);
+                        } elseif (in_array($imageFormat, ['svg'])) {
+                            continue;
+                        } else {
+                            Craft::warning("Unsupported image format: $imageFormat. Skipping conversion.");
+                            continue;
+                        }
+                        $img->src = 'data:image/' . $imageFormat . ';base64,' . base64_encode($image->getImageBlob());
+                        Craft::debug("CMYK conversion img[src]: " . $img->src . " base64_encode: " . base64_encode($image->getImageBlob()));
+                        $image->destroy();
+                    } catch (\Exception $e) {
+                        Craft::error('Imagick Error (CMYK): ' . $e->getMessage());
+                    }
+                }
+                $html_output = $html->save();
+                unset($html_input);
+                return $html_output;
+            } else {
+                return $html_input;
+                Craft::error("Cannot parse img tags and convert to CMYK, because simplehtmldom/simplehtmldom is not initialized but files exist (installed).");
+            }
+        } else {
+            return $html_input;
+            Craft::error("Cannot parse img tags and convert to CMYK, because simplehtmldom/simplehtmldom is not installed.");
+        }
     }
 }

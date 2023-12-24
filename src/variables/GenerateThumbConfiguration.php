@@ -1,7 +1,7 @@
 <?php
 /**
  *
- * Class GenerateThumbCoinfiguration
+ * Class GenerateThumbConfiguration
  *
  * PDF Generator plugin for Craft CMS 3 or Craft CMS 4.
  *
@@ -52,7 +52,8 @@
           $bestfit = false,
           $bgColor = "white",
           $page = 0,
-          $frameColor="black"
+          $frameColor="black",
+          $settings=null
       ) {
           $this->pdfPath = $pdfPath;
           $this->savePath = $savePath;
@@ -64,7 +65,7 @@
           $this->bgColor = $bgColor;
           $this->page = $page;
           $this->frameColor = $frameColor;
-  
+          $this->settings = $settings;
           if (!in_array($this->format, self::SupportedFormats, true)) {
               Craft::error(sprintf(
                   'Format "%s" is not supported. Did you mean "%s"?',
@@ -91,7 +92,6 @@
           $this->format = $format;
           $this->trim = $trim;
   
-          // Add checks for the format and existence of the file
           if (!in_array($this->format, self::SupportedFormats, true)) {
               Craft::error(sprintf(
                   'Format "%s" is not supported. Did you mean "%s"?',

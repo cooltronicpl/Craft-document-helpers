@@ -16,10 +16,12 @@ namespace cooltronicpl\documenthelpers;
 use cooltronicpl\documenthelpers\controller\PluginInstallController;
 use cooltronicpl\documenthelpers\models\Settings;
 use cooltronicpl\documenthelpers\variables\DocumentHelperVariable;
+use cooltronicpl\documenthelpers\variables\PackageManager;
 use Craft;
 use craft\base\Plugin;
 use craft\web\twig\variables\CraftVariable;
 use yii\base\Event;
+use craft\services\Plugins;
 
 /**
  * Class DocumentHelpers.
@@ -52,6 +54,7 @@ class DocumentHelper extends Plugin
             self::EDITION_PRO,
         ];
     }
+
     // Public Properties
     // =========================================================================
 
@@ -71,6 +74,9 @@ class DocumentHelper extends Plugin
                 /** @var CraftVariable $variable */
                 $variable = $event->sender;
                 $variable->set('documentHelper', DocumentHelperVariable::class);
+                if (Craft::$app->getRequest()->getIsCpRequest()) {
+                    $variable->set('packageManagerPDFGenerator', PackageManager::class);
+                }
             }
         );
         Craft::setAlias('@document-helpers', __DIR__);
@@ -102,7 +108,7 @@ class DocumentHelper extends Plugin
         $attributes = ['protection', 'disableCopyright', 'protectionCopy',
             'protectionPrint', 'protectionModify', 'protectionAnnotForms',
             'protectionExtract', 'protectionAssemble', 'protectionFillForms',
-            'protectionPrintHighres', 'protectionNoUserPassword'];
+            'protectionPrintHighres', 'protectionNoUserPassword', 'generateMode', 'convertImgToCMYK'];
 
         foreach ($attributes as $attribute) {
             $rules[] = [$attribute, function ($attribute, $params, $validator) {

@@ -117,7 +117,7 @@ Example of the `pdfAsset` method:
 {% if asset %}
     <a href="{{asset.url()}}?v={{asset.dateModified|date('U')}}">Download your PDF</a>
 {% else %}
-    File was not generated.
+    The file was not generated.
 {% endif %}
 ```
 
@@ -172,7 +172,7 @@ composer require ezyang/htmlpurifier:^4.17
 composer require ezyang/htmlpurifier:^4.13 
 ```
 
-Example of code block:
+Example of a code block:
 
 ```
 {% set pdfOptions = {
@@ -219,8 +219,8 @@ Example of using custom variables:
 You can override the default options with `pdfOptions` as shown above. Here are the available options:
 
 - `date` (default: `null`) - If you provide a date (in timestamp format) that is older than the creation date of the file, the existing file will be overwritten. Otherwise, the file will not be modified.
-- `header` (default: `null`) - The optional location of the template file for the header, which should be in the `/templates` directory. You can also use a URL or an HTML code block as a template. For example, `header: "_pdf/header.html"` or `header: "<h1>My Header</h1>"`.
-- `footer` (default: `null`) - The optional location of the template file for the footer, which should be in the `/templates` directory. You can also use a URL or an HTML code block as a template. For example, `footer: "_pdf/footer.twig"` or `footer: "<p>My Footer</p>"`.
+- `header` (default: `null`) - The optional location of the template file for the header, which should be in the `/templates` directory. You can also use a URL or an HTML code block as a template. For example, `header: "_pdf/header.html"`, `footer: "https://example.com/someheader"` or `header: "<h1>My Header</h1>"`.
+- `footer` (default: `null`) - The optional location of the template file for the footer, which should be in the `/templates` directory. You can also use a URL or an HTML code block as a template. For example, `footer: "_pdf/footer.twig"`, `footer: "https://example.com/somefooter"` or `footer: "<p>My Footer</p>"`.
 - `margin_top` (default: `30`) - The top margin is in millimetres.
 - `margin_bottom` (default: `30`) - The bottom margin is in millimetres.
 - `margin_left` (default: `15`) - The left margin is in millimetres.
@@ -231,6 +231,7 @@ You can override the default options with `pdfOptions` as shown above. Here are 
 - `custom` (default: `null`) - This allows you to add a custom variable or variables.
 - `password` (default: `null`) - This can be used to add password protection to your PDF. The password should be provided as a string.
 - `no_auto_page_break` (default: `null`) - This disables automatic system page breaks. This can be useful if you need to manually add page breaks. For example, you can add a custom page to documents with more than one-page break using `<pagebreak>`. This may fix page break issues in some cases.
+- `disableCopyright` (default: `null`) - This option requires the **Plus** plan and can be used to disable invisible copyright tags (to remove invisible watermarks).
 - `author` (default: `null`) - This sets the author metadata. It should be provided as a string.
 - `keywords` (default: `null`) - This sets the keyword metadata. It should be provided as a string in the following format: "keyword1, longer keyword2, keyword3".
 - `fonts` (default: `null`):
@@ -238,7 +239,7 @@ You can override the default options with `pdfOptions` as shown above. Here are 
 - `tempDir` (default: `@runtime/temp/pdfgenerator`) - This sets the path to the temporary directory used for generating PDFs. We have tested this with the main /tmp directory on the server with success. This could potentially improve performance when generating multiple PDFs.
 - `landscape` (default: `null`) - If this is set, the PDF will be generated in landscape mode.
 - `portrait` (default: `null`) - If this is set, the PDF will be generated in portrait mode.
-- `format` (default: `A4`) - This sets the paper size for the PDF. The default is "A4", but you can set other sizes compatible with MPDF. Other popular formats include:
+- `format` (default: `A4`) - This option sets the paper size for the PDF. The default is "A4", but you can set other sizes compatible with MPDF. Other popular formats include:
   - A3
   - A4 (default)
   - A5
@@ -247,6 +248,18 @@ You can override the default options with `pdfOptions` as shown above. Here are 
   - Executive (7,25 x 10,5 in)
   - B4
   - B5
+- `generateMode` (default: `null`) - This option requires the **Plus** plan and can be set as a string:
+  - `pdfa` for PDF-A
+  - `pdfx` for PDF-X
+  - `pdfaauto` for PDF-A with common corrections
+  - `pdfxauto` for PDF-X with common corrections
+- `colorspace` (default: `null`) - This option can be set as an integer:
+  - `1` - allow GRAYSCALE only [convert CMYK/RGB->gray]
+  - `2` - allow RGB / SPOT COLOR / Grayscale [convert CMYK->RGB]
+  - `3` - allow CMYK / SPOT COLOR / Grayscale [convert RGB->CMYK]
+  - `0` - or any other value: no restriction is made on colourspace used
+- `startPage` (default: `null`) - The first page of the PDF to be generated. You can use this option to trim unnecessary pages from the beginning of the PDF. For example, `startPage: 2` will skip the first page of the PDF.
+- `endPage` (default: `null`) - The last page of the PDF to be generated. You can use this option to trim unnecessary pages from the end of the PDF. For example, `endPage: 10` will generate a PDF with only 10 pages.
 - `watermarkImage` (default: `null`) - This option creates a watermark using the image file specified by the provided path.
 - `watermarkText` (default: `null`) - This option creates a watermark using the text provided.
 - `autoToC` (default: `null`) - This option automatically generates a Table of Contents using the H1-H6 tags in your document.
@@ -258,14 +271,28 @@ You can override the default options with `pdfOptions` as shown above. Here are 
 - `assetThumb` (default: `null`) - This option generates a thumbnail image of a Craft CMS image Asset using the `pdfAsset` method (requires ImageMagick). It can be accessed in the Twig template as `asset.assetThumb`.
   - `assetThumbVolumeHandle` (default: `null`): This parameter is optional and defines the Volume Handle of the thumbnail. It falls back to the PDF Volume Handle if not set. The Volume Handle needs a `Base URL` like `@web\pdffiles` in the Craft CMS Filesystems, Assets settings for testing.
 - `dumbThumb` (default: `null`) - This option generates a basic thumbnail image (without an Asset) using the `pdf` method (requires ImageMagick).
-- `qrdata` (default: `null`) - This option allows you to generate a QR Code image from any data you provide. The image will be available on the Twig template with `{{qrimg}}` variable. Required to install optional package from plugin settings.
+
+Both `assetThumb` and `dumbThumb` support the following optional customizations:
+
+- `thumbType` - This parameter allows you to choose the format of the thumbnail. Options include `jpg`, `gif`, `webp`, `avif`, and `png`. The default format is `jpg`.
+- `thumbWidth` - This parameter specifies the width of the thumbnail in pixels. The default width is `210`.
+- `thumbHeight` - This parameter specifies the height of the thumbnail in pixels. The default height is `297`.
+- `thumbPage` - This parameter specifies the page to generate the thumbnail from. The default is the first page, which is numbered from `0`.
+- `thumbBgColor` - This parameter specifies the background colour of the thumbnail. Options include `black`, `rgb(33,66,99)`, and `#123456`. The default colour is `white`.
+- `thumbTrim` - This parameter, when set to `true`, trims your page and centres the content. The default value is `false`.
+- `thumbTrimFrameColor` - This parameter changes the colour of the trim frame. Colours can be specified as `black` or in RGB format (e.g., `rgb(12,1,2)`) or HEX format (e.g., `#662266`).
+- `thumbBestfit` - This boolean value determines whether to fit the image within the given dimensions or not. If `true`, the image will be scaled down so that it fits within the given dimensions. If `false`, the image will be stretched or cropped to fill the given dimensions.
+
+Advanced options:
+
 - `encoding` (default: `null`) - This can set encoding of the following codepages are supported by the `iconv()` function like `UTF-8`. [More info](https://mpdf.github.io/reference/codepages-glyphs/iconv.html).
-- `disableCopyright` (default: `null`) - This option requires the **Plus** plan and can be used to disable invisible copyright tags.
+- `disableCompression` (default: `false`) - This option can be set to `true` to disable automatic compression of the generated PDF file. This may increase the file size but also improve the quality.
+- `qrdata` (default: `null`) - This option allows you to generate a QR Code image from any data you provide. The image will be available on the Twig template with the `{{qrimg}}` variable. Required to install optional package from plugin settings.
 - `URLPurify` (default: `null`) - Whether to enable an external library to sanitize the HTML provided by the URL in the `template` parameter. Set to `true` to enable this feature.
 - `URLTwigRender` (default: `null`) - Whether to render Twig variables on parsed custom URLs. This allows the use of attributes like `{{custom}}` or QR Code as `{{qrimg}}` from parsed custom URLs. Set to `true` to enable this feature.
 - `URLMode` (default: `null`) - This option can be set to `curl`, to get URLs via CURL instead of `file_get_contents()`.
-- `startPage` (default: `null`) - The first page of the PDF to be generated. You can use this option to trim unnecessary pages from the beginning of the PDF. For example, `startPage: 2` will skip the first page of the PDF.
-- `endPage` (default: `null`) - The last page of the PDF to be generated. You can use this option to trim unnecessary pages from the end of the PDF. For example, `endPage: 10` will generate a PDF with only 10 pages.
+- `convertImgToCMYK` (default: `null`) - Set this option to `true` to convert all images to CMYK in a document for PDF-X mode with the optional package `simplehtmldom/simplehtmldom`. This option requires the **Plus** plan and ImageMagick.
+- `log` (default: `null`) - This option prints the output of debug mPDF into the specified file. For example, `log: @alias(root) ~ '/pdflog.txt'`.
 - `protection` (default: `null`) - This option requires the **Plus** plan and can be used to restrict the actions that users can perform on the PDF file. You can pass an array of strings or a JSON string with the following values to enable the protection mode with the **Plus** plan (to make the PDF compatible with ISO, BSI, and DIN standards):
   - `copy` - Copy text and graphics.
   - `print` - Print in low resolution.
@@ -278,17 +305,6 @@ You can override the default options with `pdfOptions` as shown above. Here are 
   - `no-user-password` - Open a document without password.
   
 For example, `protection: ["copy", "no-user-password"]` or `protection: '["copy", "no-user-password"]'` will allow users to copy text and graphics and open the document without a password, but will disable all other actions.
-
-Both `assetThumb` and `dumbThumb` support the following optional customizations:
-
-- `thumbType` - This parameter allows you to choose the format of the thumbnail. Options include `jpg`, `gif`, `webp`, `avif`, and `png`. The default format is `jpg`.
-- `thumbWidth` - This parameter specifies the width of the thumbnail in pixels. The default width is `210`.
-- `thumbHeight` - This parameter specifies the height of the thumbnail in pixels. The default height is `297`.
-- `thumbPage` - This parameter specifies the page to generate the thumbnail from. The default is the first page, which is numbered from `0`.
-- `thumbBgColor` - This parameter specifies the background colour of the thumbnail. Options include `black`, `rgb(33,66,99)`, and `#123456`. The default colour is `white`.
-- `thumbTrim` - This parameter, when set to `true`, trims your page and centres the content. The default value is `false`.
-- `thumbTrimFrameColor` - This parameter changes the colour of the trim frame. Colours can be specified as `black` or in RGB format (e.g., `rgb(12,1,2)`) or HEX format (e.g., `#662266`).
-- `thumbBestfit` - This boolean value determines whether to fit the image within the given dimensions or not. If `true`, the image will be scaled down so that it fits within the given dimensions. If `false`, the image will be stretched or cropped to fill the given dimensions.
 
 You can also choose these options globally by checking the options in the Plugin Settings and overwriting them in the `pdfOptions` parameter.
 
@@ -367,7 +383,7 @@ You can add generated PDF files to your Craft assets. To do this you need to spe
 {% if asset %}
     <a href="{{asset.url()}}?v={{asset.dateModified|date('U')}}">Download PDF</a>
 {% else %}
-    File was not generated.
+    The file was not generated.
 {% endif %}
 ```
 
@@ -393,7 +409,7 @@ In this example:
 - assetTitle sets a custom title.
 - assetFilename sets a custom filename.
 - assetDelete when set to true, the file in the `@root` path is deleted and regenerated every time this code runs.
-- assetSiteId sets the site ID of the generated PDF to the site with another id.
+- assetSiteId sets the site ID of the generated PDF to the site with another ID.
   You can also use string variables for `assetTitle` and `assetFilename`, such as the entry title:
 
 ```twig
@@ -469,7 +485,7 @@ To display the Image Thumbnail added to the Craft CMS Twig template you may use 
   {% if assetThumb %}
   <img src="{{ assetThumb.url() }}?v={{ assetThumb.dateModified|date('U') }}" />
   {% else %}
-  Thumbnail is not available
+  The thumbnail is not available
   {% endif %}
 </a>
 {% else %}
@@ -728,8 +744,8 @@ Navigate to the PDF Generator plugin, and click on the "Optional functions to en
 Prepare the `qrdata` string that contains the information you want to encode in the QRCode. The format of the `qrdata` string depends on the type of information you want to attach. You need to install an optional package in the Plugin Settings `Optional` pane. Here are some common formats:
 
 - For a website link, you can just use the URL of the website, such as `https://cooltronic.pl/`
-- For a plain text, you can use any message you want, such as `Hello, world!`
-- For a contact information, you can use the vCard format, which is a standard for exchanging personal data, such as `BEGIN:VCARD\nVERSION:3.0\nN:Potacki;Pawel\nTEL;TYPE=work,voice;VALUE=uri:tel:+99-888-777-666\nEMAIL:pawel@cooltronic.pl\nEND:VCARD`
+- For plain text, you can use any message you want, such as `Hello, world!`
+- For contact information, you can use the vCard format, which is a standard for exchanging personal data, such as `BEGIN:VCARD\nVERSION:3.0\nN:Potacki;Pawel\nTEL;TYPE=work,voice;VALUE=uri:tel:+99-888-777-666\nEMAIL:pawel@cooltronic.pl\nEND:VCARD`
 - For a WiFi configuration, you can use the WIFI format, which is a simple way to share network settings, such as `WIFI:S:MyNetwork;T:WPA;P:MyPassword;;`
 
 Example:

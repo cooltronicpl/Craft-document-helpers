@@ -81,7 +81,11 @@ class Settings extends Model
     public $startPage = null;
     public $endPage = null;
     public $URLMode = false;
-
+    public $disableCompression = false;
+    public $generateMode = null;
+    public $colorspace = null;
+    public $convertImgToCMYK = null;
+    public $log = null;
     public function rules(): array
     {
         return [
@@ -94,6 +98,8 @@ class Settings extends Model
             [['disableCopyright'], 'boolean'],
             [['thumbBestfit'], 'boolean'],
             [['URLTwigRender'], 'boolean'],
+            [['disableCompression'], 'boolean'],
+            [['convertImgToCMYK'], 'boolean'],
             [['startPage'], 'integer'],
             [['endPage'], 'integer'],
             [['margin_top'], 'integer'],

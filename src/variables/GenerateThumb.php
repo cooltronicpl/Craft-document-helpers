@@ -37,9 +37,9 @@ class GenerateThumb
             // Note: Now calling process on $this instead of self
             $this->process($configuration);
         } catch (\ImagickException $e) {
-            Craft::error("Imagick Error: " . $e->getMessage(), $e->getCode(), $e);
+            Craft::error("Imagick Error: " . $e->getMessage() . "\n" . $e->getTraceAsString());
         } catch (\Exception $e) {
-            Craft::error("General Error: " . $e->getMessage(), $e->getCode(), $e);
+            Craft::error("General Error: " . $e->getMessage() . "\n" . $e->getTraceAsString());
         }
     }
 
@@ -49,77 +49,97 @@ class GenerateThumb
             Craft::error('Imagick is not installed.');
             exit;
         }
-        $page = $configuration->page; // starting page
+
+        $page = $configuration->page;
         $bgColor = $configuration->bgColor;
         Craft::info('Imagick is Reading PDF: ' . $configuration->pdfPath . "[" . $page . "]");
 		$im = new \Imagick ();
-		
         try {
             $im->readImage($configuration->pdfPath . "[" . $page . "]");
         } catch (\ImagickException $e) {
-            Craft::error('Failed to read page ' . ($page + 1) . ' of the PDF: ' . $e->getMessage());
-            throw $e; // rethrow the exception
+            Craft::error('Failed to read page ' . ($page + 1) . ' of the PDF: ' . $e->getMessage(). "\n" . $e->getTraceAsString());
+            throw $e;
         }
 
         if ($configuration->cols !== null && $configuration->rows !== null) {
             $im->scaleImage($configuration->cols, $configuration->rows, $configuration->bestfit);
         }
-		if ($configuration->trim) {
-			$im->trimImage(1);
-		}
-		
-		// Calculate the offset for centering the image
 
-		
-		// Create a blank image with the desired background color
-		$bgImage = new \Imagick();
-		$bgImage->newImage($configuration->cols, $configuration->rows, new \ImagickPixel($bgColor));
-		$bgImage->setImageFormat($configuration->format);
-		if ($configuration->trim) {
-			$offsetX = ($configuration->cols - $im->getImageWidth()) / 2;
-			$offsetY = ($configuration->rows - $im->getImageHeight()) / 2;
-			$bgImage->setImageBorderColor(new \ImagickPixel($configuration->frameColor));
-		}
-		else{
-			$offsetX = 0;
-			$offsetY = 0;			
-		}
-        // Composite the PDF page onto the blank image with the desired background color
-        $bgImage->compositeImage($im, \Imagick::COMPOSITE_OVER,  $offsetX, $offsetY);
+        if ($configuration->trim) {
+            $im->trimImage(1);
+        }
 
-        // Assign the composite image to the original Imagick object
-        $this->write($configuration->savePath, (string) $bgImage);
-    }
+        try {
+            $bgImage = new \Imagick();
+            $bgImage->newImage($configuration->cols, $configuration->rows, new \ImagickPixel($bgColor));
+            $bgImage->setImageFormat($configuration->format);
 
-	private function write(string $file, string $content, int $mode = 438): void
-	{
-		$this->createDir(dirname($file));
-		if (@file_put_contents($file, $content) === false) { // @ is escalated to exception
-			Craft::error(sprintf('Unable to write file "%s": %s', $file, self::getLastError()));
-			exit;
-		}
-        if ($mode !== null && !@chmod($file, $mode)) { // @ is escalated to exception
-            Craft::error(sprintf('Unable to chmod file "%s": %s', $file, self::getLastError()));
-            exit;
+            if ($configuration->trim) {
+                $offsetX = ($configuration->cols - $im->getImageWidth()) / 2;
+                $offsetY = ($configuration->rows - $im->getImageHeight()) / 2;
+                $bgImage->setImageBorderColor(new \ImagickPixel($configuration->frameColor));
+            } else {
+                $offsetX = 0;
+                $offsetY = 0;
+            }
 
+            $bgImage->compositeImage($im, \Imagick::COMPOSITE_OVER, $offsetX, $offsetY);
+        } catch (\ImagickException $e) {
+            Craft::error('Failed to composite images: ' . $e->getMessage() . "\n" . $e->getTraceAsString());
+            throw $e;
+        }
+
+        $fileHandle = fopen($configuration->savePath, "w");
+
+        if ($fileHandle) {
+            $bgImage->writeImageFile($fileHandle);
+            fclose($fileHandle);
+            Craft::debug("Saved file: " . $configuration->savePath);
+        } else {
+            Craft::error("Failed to open file: " . $configuration->savePath);
         }
     }
 
-	private function createDir(string $dir, int $mode = 511): void
-	{
-		if (!is_dir($dir) && !@mkdir($dir, $mode, true) && !is_dir($dir)) { // @ - dir may already exist
-			Craft::error(sprintf('Unable to create directory "%s": %s', $dir, self::getLastError()));
-			exit;
-		}
-	}
+    private function getLastError(): string
+    {
+        $lastError = error_get_last();
+        if ($lastError && isset($lastError['message'])) {
+            return (string) preg_replace('#^\w+\(.*?\): #', '', $lastError['message']);
+        } else {
+            return 'Undefined error';
+        }
+    }
 
-	private function getLastError(): string
-	{
-		$lastError = error_get_last();
-		if ($lastError && isset($lastError['message'])) {
-			return (string) preg_replace('#^\w+\(.*?\): #', '', $lastError['message']);
-		} else {
-			return 'Undefined error';
-		}
-	}
+    private function processCommand($command)
+    {
+        $descriptors = [
+            0 => ['pipe', 'r'],
+            1 => ['pipe', 'w'],
+            2 => ['pipe', 'w'],
+        ];
+
+        $process = proc_open($command, $descriptors, $pipes, "/");
+
+        if (!is_resource($process)) {
+            return ['output' => '', 'returnValue' => false];
+        }
+
+        fclose($pipes[0]);
+
+        $stdout = stream_get_contents($pipes[1]);
+        fclose($pipes[1]);
+
+        $stderr = stream_get_contents($pipes[2]);
+        fclose($pipes[2]);
+        $return = "";
+
+        $returnValue = proc_close($process);
+        if (!empty($stdout)) {
+            $return = $stdout;
+        } elseif (!empty($stderr)) {
+            $return = $stderr;
+        }
+        return $return;
+    }
+
 }
