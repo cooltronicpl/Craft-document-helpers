@@ -1,5 +1,13 @@
 # PDF Generator for Craft 3 or 4
 
+## 2.1.1 - 2023-12-28
+
+### Added
+- Compatibility with the latest 5.0.0.alpha version of Craft CMS, a flexible and user-friendly content management system.
+
+### Codename
+- Happy New Year Edition
+
 ## 2.1.0 - 2023-12-24
 
 ### Codename
