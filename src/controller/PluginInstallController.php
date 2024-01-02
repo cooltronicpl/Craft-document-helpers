@@ -8,7 +8,7 @@
  * @link      https://cooltronic.pl
  * @link      https://potacki.com
  * @license   https://github.com/cooltronicpl/Craft-document-helpers/blob/master/LICENSE.md
- * @copyright Copyright (c) 2023 CoolTRONIC.pl sp. z o.o. by Pawel Potacki
+ * @copyright Copyright (c) 2024 CoolTRONIC.pl sp. z o.o. by Pawel Potacki
  */
 
 namespace cooltronicpl\documenthelpers\controller;
@@ -107,7 +107,16 @@ class PluginInstallController extends Controller
     {
 
         $craftVersion = Craft::$app->getVersion();
-        if (version_compare($craftVersion, '4.0', '>=')) {
+        if (version_compare($craftVersion, '5.0', '>=')) {
+            exec("which php8.2", $out, $ret);
+            if ($ret == 0) {
+                return (is_array($out) ? implode('', $out) : $out);
+            }
+            exec("which php8.3", $out, $ret);
+            if ($ret == 0) {
+                return (is_array($out) ? implode('', $out) : $out);
+            }
+        } elseif (version_compare($craftVersion, '4.0', '>=')) {
             exec("which php8.0", $out, $ret);
             if ($ret == 0) {
                 return (is_array($out) ? implode('', $out) : $out);
@@ -187,35 +196,33 @@ class PluginInstallController extends Controller
     private function processCommand($command)
     {
         $root = Craft::getAlias('@root');
-    
+
         $descriptors = [
             0 => ['pipe', 'r'],
             1 => ['pipe', 'w'],
             2 => ['pipe', 'w'],
         ];
-    
+
         $process = proc_open($command, $descriptors, $pipes, $root);
-    
+
         if (!is_resource($process)) {
             return ['output' => '', 'returnValue' => false];
         }
-    
+
         fclose($pipes[0]);
-    
+
         $stdout = stream_get_contents($pipes[1]);
         fclose($pipes[1]);
-    
+
         $stderr = stream_get_contents($pipes[2]);
         fclose($pipes[2]);
-        $return="";
+        $return = "";
 
         $returnValue = proc_close($process);
-        if (!empty($stdout))
-        {
-            $return = $stdout; 
-        } elseif (!empty($stderr))
-        {
-            $return = $stderr; 
+        if (!empty($stdout)) {
+            $return = $stdout;
+        } elseif (!empty($stderr)) {
+            $return = $stderr;
         }
         return $return;
     }

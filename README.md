@@ -1,4 +1,4 @@
-# Craft CMS PDF Generator (Versions 3.x and 4.x)
+# Craft CMS PDF Generator (Versions 3.x and 4.x, 5.0.0.alpha)
 
 Developed by [CoolTRONIC.pl sp. z o.o.](https://cooltronic.pl) and [Pawel Potacki](https://potacki.com). This plugin allows you to generate PDF files from Twig templates using the mPDF library. You can customize the PDF output with various options and save it as a file, an asset, or a string. You can also use URLs or HTML code blocks as templates.
 
@@ -56,13 +56,13 @@ Go to the [Craft CMS Plugin Store](https://plugins.craftcms.com/document-helpers
 Open your terminal and go to your Craft project:
 
 ```bash
+# go to project directory
 cd /path/to/project
-```
-
-Then tell Composer to require the plugin:
-
-```bash
+# Then tell Composer to require the plugin
 composer require cooltronicpl/document-helpers
+# tell Craft to install and enable the plugin
+./craft plugin/install document-helpers
+./craft plugin/enable document-helpers
 ```
 
 ## Usage
@@ -166,7 +166,7 @@ When you encounter problems with URLs you can set `encoding`, proposed to set `U
 After installing the custom URL Purifier (HTMLPurifier) package in plugin settings you can solve problems with scraping external websites and enable the `URLPurify` option. When you encounter problems try to install this package in the `@root` path:
 
 ```
-# Craft CMS 4
+# Craft CMS 4, 5.0.0.alpha
 composer require ezyang/htmlpurifier:^4.17 
 # Craft CMS 3
 composer require ezyang/htmlpurifier:^4.13 
@@ -770,7 +770,7 @@ Where `{{qrimg}}` is the variable that holds the image from the package [PHP QRC
 You can install the package manually when you encounter problems in automatic installation for Craft CMS 3 (you need 3.4) and for 4 (you need 4.3) version of the optional package for display QR Code generation. This is an example of to how install to your main Craft (`@root`) installation directory:
 
 ```
-# Craft CMS 4
+# Craft CMS 4, 5.0.0.alpha
 composer require chillerlan/php-qrcode:^4.3
 # Craft CMS 3
 composer require chillerlan/php-qrcode:^3.4
@@ -870,7 +870,7 @@ Additionally, we can enable the automatic generation of Bookmarks from H1-H6 tag
 
 ## Requirements
 
-- This plugin supports Craft CMS `3.0` or above, including `4.0` or above, starting from version `2.0.0` of the plugin in the `master` branch.
+- This plugin supports Craft CMS `3.0` or above, including `5.0.0.alpha`, `4.0` or above, starting from version `2.2.0` of the plugin in the `master` branch.
 - For Craft CMS version `3.x`, we used version `0.x` of branch `craft3` of the plugin (up to version `0.4.x`) which is deprecated. Please install version `2.0` or above instead. 
 - For Craft CMS version `4.x`, we used version `1.x` of branch `master` of the plugin (up to version `1.3.x`) which is deprecated. Please install version `2.0` or above instead.
 

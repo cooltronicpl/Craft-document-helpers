@@ -533,8 +533,13 @@ on: settings.no_auto_page_break,
         'ezyang/htmlpurifier': '4.17',
         'simplehtmldom/simplehtmldom': '2.0-RC'
     } %}
-{% endif %}
-{% js at endBody %}
+{% elseif craftVersion starts with '5.' %}
+    {% set versions = {
+        'chillerlan/php-qrcode': '4.3',
+        'ezyang/htmlpurifier': '4.17',
+        'simplehtmldom/simplehtmldom': '2.0-RC'
+    } %}
+{% endif %}{% js at endBody %}
     function setCookie(name, value, days) {
         var expires = "";
         if (days) {

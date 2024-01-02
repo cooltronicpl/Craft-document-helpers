@@ -1,4 +1,14 @@
-# PDF Generator for Craft 3 or 4
+# PDF Generator for Craft 3 or 4, 5.0.0.alpha
+
+## 2.2.0 - 2024-01-02
+
+### Added
+- Support for Craft v5.0.x in Optional packages installer, using the same versions as v4.0.
+- Import of image generation classes for methods via Imagick, compatible with v5.0.x.
+- Detection of PHP 8.2 and 8.3 locations for Craft v5.0.
+
+### Fixed
+- Missing packages for JavaScript in Admin Settings options, causing plugin issue in `5.0.0.alpha`.
 
 ## 2.1.1 - 2023-12-28
 
