@@ -76,6 +76,7 @@ errors: settings.getErrors('margin_left')
 
 }) }}
             {{ forms.textField({ label: "Margin right" | t, id: 'margin_right', name: 'margin_right', instructions: "This is the right margin of the PDF in millimetres. The default value is 15."|t, value: settings. margin_right|default(null), errors: settings.getErrors('margin_right') }) }}
+            
             {{ forms.textField({ label: "Page numbers" | t, id: 'pageNumbers', name: 'pageNumbers', instructions: "This is the format of the page numbers that will be added in the footer of the PDF. For example, you can use '{PAGENO}/{nbpg}' to show the current page and the total number of pages."|t, value: settings. pageNumbers|default(null), errors: settings.getErrors('pageNumbers') }) }}
 
             {{ forms.textField({
@@ -324,14 +325,29 @@ on: settings.no_auto_page_break,
     on: settings.dumbThumb,
     instructions: "This option generates a basic thumbnail image (without an Asset) using the `pdf` method (requires ImageMagick)."|t,
 }) }}
+            {{ forms.textField({
+    label: "Dumb thumbnail directory" | t,
+    id: 'dumbThumbDir',
+    name: 'dumbThumbDir',
+    instructions: "This option sets the custom directory where the dumb thumbnails are saved. The directory should be relative to the `@webroot` and should exists. For example, `images/thumbnails`."|t,
+    value: settings. dumbThumbDir|default(null),
+    errors: settings.getErrors('dumbThumbDir')
+}) }}
+           {{ forms.textField({
+    label: "Dumb thumbnail filename" | t,
+    id: 'dumbThumbFilename',
+    name: 'dumbThumbFilename',
+    instructions: "This option sets the custom filename for the dumb thumbnails. The filename should not include the extension, as it will be added automatically based on the format type option. For example, `image.pdf`."|t,
+    value: settings. dumbThumbFilename|default(null),
+    errors: settings.getErrors('dumbThumbFilename')
+}) }}
 
 
             <p>
-                Both `assetThumb` and `dumbThumb` support the following optional customizations:
             </p>
 
             {{ forms.textField({
-    label: "Thumbnail type" | t,
+    label: "Thumbnail format type" | t,
     id: 'thumbType',
     name: 'thumbType',
     instructions: "This option sets the format of the thumbnail image. You can choose from `jpg`, `gif`, `webp`, `avif`, and `png`. The default format is `jpg`."|t,
@@ -361,6 +377,14 @@ on: settings.no_auto_page_break,
     instructions: "This option sets the page number to generate the thumbnail image from. The default is the first page, which is numbered from `0`."|t,
     value: settings. thumbPage|default(null),
     errors: settings.getErrors('thumbPage')
+}) }}
+            {{ forms.textField({
+    label: "Thumbnail quality" | t,
+    id: 'thumbQuality',
+    name: 'thumbQuality',
+    instructions: "This option sets the quality of the thumbnails, from 0 (lowest) to 100 (highest)."|t,
+    value: settings. thumbQuality|default(null),
+    errors: settings.getErrors('thumbQuality')
 }) }}
             {{ forms.lightswitchField({
     label: "Thumbnail best fit" | t,

@@ -35,7 +35,7 @@ class PackageManager
         } else {
             $php = $this->getPHPExecutable();
         }
-        $composer = Craft::getAlias('@document-helpers') . '/' . 'resources/composer.phar';
+        $composer = Craft::getAlias('@document-helpers') . DIRECTORY_SEPARATOR . 'resources' . DIRECTORY_SEPARATOR . 'composer.phar';
         $command = escapeshellarg($php) . " " . escapeshellarg($composer) . " show " . escapeshellarg($package);
         $descriptors = [
             0 => ['pipe', 'r'],
@@ -44,7 +44,7 @@ class PackageManager
         ];
         $process = proc_open($command, $descriptors, $pipes, $root);
         if (!is_resource($process)) {
-            return false; 
+            return false;
         }
         fclose($pipes[0]);
         $stdout = stream_get_contents($pipes[1]);

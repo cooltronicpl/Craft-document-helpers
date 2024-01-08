@@ -52,6 +52,7 @@ class GenerateThumb
 
         $page = $configuration->page;
         $bgColor = $configuration->bgColor;
+        $settings=$configuration->settings;
         Craft::info('Imagick is Reading PDF: ' . $configuration->pdfPath . "[" . $page . "]");
 		$im = new \Imagick ();
         try {
@@ -82,6 +83,8 @@ class GenerateThumb
                 $offsetX = 0;
                 $offsetY = 0;
             }
+            if(isset($settings['thumbQuality']))
+                $bgImage->setImageCompressionQuality($settings['thumbQuality']);
 
             $bgImage->compositeImage($im, \Imagick::COMPOSITE_OVER, $offsetX, $offsetY);
         } catch (\ImagickException $e) {

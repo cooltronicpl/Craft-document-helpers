@@ -77,10 +77,18 @@ class DocumentHelperVariable
             if (class_exists('chillerlan\\QRCode\\QRCode')) {
                 $settings['qrdata'] = (new \chillerlan\QRCode\QRCode)->render($settings['qrdata']);
             } else {
-                $settings['qrdata'] = Craft::getAlias('@document-helpers') . '/' . "resources/QR.jpg";
+                $imageData = base64_encode(file_get_contents(Craft::getAlias('@document-helpers') . DIRECTORY_SEPARATOR . "resources" . DIRECTORY_SEPARATOR . "QR.jpg"));
+                $settings['qrdata'] = 'data:image/jpeg;base64,' . $imageData;
             }
         }
-
+        if ($variables === null) {
+            $variables = new \craft\elements\Entry();
+            Craft::info('Inserted null $entry varaiable');
+        }
+        if ($filename === null) {
+            $filename = rand(1000, 10000) . ".pdf";
+            Craft::info('Inserted null $filename varaiable');
+        }
         $vars = [
             'entry' => $variables->getFieldValues(),
             'custom' => $settings['custom'] ?? null,
@@ -174,10 +182,10 @@ class DocumentHelperVariable
                     break;
             }
         }
-        if (isset($settings['header'])) {
+        if (isset($settings['header']) && !(isset($settings['startPage']) || isset($settings['endPage']))) {
             $pdf_string = $pdf->SetHTMLHeader($html_header);
         }
-        if (isset($settings['footer'])) {
+        if (isset($settings['footer']) && !(isset($settings['startPage']) || isset($settings['endPage']))) {
             $pdf_string = $pdf->SetHTMLFooter($html_footer);
         }
         if (isset($settings['pageNumbers'])) {
@@ -307,10 +315,10 @@ class DocumentHelperVariable
             $dir = StringHelper::toString(pathinfo($filename));
             $basename = StringHelper::toString(basename($filename));
             $tempPath = StringHelper::toString(FileHelper::normalizePath($runtimePath . '/temp/pdfgenerator'));
-            if (!is_dir($tempPath . '/' . $dir)) {
-                FileHelper::createDirectory($tempPath . '/' . $dir);
+            if (!is_dir($tempPath . DIRECTORY_SEPARATOR . $dir)) {
+                FileHelper::createDirectory($tempPath . DIRECTORY_SEPARATOR . $dir);
             }
-            $pdf->Output($tempPath . '/' . $dir . '/' . $basename, 'F');
+            $pdf->Output($tempPath . DIRECTORY_SEPARATOR . $dir . DIRECTORY_SEPARATOR . $basename, 'F');
             $mpdf = new \Mpdf\Mpdf();
             if (isset($settings['startPage']) && filter_var($settings['startPage'], FILTER_VALIDATE_INT) !== false) {
                 $startPage = $settings['startPage'];
@@ -318,15 +326,25 @@ class DocumentHelperVariable
                 $startPage = 1;
             }
             if (isset($settings['endPage']) && filter_var($settings['endPage'], FILTER_VALIDATE_INT) !== false) {
-                $mpdf->setSourceFile($tempPath . '/' . $dir . '/' . $basename);
+                $mpdf->setSourceFile($tempPath . DIRECTORY_SEPARATOR . $dir . DIRECTORY_SEPARATOR . $basename);
                 $endPage = $settings['endPage'];
             } else {
-                $endPage = $mpdf->setSourceFile($tempPath . '/' . $dir . '/' . $basename);
+                $endPage = $mpdf->setSourceFile($tempPath . DIRECTORY_SEPARATOR . $dir . DIRECTORY_SEPARATOR . $basename);
+            }
+            if (isset($settings['header'])) {
+                $pdf_string = $mpdf->SetHTMLHeader($html_header);
+            }
+            if (isset($settings['footer'])) {
+                $pdf_string = $mpdf->SetHTMLFooter($html_footer);
             }
             for ($i = $startPage; $i <= $endPage; $i++) {
-                $tplId = $mpdf->importPage($startPage);
+                $tplId = $mpdf->importPage($i);
                 $mpdf->useTemplate($tplId);
-                $mpdf->AddPage();
+                if ($i == $endPage) {
+
+                } else {
+                    $mpdf->AddPage();
+                }
             }
             $pdf = $mpdf;
             unset($mpdf);
@@ -341,7 +359,13 @@ class DocumentHelperVariable
             }
             $infoDumb = pathinfo($filename);
             $dumbThumbFilename = $infoDumb['filename'];
+            if (isset($settings['dumbThumbFilename'])) {
+                $dumbThumbFilename = $settings['dumbThumbFilename'];
+            }
             $dumpDir = $infoDumb['dirname'];
+            if (isset($settings['dumbThumbDir'])) {
+                $dumpDir = $settings['dumbThumbDir'];
+            }
             if (!file_exists($dumpDir . DIRECTORY_SEPARATOR . $dumbThumbFilename . '.' . $assetType)) {
                 $this->makeThumb($filename, $dumpDir . DIRECTORY_SEPARATOR . $dumbThumbFilename . '.' . $assetType, $assetType, $settings);
             }
@@ -390,7 +414,10 @@ class DocumentHelperVariable
             }
         }
         $settings = array_merge($settings, $attributes);
-
+        if ($tempFilename === null) {
+            $tempFilename = Craft::getAlias('@root') . DIRECTORY_SEPARATOR . rand(1000, 10000) . ".pdf";
+            Craft::info('Inserted null $tempFilename varaiable');
+        }
         // Generate the PDF using the existing pdf method
         $pdfPath = $this->pdf($template, 'file', $tempFilename, $variables, $attributes);
         $info = pathinfo($pdfPath);
@@ -515,8 +542,7 @@ class DocumentHelperVariable
             $extendedAsset = new ExtendedAsset();
         } elseif (version_compare($craftVersion, '5.0', '>=')) {
             $extendedAsset = new ExtendedAsset();
-        }
-        elseif (version_compare($craftVersion, '3.0', '>=')) {
+        } elseif (version_compare($craftVersion, '3.0', '>=')) {
             $extendedAsset = new ExtendedAssetv3();
         }
         foreach ($asset->getAttributes() as $name => $value) {
@@ -703,7 +729,7 @@ class DocumentHelperVariable
      */
     private function generateContent($input_content, $vars, $settings)
     {
-        if (file_exists(Craft::getAlias('@templates') . '/' . $input_content) && is_file(Craft::getAlias('@templates') . '/' . $input_content)) {
+        if (file_exists(Craft::getAlias('@templates') . DIRECTORY_SEPARATOR . $input_content) && is_file(Craft::getAlias('@templates') . DIRECTORY_SEPARATOR . $input_content)) {
             try {
                 $html_content = Craft::$app->getView()->renderTemplate($input_content, $vars);
             } catch (LoaderError | RuntimeError | SyntaxError | Exception $e) {

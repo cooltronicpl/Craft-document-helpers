@@ -1,5 +1,25 @@
 # PDF Generator for Craft 3 or 4, 5.0.0.alpha
 
+## 2.3.0 - 2024-01-08
+
+### Added
+- Customizable filename for dumb thumbnails
+- Option to specify the directory for dumb thumbnails
+- Functionality to adjust thumbnail quality
+- Random filename when input filename is null
+- Empty Entry when input entry is null
+
+### Changed
+- Mechanism for loading PDF footers and headers with start and end page options:
+  - Fixed duplicated start pages,
+  - Fixed incorrect page numbering when using footers or headers,
+  - Fixed the empty page at the end of the file.
+- Refactor classes targeted to paths.
+  - Fixed fallback image when QR package is missing
+
+### Codename
+- Team CoolTRONIC.pl LLC wishes everyone a Merry Orthodox Christmas.
+
 ## 2.2.0 - 2024-01-02
 
 ### Added

@@ -86,6 +86,9 @@ class Settings extends Model
     public $colorspace = null;
     public $convertImgToCMYK = null;
     public $log = null;
+    public $dumbThumbDir = null;
+    public $dumbThumbFilename = null;
+    public $thumbQuality = null;
     public function rules(): array
     {
         return [
@@ -106,6 +109,7 @@ class Settings extends Model
             [['margin_bottom'], 'integer'],
             [['margin_left'], 'integer'],
             [['margin_right'], 'integer'],
+            [['thumbQuality'], 'integer'],
         ];
     }
 }

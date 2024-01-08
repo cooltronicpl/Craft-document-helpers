@@ -38,7 +38,7 @@ class PluginInstallController extends Controller
         } else {
             $php = $this->getPHPExecutable();
         }
-        $composer = Craft::getAlias('@document-helpers') . '/' . 'resources/composer.phar';
+        $composer = Craft::getAlias('@document-helpers') . DIRECTORY_SEPARATOR . 'resources' . DIRECTORY_SEPARATOR . 'composer.phar';
         $installed = Craft::$app->request->getParam('installed');
         $package = Craft::$app->request->getParam('package');
         $version = Craft::$app->request->getParam('version');

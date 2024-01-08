@@ -75,9 +75,9 @@ The pdf method generates a PDF file from a Twig template and returns a URL to th
 
 - `destination` - This indicates where the PDF file will be generated. It can be one of four options: `file`, `inline`, `download`, or `string`. To download multiple files, refer to the JavaScript example provided in the README.md file.
 
-- `filename` - This is the name of the generated PDF file.
+- `filename` - This is the name of the generated PDF file. If this is provided as `null`, a random filename will be generated.
 
-- `entry` - This represents the data that will be inputted into the template to generate the PDF. This data is contained within an 'entry' array.
+- `entry` - This represents the data that will be inputted into the template to generate the PDF. This data is contained within an `Entry` type. If this is provided as `null`, an empty Entry will be created to pass functions.
 
 - `pdfOptions` - This parameter allows you to customize the generation of the PDF. The available options are described in the section on overriding default options.
 
@@ -102,9 +102,9 @@ The `pdfAsset` method generates a PDF file from a Twig template, saves it as an 
 
 - `template` - This is the location of the template file for the PDF, which should be located in the /templates directory. Also you can pass here now a URL or a HTML code block from 1.3.2 or 0.4.2.
 
-- `filename` - This is the name of the temporary or/and final generated PDF file.
+- `filename` - This is the name of the temporary or/and final generated PDF file. If this is provided as `null`, a random filename will be generated.
 
-- `entry` - This represents the data that will be inputted into the template to generate the PDF. This data is contained within an 'entry' array.
+- `entry` - This represents the data that will be inputted into the template to generate the PDF. This data is contained within an `Entry` type. If this is provided as `null`, an empty Entry will be created to pass functions.
 
 - `pdfOptions` - This parameter allows you to customize the generation of the PDF. The available options are described in the section on overriding default options.
 
@@ -271,6 +271,8 @@ You can override the default options with `pdfOptions` as shown above. Here are 
 - `assetThumb` (default: `null`) - This option generates a thumbnail image of a Craft CMS image Asset using the `pdfAsset` method (requires ImageMagick). It can be accessed in the Twig template as `asset.assetThumb`.
   - `assetThumbVolumeHandle` (default: `null`): This parameter is optional and defines the Volume Handle of the thumbnail. It falls back to the PDF Volume Handle if not set. The Volume Handle needs a `Base URL` like `@web\pdffiles` in the Craft CMS Filesystems, Assets settings for testing.
 - `dumbThumb` (default: `null`) - This option generates a basic thumbnail image (without an Asset) using the `pdf` method (requires ImageMagick).
+    - `dumbThumbFilename` (default: `null`) - The custom filename of the generated image, the `thumbType` extension will be added to the filename.
+    - `dumbThumbDir` (default: `null`) - The custom save directory of the generated image, which must exist.
 
 Both `assetThumb` and `dumbThumb` support the following optional customizations:
 
@@ -278,6 +280,7 @@ Both `assetThumb` and `dumbThumb` support the following optional customizations:
 - `thumbWidth` - This parameter specifies the width of the thumbnail in pixels. The default width is `210`.
 - `thumbHeight` - This parameter specifies the height of the thumbnail in pixels. The default height is `297`.
 - `thumbPage` - This parameter specifies the page to generate the thumbnail from. The default is the first page, which is numbered from `0`.
+- `thumbQuality` - The quality of the generated thumbnail image from (lowest) 0 to 100 (highest).
 - `thumbBgColor` - This parameter specifies the background colour of the thumbnail. Options include `black`, `rgb(33,66,99)`, and `#123456`. The default colour is `white`.
 - `thumbTrim` - This parameter, when set to `true`, trims your page and centres the content. The default value is `false`.
 - `thumbTrimFrameColor` - This parameter changes the colour of the trim frame. Colours can be specified as `black` or in RGB format (e.g., `rgb(12,1,2)`) or HEX format (e.g., `#662266`).
@@ -304,7 +307,7 @@ Advanced options:
   - `print-highres` - Print in high resolution.
   - `no-user-password` - Open a document without password.
   
-For example, `protection: ["copy", "no-user-password"]` or `protection: '["copy", "no-user-password"]'` will allow users to copy text and graphics and open the document without a password, but will disable all other actions.
+For example, `protection: ["copy", "no-user-password"]` or `protection: '["copy", "no-user-password"]'` will allow users to copy text and graphics and open the document without a password, but will disable all other actions than copy text.
 
 You can also choose these options globally by checking the options in the Plugin Settings and overwriting them in the `pdfOptions` parameter.
 
