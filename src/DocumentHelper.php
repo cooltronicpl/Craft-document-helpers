@@ -21,30 +21,33 @@ use Craft;
 use craft\base\Plugin;
 use craft\web\twig\variables\CraftVariable;
 use yii\base\Event;
-use craft\services\Plugins;
 
 /**
  * Class DocumentHelpers.
-
  * @author    CoolTRONIC.pl sp. z o.o. <github@cooltronic.pl>
  * @author    Pawel Potacki
  * @since     0.0.2
  */
-
 class DocumentHelper extends Plugin
 {
 
-    // Static Properties
+    const EDITION_LITE = 'lite';
+    const EDITION_PLUS = 'plus';
+    const EDITION_PRO = 'pro';
+
+    // Public Properties
     // =========================================================================
 
     /**
      * @var DocumentHelper
      */
     public static $plugin;
+    public $controllerMap = [
+        'install' => PluginInstallController::class,
+    ];
 
-    const EDITION_LITE = 'lite';
-    const EDITION_PLUS = 'plus';
-    const EDITION_PRO = 'pro';
+    // Static Methods
+    // =========================================================================
 
     public static function editions(): array
     {
@@ -55,11 +58,9 @@ class DocumentHelper extends Plugin
         ];
     }
 
-    // Public Properties
-    // =========================================================================
-
     // Public Methods
     // =========================================================================
+
     /**
      * {@inheritdoc}
      */
@@ -83,11 +84,6 @@ class DocumentHelper extends Plugin
         parent::init();
     }
 
-    public function isPlusEdition()
-    {
-        return $this->is(self::EDITION_PLUS);
-    }
-
     public function hasCpSection()
     {
         return false;
@@ -97,10 +93,6 @@ class DocumentHelper extends Plugin
     {
         return true;
     }
-
-    public $controllerMap = [
-        'install' => PluginInstallController::class,
-    ];
 
     public function rules()
     {
@@ -119,6 +111,11 @@ class DocumentHelper extends Plugin
         }
     }
 
+    public function isPlusEdition()
+    {
+        return $this->is(self::EDITION_PLUS);
+    }
+
     // Protected Methods
     // =========================================================================
 
@@ -126,7 +123,7 @@ class DocumentHelper extends Plugin
     {
         $settings = $this->getSettings();
 
-        return \Craft::$app->getView()->renderTemplate(
+        return Craft::$app->getView()->renderTemplate(
             'document-helpers/_settings',
             [
                 'settings' => $settings,

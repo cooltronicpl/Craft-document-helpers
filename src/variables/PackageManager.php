@@ -15,14 +15,14 @@ namespace cooltronicpl\documenthelpers\variables;
 
 use Craft;
 
-class PackageManager
-{
-
 /**
  * @author    CoolTRONIC.pl sp. z o.o. <github@cooltronic.pl>
  * @author    Pawel Potacki
  * @since     2.1.0
  */
+
+class PackageManager
+{
 
     public function isInstalledPackage($package)
     {

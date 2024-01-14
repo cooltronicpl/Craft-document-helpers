@@ -18,10 +18,12 @@ use cooltronicpl\documenthelpers\classes\ExtendedAsset;
 use cooltronicpl\documenthelpers\classes\ExtendedAssetv3;
 use cooltronicpl\documenthelpers\DocumentHelper as DocumentHelpers;
 use Craft;
+use craft\elements\Asset;
+use craft\elements\Entry;
 use craft\errors\ElementNotFoundException;
 use craft\helpers\FileHelper;
 use craft\helpers\StringHelper;
-use Mpdf\MpdfException;
+use Throwable;
 use Twig\Error\LoaderError;
 use Twig\Error\RuntimeError;
 use Twig\Error\SyntaxError;
@@ -35,7 +37,197 @@ use yii\base\Exception;
 class DocumentHelperVariable
 {
     /**
-     * Fuction generates PDF with settings
+     * Function generates PDF added to Assets
+     * @param string $template Input content as path of Twig template, URL or Code block
+     * @param string $tempFilename Temporary filename
+     * @param array $variables Craft variables to parse into template
+     * @param array $attributes Optional attributes passed to function as `pdfOptions` which is merged and overwritten over global plugin Settings
+     * @param string $volumeHandle Volume handle when PDF should be saved
+     * @return ExtendedAsset|ExtendedAssetv3|null Asset with optional field asset.assetThumb (when Asset Thumbnail is enabled and generated) or null on error
+     * @throws Exception
+     * @throws MpdfException
+     * @throws Throwable
+     * @throws ElementNotFoundException
+     */
+    public function pdfAsset($template, $tempFilename, $variables, $attributes, $volumeHandle)
+    {
+        $plugin = Craft::$app->plugins->getPlugin('document-helpers');
+        $settings = $plugin->getSettings()->toArray();
+        foreach ($settings as $key => $value) {
+            if ($value === '') {
+                $settings[$key] = null;
+            }
+            if ($value == false) {
+                $settings[$key] = null;
+            }
+        }
+        $settings = array_merge($settings, $attributes);
+        if ($tempFilename === null) {
+            $tempFilename = Craft::getAlias('@root') . DIRECTORY_SEPARATOR . rand(1000, 10000) . ".pdf";
+            Craft::info('Inserted null $tempFilename varaiable');
+        }
+        // Generate the PDF using the existing pdf method
+        $pdfPath = $this->pdf($template, 'file', $tempFilename, $variables, $attributes);
+        $info = pathinfo($pdfPath);
+        $plugin = Craft::$app->plugins->getPlugin('document-helpers');
+        if (isset($settings['assetFilename'])) {
+            $filename = $settings['assetFilename'];
+        } else {
+            $filename = $info['basename'];
+        }
+
+        // Set the volume ID of the asset
+        $volumeId = Craft::$app->volumes->getVolumeByHandle($volumeHandle)->id;
+        $assetQuery = Asset::find();
+        $assetQuery->filename = $filename;
+        $assetQuery->volumeId = $volumeId;
+        $asset = $assetQuery->one();
+
+        // If the asset doesn't exist or the temp file is newer, create or update the asset
+        if (!$asset || filemtime($tempFilename) > $asset->dateModified->getTimestamp()) {
+            if (!$asset) {
+                $asset = new Asset();
+            }
+
+            if (isset($settings['assetTitle'])) {
+                $asset->title = $settings['assetTitle'];
+            }
+
+            if (isset($settings['assetSiteId'])) {
+                $asset->siteId = $settings['assetSiteId'];
+            }
+
+            $asset->volumeId = $volumeId;
+
+            // Find the folder where the asset will be stored
+            $folder = Craft::$app->assets->getRootFolderByVolumeId($volumeId);
+            $folderId = $folder->id;
+            $tempCopyInfo = pathinfo($pdfPath);
+            $tempName = $tempCopyInfo['basename'];
+            $tempDirName = $tempCopyInfo['dirname'];
+            $copyFilename = $tempDirName . '/copy_' . $tempName;
+            if (!copy($tempFilename, $copyFilename)) {
+                Craft::error('Failed to copy file: ' . $tempFilename);
+            }
+
+            // Set the temporary file path of the asset to the path of the generated PDF
+            $asset->tempFilePath = $copyFilename;
+            $asset->filename = $filename;
+            $asset->newFolderId = $folderId;
+            $asset->setScenario(Asset::SCENARIO_DEFAULT);
+            $result = Craft::$app->getElements()->saveElement($asset);
+            // Check if the asset was saved successfully
+            if (!$result) {
+                Craft::error("Can't find asset: " . StringHelper::toString($filename) . ', in volume: ' . StringHelper::toString($volumeHandle));
+                return null;
+            }
+        }
+
+        if (isset($settings['assetThumb'])) {
+            if (isset($settings['thumbType'])) {
+                $assetType = $settings['thumbType'];
+            } else {
+                $assetType = "jpg";
+            }
+            if (isset($settings['assetFilename'])) {
+                $finalNameThumb = $settings['assetFilename'] . '.' . $assetType;
+            } else {
+                $finalNameThumb = $info['basename'] . '.' . $assetType;
+            }
+            $infoThumb = pathinfo($tempFilename);
+            $fileTempName = $infoThumb['filename'];
+            $dirTemp = $infoThumb['dirname'];
+            $this->makeThumb($pdfPath, $dirTemp . DIRECTORY_SEPARATOR . $fileTempName . '.' . $assetType, $assetType, $settings);
+
+            if (isset($settings['assetThumbVolumeHandle'])) {
+                $thumbVolumeId = Craft::$app->volumes->getVolumeByHandle($settings['assetThumbVolumeHandle'])->id;
+            } else {
+                $thumbVolumeId = Craft::$app->volumes->getVolumeByHandle($volumeHandle)->id;
+            }
+
+            // Find the existing asset
+            $assetQueryThumb = Asset::find();
+            $assetQueryThumb->filename = $finalNameThumb;
+            $assetQueryThumb->volumeId = $thumbVolumeId;
+            $assetThumb = $assetQueryThumb->one();
+
+            // If the asset doesn't exist or the temp file is newer, create or update the asset
+            if (!$assetThumb || (file_exists($dirTemp . DIRECTORY_SEPARATOR . $fileTempName . '.' . $assetType) && filemtime($dirTemp . DIRECTORY_SEPARATOR . $fileTempName . '.' . $assetType) > $assetThumb->dateModified->getTimestamp())) {
+                if (!$assetThumb) {
+                    $assetThumb = new Asset();
+                }
+
+                if (isset($settings['assetTitle'])) {
+                    $assetThumb->title = $settings['assetTitle'];
+                }
+
+                if (isset($settings['assetSiteId'])) {
+                    $assetThumb->siteId = $settings['assetSiteId'];
+                }
+
+                $assetThumb->volumeId = $thumbVolumeId;
+                $folder = Craft::$app->assets->getRootFolderByVolumeId($thumbVolumeId);
+                $folderId = $folder->id;
+                $assetThumb->tempFilePath = $dirTemp . DIRECTORY_SEPARATOR . $fileTempName . '.' . $assetType;
+                $assetThumb->filename = $finalNameThumb;
+                $assetThumb->newFolderId = $folderId;
+                $assetThumb->setScenario(Asset::SCENARIO_DEFAULT);
+
+                try {
+                    $resultThumb = Craft::$app->getElements()->saveElement($assetThumb);
+                } catch (\Exception $e) {
+                    Craft::error('Error relocating thumbnail: ' . StringHelper::toString($e->getMessage()));
+                }
+                if (!isset($resultThumb)) {
+                    Craft::error("Can't find assetThumb: " . StringHelper::toString($dirTemp . DIRECTORY_SEPARATOR . $fileTempName . '.' . $assetType) . " and save it into: " . StringHelper::toString($filename . '.' . $assetType) . ", in volume: " . StringHelper::toString(isset($settings['assetThumbVolumeHandle']) ? $settings['assetThumbVolumeHandle'] : $volumeHandle));
+                    return null;
+                }
+            }
+        }
+
+        $craftVersion = Craft::$app->getVersion();
+        if (version_compare($craftVersion, '4.0', '>=')) {
+            $extendedAsset = new ExtendedAsset();
+        } elseif (version_compare($craftVersion, '5.0', '>=')) {
+            $extendedAsset = new ExtendedAsset();
+        } elseif (version_compare($craftVersion, '3.0', '>=')) {
+            $extendedAsset = new ExtendedAssetv3();
+        }
+        foreach ($asset->getAttributes() as $name => $value) {
+            $extendedAsset->$name = $value;
+        }
+        if (isset($settings['assetThumb'])) {
+            $extendedAsset->assetThumb = $assetThumb;
+        }
+
+        if (isset($settings['assetDelete'])) {
+            if (file_exists($tempFilename)) {
+                if (unlink($tempFilename)) {
+                    Craft::info("Deleted (unlink) temporary PDF file on path: " . StringHelper::toString($tempFilename));
+                } else {
+                    Craft::error("Deletion error (unlink) of temporary PDF file on path: " . StringHelper::toString($tempFilename));
+                }
+            }
+
+            if (isset($settings['assetThumb'])) {
+                if (file_exists($dirTemp . DIRECTORY_SEPARATOR . $fileTempName . '.' . $assetType)) {
+                    if (unlink($dirTemp . DIRECTORY_SEPARATOR . $fileTempName . '.' . $assetType)) {
+                        Craft::info("Deleted (unlink) temporary PDF Thumb file on path: " . StringHelper::toString($dirTemp . DIRECTORY_SEPARATOR . $fileTempName . '.' . $assetType));
+                    } else {
+                        Craft::error("Deletion error (unlink) of temporary PDF Thumb on path: " . StringHelper::toString($dirTemp . DIRECTORY_SEPARATOR . $fileTempName . '.' . $assetType));
+                    }
+                }
+            }
+        }
+        unset($asset);
+        unset($assetThumb);
+
+        /** @var ExtendedAsset|ExtendedAssetv3 $extendedAsset */
+        return $extendedAsset;
+    }
+
+    /**
+     * Function generates PDF with settings
      * @param string $template Input content as path of Twig template, URL or Code block
      * @param string $destination type of generated document
      * @param string $filename Generated PDF filename
@@ -43,7 +235,7 @@ class DocumentHelperVariable
      * @param array $attributes Optional attributes passed to function as `pdfOptions` which is merged and overwritten over global plugin Settings
      * @return string Filename, contents of PDF file, or null on error
      * @throws Exception
-     * @throws MpdfException
+     * @throws \Mpdf\MpdfException
      */
     public function pdf($template, $destination, $filename, $variables, $attributes)
     {
@@ -74,7 +266,7 @@ class DocumentHelperVariable
             }
         }
         if (isset($settings['qrdata'])) {
-            if (class_exists('chillerlan\\QRCode\\QRCode')) {
+            if (class_exists('\\chillerlan\\QRCode\\QRCode')) {
                 $settings['qrdata'] = (new \chillerlan\QRCode\QRCode)->render($settings['qrdata']);
             } else {
                 $imageData = base64_encode(file_get_contents(Craft::getAlias('@document-helpers') . DIRECTORY_SEPARATOR . "resources" . DIRECTORY_SEPARATOR . "QR.jpg"));
@@ -82,7 +274,7 @@ class DocumentHelperVariable
             }
         }
         if ($variables === null) {
-            $variables = new \craft\elements\Entry();
+            $variables = new Entry();
             Craft::info('Inserted null $entry varaiable');
         }
         if ($filename === null) {
@@ -388,210 +580,41 @@ class DocumentHelperVariable
     }
 
     /**
-     * Fuction generates PDF added to Assets
-     * @param string $template Input content as path of Twig template, URL or Code block
-     * @param string $tempFilename Temporary filename
-     * @param array $variables Craft variables to parse into template
-     * @param array $attributes Optional attributes passed to function as `pdfOptions` which is merged and overwritten over global plugin Settings
-     * @param string $volumeHandle Volume handle when PDF should be saved
-     * @return ExtendedAsset|ExtendedAssetv3|null Asset with optional field asset.assetThumb (when Asset Thumbnail is enabled and generated) or null on error
-     * @throws CrossReferenceException
-     * @throws Exception
-     * @throws MpdfException
-     * @throws \Throwable
-     * @throws ElementNotFoundException
+     * Function which is running generating content from input content from Twig template, URL or HTML code block
+     * @param string $input_content Input content as path of Twig template, URL or Code block
+     * @param string $vars Variables like entry from Craft CMS
+     * @param array $settings Settings parsed from `pdfOptions` or plugin Settings
+     * @return string Returned HTML Content
      */
-    public function pdfAsset($template, $tempFilename, $variables, $attributes, $volumeHandle)
+    private function generateContent($input_content, $vars, $settings)
     {
-        $plugin = Craft::$app->plugins->getPlugin('document-helpers');
-        $settings = $plugin->getSettings()->toArray();
-        foreach ($settings as $key => $value) {
-            if ($value === '') {
-                $settings[$key] = null;
+        if (file_exists(Craft::getAlias('@templates') . DIRECTORY_SEPARATOR . $input_content) && is_file(Craft::getAlias('@templates') . DIRECTORY_SEPARATOR . $input_content)) {
+            try {
+                $html_content = Craft::$app->getView()->renderTemplate($input_content, $vars);
+            } catch (LoaderError | RuntimeError | SyntaxError | Exception $e) {
+                $html_content = "<p>Error in retriving a Twig template. Error: " . StringHelper::toString($e) . "  Not compatibile \$template path:<br> " . StringHelper::toString($input_content) . "</p>";
             }
-            if ($value == false) {
-                $settings[$key] = null;
+        } elseif (filter_var($input_content, FILTER_VALIDATE_URL)) {
+            $html_content = $this->getURL($input_content, $settings);
+            if (!isset($html_content)) {
+                $html_content = "<p>Error in getting a URL HTML template from $input_content URL. </p>";
             }
-        }
-        $settings = array_merge($settings, $attributes);
-        if ($tempFilename === null) {
-            $tempFilename = Craft::getAlias('@root') . DIRECTORY_SEPARATOR . rand(1000, 10000) . ".pdf";
-            Craft::info('Inserted null $tempFilename varaiable');
-        }
-        // Generate the PDF using the existing pdf method
-        $pdfPath = $this->pdf($template, 'file', $tempFilename, $variables, $attributes);
-        $info = pathinfo($pdfPath);
-        $plugin = Craft::$app->plugins->getPlugin('document-helpers');
-        if (isset($settings['assetFilename'])) {
-            $filename = $settings['assetFilename'];
+            try {
+                $html_content = Craft::$app->getView()->renderString($html_content, $vars);
+            } catch (LoaderError | SyntaxError $e) {
+                $html_content = "<p>Error in inserting Twig vars into HTML URL template. Error: " . StringHelper::toString($e) . " contents:<br> " . StringHelper::toString($html_content) . "</p>";
+            }
+
+        } elseif (strip_tags($input_content) != $input_content) {
+            try {
+                $html_content = Craft::$app->getView()->renderString($input_content, $vars);
+            } catch (LoaderError | SyntaxError $e) {
+                $html_content = "<p>Error in retriving a code block template. Error: " . StringHelper::toString($e) . " contents:<br> " . StringHelper::toString($input_content) . "</p>";
+            }
         } else {
-            $filename = $info['basename'];
+            $html_content = "<p>Error in retriving a template of header. Not compatibile type of \$template, contents:<br> " . $input_content . "</p>";
         }
-
-        // Set the volume ID of the asset
-        $volumeId = Craft::$app->volumes->getVolumeByHandle($volumeHandle)->id;
-        $assetQuery = \craft\elements\Asset::find();
-        $assetQuery->filename = $filename;
-        $assetQuery->volumeId = $volumeId;
-        $asset = $assetQuery->one();
-
-        // If the asset doesn't exist or the temp file is newer, create or update the asset
-        if (!$asset || filemtime($tempFilename) > $asset->dateModified->getTimestamp()) {
-            if (!$asset) {
-                $asset = new \craft\elements\Asset();
-            }
-
-            if (isset($settings['assetTitle'])) {
-                $asset->title = $settings['assetTitle'];
-            }
-
-            if (isset($settings['assetSiteId'])) {
-                $asset->siteId = $settings['assetSiteId'];
-            }
-
-            $asset->volumeId = $volumeId;
-
-            // Find the folder where the asset will be stored
-            $folder = Craft::$app->assets->getRootFolderByVolumeId($volumeId);
-            $folderId = $folder->id;
-            $tempCopyInfo = pathinfo($pdfPath);
-            $tempName = $tempCopyInfo['basename'];
-            $tempDirName = $tempCopyInfo['dirname'];
-            $copyFilename = $tempDirName . '/copy_' . $tempName;
-            if (!copy($tempFilename, $copyFilename)) {
-                Craft::error('Failed to copy file: ' . $tempFilename);
-            }
-
-            // Set the temporary file path of the asset to the path of the generated PDF
-            $asset->tempFilePath = $copyFilename;
-            $asset->filename = $filename;
-            $asset->newFolderId = $folderId;
-            $asset->setScenario(\craft\elements\Asset::SCENARIO_DEFAULT);
-            $result = Craft::$app->getElements()->saveElement($asset);
-            // Check if the asset was saved successfully
-            if (!$result) {
-                Craft::error("Can't find asset: " . StringHelper::toString($filename) . ', in volume: ' . StringHelper::toString($volumeHandle));
-                return null;
-            }
-        }
-
-        if (isset($settings['assetThumb'])) {
-            if (isset($settings['thumbType'])) {
-                $assetType = $settings['thumbType'];
-            } else {
-                $assetType = "jpg";
-            }
-            if (isset($settings['assetFilename'])) {
-                $finalNameThumb = $settings['assetFilename'] . '.' . $assetType;
-            } else {
-                $finalNameThumb = $info['basename'] . '.' . $assetType;
-            }
-            $infoThumb = pathinfo($tempFilename);
-            $fileTempName = $infoThumb['filename'];
-            $dirTemp = $infoThumb['dirname'];
-            $this->makeThumb($pdfPath, $dirTemp . DIRECTORY_SEPARATOR . $fileTempName . '.' . $assetType, $assetType, $settings);
-
-            if (isset($settings['assetThumbVolumeHandle'])) {
-                $thumbVolumeId = Craft::$app->volumes->getVolumeByHandle($settings['assetThumbVolumeHandle'])->id;
-            } else {
-                $thumbVolumeId = Craft::$app->volumes->getVolumeByHandle($volumeHandle)->id;
-            }
-
-            // Find the existing asset
-            $assetQueryThumb = \craft\elements\Asset::find();
-            $assetQueryThumb->filename = $finalNameThumb;
-            $assetQueryThumb->volumeId = $thumbVolumeId;
-            $assetThumb = $assetQueryThumb->one();
-
-            // If the asset doesn't exist or the temp file is newer, create or update the asset
-            if (!$assetThumb || (file_exists($dirTemp . DIRECTORY_SEPARATOR . $fileTempName . '.' . $assetType) && filemtime($dirTemp . DIRECTORY_SEPARATOR . $fileTempName . '.' . $assetType) > $assetThumb->dateModified->getTimestamp())) {
-                if (!$assetThumb) {
-                    $assetThumb = new \craft\elements\Asset();
-                }
-
-                if (isset($settings['assetTitle'])) {
-                    $assetThumb->title = $settings['assetTitle'];
-                }
-
-                if (isset($settings['assetSiteId'])) {
-                    $assetThumb->siteId = $settings['assetSiteId'];
-                }
-
-                $assetThumb->volumeId = $thumbVolumeId;
-                $folder = Craft::$app->assets->getRootFolderByVolumeId($thumbVolumeId);
-                $folderId = $folder->id;
-                $assetThumb->tempFilePath = $dirTemp . DIRECTORY_SEPARATOR . $fileTempName . '.' . $assetType;
-                $assetThumb->filename = $finalNameThumb;
-                $assetThumb->newFolderId = $folderId;
-                $assetThumb->setScenario(\craft\elements\Asset::SCENARIO_DEFAULT);
-
-                try {
-                    $resultThumb = Craft::$app->getElements()->saveElement($assetThumb);
-                } catch (\Exception $e) {
-                    Craft::error('Error relocating thumbnail: ' . StringHelper::toString($e->getMessage()));
-                }
-                if (!isset($resultThumb)) {
-                    Craft::error("Can't find assetThumb: " . StringHelper::toString($dirTemp . DIRECTORY_SEPARATOR . $fileTempName . '.' . $assetType) . " and save it into: " . StringHelper::toString($filename . '.' . $assetType) . ", in volume: " . StringHelper::toString(isset($settings['assetThumbVolumeHandle']) ? $settings['assetThumbVolumeHandle'] : $volumeHandle));
-                    return null;
-                }
-            }
-        }
-
-        $craftVersion = Craft::$app->getVersion();
-        if (version_compare($craftVersion, '4.0', '>=')) {
-            $extendedAsset = new ExtendedAsset();
-        } elseif (version_compare($craftVersion, '5.0', '>=')) {
-            $extendedAsset = new ExtendedAsset();
-        } elseif (version_compare($craftVersion, '3.0', '>=')) {
-            $extendedAsset = new ExtendedAssetv3();
-        }
-        foreach ($asset->getAttributes() as $name => $value) {
-            $extendedAsset->$name = $value;
-        }
-        if (isset($settings['assetThumb'])) {
-            $extendedAsset->assetThumb = $assetThumb;
-        }
-
-        if (isset($settings['assetDelete'])) {
-            if (file_exists($tempFilename)) {
-                if (unlink($tempFilename)) {
-                    Craft::info("Deleted (unlink) temporary PDF file on path: " . StringHelper::toString($tempFilename));
-                } else {
-                    Craft::error("Deletion error (unlink) of temporary PDF file on path: " . StringHelper::toString($tempFilename));
-                }
-            }
-
-            if (isset($settings['assetThumb'])) {
-                if (file_exists($dirTemp . DIRECTORY_SEPARATOR . $fileTempName . '.' . $assetType)) {
-                    if (unlink($dirTemp . DIRECTORY_SEPARATOR . $fileTempName . '.' . $assetType)) {
-                        Craft::info("Deleted (unlink) temporary PDF Thumb file on path: " . StringHelper::toString($dirTemp . DIRECTORY_SEPARATOR . $fileTempName . '.' . $assetType));
-                    } else {
-                        Craft::error("Deletion error (unlink) of temporary PDF Thumb on path: " . StringHelper::toString($dirTemp . DIRECTORY_SEPARATOR . $fileTempName . '.' . $assetType));
-                    }
-                }
-            }
-        }
-        unset($asset);
-        unset($assetThumb);
-
-        /** @var ExtendedAsset|ExtendedAssetv3 $extendedAsset */
-        return $extendedAsset;
-    }
-
-    /**
-     * Fuction checking string is JSON
-     * @param string $string input string
-     * @return boolean
-     */
-    private function is_json($string)
-    {
-        if (is_string($string)) {
-            json_decode($string);
-            if (json_last_error() == JSON_ERROR_NONE) {
-                return true;
-            }
-        }
-        return false;
+        return $html_content;
     }
 
     /**
@@ -651,6 +674,76 @@ class DocumentHelperVariable
             $html = mb_convert_encoding($html, 'UTF-8', mb_detect_encoding($html));
         }
         return $html;
+    }
+
+    private function convertImgToCMYK($html_input)
+    {
+        $loader = '/vendor/simplehtmldom/simplehtmldom/simple_html_dom.php';
+        if (file_exists(Craft::getAlias('@root') . $loader) &&
+            is_file(Craft::getAlias('@root') . $loader)) {
+            require_once Craft::getAlias('@root') . $loader;
+
+            if (class_exists('simple_html_dom')) {
+                $html = new \simple_html_dom();
+                $html->load($html_input);
+                foreach ($html->find('img') as $img) {
+                    try {
+                        $src = $img->src;
+                        if (class_exists('\Imagick') === false) {
+                            Craft::error('Cannot parse img tags and convert to CMYK. Imagick is not installed.');
+                            return $html_input;
+                        }
+                        $image = new \Imagick();
+                        if (filter_var($src, FILTER_VALIDATE_URL)) {
+                            $imageBlob = file_get_contents($src);
+                        } else {
+                            $imageBlob = base64_decode($src);
+                        }
+                        $image->readImageBlob($imageBlob);
+                        $imageFormat = strtolower($image->getImageFormat());
+                        $supportedFormats = ['jpeg', 'png', 'webp', 'avif', 'gif', 'bmp', 'tiff'];
+                        if (in_array($imageFormat, $supportedFormats)) {
+                            $image->transformImageColorspace(\Imagick::COLORSPACE_CMYK);
+                        } elseif (in_array($imageFormat, ['svg'])) {
+                            continue;
+                        } else {
+                            Craft::warning("Unsupported image format: $imageFormat. Skipping conversion.");
+                            continue;
+                        }
+                        $img->src = 'data:image/' . $imageFormat . ';base64,' . base64_encode($image->getImageBlob());
+                        Craft::debug("CMYK conversion img[src]: " . $img->src . " base64_encode: " . base64_encode($image->getImageBlob()));
+                        $image->destroy();
+                    } catch (\Exception $e) {
+                        Craft::error('Imagick Error (CMYK): ' . $e->getMessage());
+                    }
+                }
+                $html_output = $html->save();
+                unset($html_input);
+                return $html_output;
+            } else {
+                return $html_input;
+                Craft::error("Cannot parse img tags and convert to CMYK, because simplehtmldom/simplehtmldom is not initialized but files exist (installed).");
+            }
+        } else {
+            return $html_input;
+            Craft::error("Cannot parse img tags and convert to CMYK, because simplehtmldom/simplehtmldom is not installed.");
+        }
+    }
+
+    /**
+     * Fuction checking string is JSON
+     * @param string $string input string
+     * @return boolean
+     */
+    private function is_json($string)
+    {
+        if (is_string($string)) {
+            json_decode($string);
+            if (json_last_error() == JSON_ERROR_NONE) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
@@ -719,96 +812,5 @@ class DocumentHelperVariable
             Craft::error('Error generating thumbnail: ' . StringHelper::toString($e->getMessage()));
         }
         return false;
-    }
-    /**
-     * Function which is running generating content from input content from Twig template, URL or HTML code block
-     * @param string $input_content Input content as path of Twig template, URL or Code block
-     * @param string $vars Variables like entry from Craft CMS
-     * @param array $settings Settings parsed from `pdfOptions` or plugin Settings
-     * @return string Returned HTML Content
-     */
-    private function generateContent($input_content, $vars, $settings)
-    {
-        if (file_exists(Craft::getAlias('@templates') . DIRECTORY_SEPARATOR . $input_content) && is_file(Craft::getAlias('@templates') . DIRECTORY_SEPARATOR . $input_content)) {
-            try {
-                $html_content = Craft::$app->getView()->renderTemplate($input_content, $vars);
-            } catch (LoaderError | RuntimeError | SyntaxError | Exception $e) {
-                $html_content = "<p>Error in retriving a Twig template. Error: " . StringHelper::toString($e) . "  Not compatibile \$template path:<br> " . StringHelper::toString($input_content) . "</p>";
-            }
-        } elseif (filter_var($input_content, FILTER_VALIDATE_URL)) {
-            $html_content = $this->getURL($input_content, $settings);
-            if (!isset($html_content)) {
-                $html_content = "<p>Error in getting a URL HTML template from $input_content URL. </p>";
-            }
-            try {
-                $html_content = Craft::$app->getView()->renderString($html_content, $vars);
-            } catch (LoaderError | SyntaxError $e) {
-                $html_content = "<p>Error in inserting Twig vars into HTML URL template. Error: " . StringHelper::toString($e) . " contents:<br> " . StringHelper::toString($html_content) . "</p>";
-            }
-
-        } elseif (strip_tags($input_content) != $input_content) {
-            try {
-                $html_content = Craft::$app->getView()->renderString($input_content, $vars);
-            } catch (LoaderError | SyntaxError $e) {
-                $html_content = "<p>Error in retriving a code block template. Error: " . StringHelper::toString($e) . " contents:<br> " . StringHelper::toString($input_content) . "</p>";
-            }
-        } else {
-            $html_content = "<p>Error in retriving a template of header. Not compatibile type of \$template, contents:<br> " . $input_content . "</p>";
-        }
-        return $html_content;
-    }
-
-    private function convertImgToCMYK($html_input)
-    {
-        $loader = '/vendor/simplehtmldom/simplehtmldom/simple_html_dom.php';
-        if (file_exists(Craft::getAlias('@root') . $loader) &&
-            is_file(Craft::getAlias('@root') . $loader)) {
-            require_once Craft::getAlias('@root') . $loader;
-
-            if (class_exists('simple_html_dom')) {
-                $html = new \simple_html_dom();
-                $html->load($html_input);
-                foreach ($html->find('img') as $img) {
-                    try {
-                        $src = $img->src;
-                        if (class_exists('\Imagick') === false) {
-                            Craft::error('Cannot parse img tags and convert to CMYK. Imagick is not installed.');
-                            return $html_input;
-                        }
-                        $image = new \Imagick();
-                        if (filter_var($src, FILTER_VALIDATE_URL)) {
-                            $imageBlob = file_get_contents($src);
-                        } else {
-                            $imageBlob = base64_decode($src);
-                        }
-                        $image->readImageBlob($imageBlob);
-                        $imageFormat = strtolower($image->getImageFormat());
-                        $supportedFormats = ['jpeg', 'png', 'webp', 'avif', 'gif', 'bmp', 'tiff'];
-                        if (in_array($imageFormat, $supportedFormats)) {
-                            $image->transformImageColorspace(\Imagick::COLORSPACE_CMYK);
-                        } elseif (in_array($imageFormat, ['svg'])) {
-                            continue;
-                        } else {
-                            Craft::warning("Unsupported image format: $imageFormat. Skipping conversion.");
-                            continue;
-                        }
-                        $img->src = 'data:image/' . $imageFormat . ';base64,' . base64_encode($image->getImageBlob());
-                        Craft::debug("CMYK conversion img[src]: " . $img->src . " base64_encode: " . base64_encode($image->getImageBlob()));
-                        $image->destroy();
-                    } catch (\Exception $e) {
-                        Craft::error('Imagick Error (CMYK): ' . $e->getMessage());
-                    }
-                }
-                $html_output = $html->save();
-                unset($html_input);
-                return $html_output;
-            } else {
-                return $html_input;
-                Craft::error("Cannot parse img tags and convert to CMYK, because simplehtmldom/simplehtmldom is not initialized but files exist (installed).");
-            }
-        } else {
-            return $html_input;
-            Craft::error("Cannot parse img tags and convert to CMYK, because simplehtmldom/simplehtmldom is not installed.");
-        }
     }
 }

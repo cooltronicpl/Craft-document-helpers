@@ -24,7 +24,6 @@ use yii\web\Response;
  * @since     1.3.1
  * @since     0.4.1
  */
-
 class PluginInstallController extends Controller
 {
 
@@ -91,8 +90,8 @@ class PluginInstallController extends Controller
             'success' => $success,
             'installed' => ($installed == 0),
             'message' => $success
-            ? "Package $package has been " . (($installed == 0) ? "installed " : "uninstalled ") . "successfully. \n $outputContent"
-            : "Package " . (($installed == 0) ? "install " : "uninstall ") . "unsuccessful. Try to do it manually, more info in the Plugin Documentation. \n $outputContent",
+                ? "Package $package has been " . (($installed == 0) ? "installed " : "uninstalled ") . "successfully. \n $outputContent"
+                : "Package " . (($installed == 0) ? "install " : "uninstall ") . "unsuccessful. Try to do it manually, more info in the Plugin Documentation. \n $outputContent",
         ];
         Craft::debug('PDF Generator - Debugging Info:');
         Craft::debug('$installed: ' . json_encode($installed));

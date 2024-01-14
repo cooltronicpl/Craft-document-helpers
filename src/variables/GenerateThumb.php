@@ -16,6 +16,7 @@ namespace cooltronicpl\documenthelpers\variables;
 
 use cooltronicpl\documenthelpers\variables\GenerateThumbConfiguration;
 use Craft;
+use Exception;
 
 /**
  * @author    CoolTRONIC.pl sp. z o.o. <github@cooltronic.pl>
@@ -23,7 +24,6 @@ use Craft;
  * @since     0.3.2
  * @since     2.0.0
  */
-
 class GenerateThumb
 {
     public function __construct()
@@ -38,7 +38,7 @@ class GenerateThumb
             $this->process($configuration);
         } catch (\ImagickException $e) {
             Craft::error("Imagick Error: " . $e->getMessage() . "\n" . $e->getTraceAsString());
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Craft::error("General Error: " . $e->getMessage() . "\n" . $e->getTraceAsString());
         }
     }
@@ -52,13 +52,13 @@ class GenerateThumb
 
         $page = $configuration->page;
         $bgColor = $configuration->bgColor;
-        $settings=$configuration->settings;
+        $settings = $configuration->settings;
         Craft::info('Imagick is Reading PDF: ' . $configuration->pdfPath . "[" . $page . "]");
-		$im = new \Imagick ();
+        $im = new \Imagick();
         try {
             $im->readImage($configuration->pdfPath . "[" . $page . "]");
         } catch (\ImagickException $e) {
-            Craft::error('Failed to read page ' . ($page + 1) . ' of the PDF: ' . $e->getMessage(). "\n" . $e->getTraceAsString());
+            Craft::error('Failed to read page ' . ($page + 1) . ' of the PDF: ' . $e->getMessage() . "\n" . $e->getTraceAsString());
             throw $e;
         }
 
@@ -83,8 +83,9 @@ class GenerateThumb
                 $offsetX = 0;
                 $offsetY = 0;
             }
-            if(isset($settings['thumbQuality']))
+            if (isset($settings['thumbQuality'])) {
                 $bgImage->setImageCompressionQuality($settings['thumbQuality']);
+            }
 
             $bgImage->compositeImage($im, \Imagick::COMPOSITE_OVER, $offsetX, $offsetY);
         } catch (\ImagickException $e) {
@@ -101,48 +102,6 @@ class GenerateThumb
         } else {
             Craft::error("Failed to open file: " . $configuration->savePath);
         }
-    }
-
-    private function getLastError(): string
-    {
-        $lastError = error_get_last();
-        if ($lastError && isset($lastError['message'])) {
-            return (string) preg_replace('#^\w+\(.*?\): #', '', $lastError['message']);
-        } else {
-            return 'Undefined error';
-        }
-    }
-
-    private function processCommand($command)
-    {
-        $descriptors = [
-            0 => ['pipe', 'r'],
-            1 => ['pipe', 'w'],
-            2 => ['pipe', 'w'],
-        ];
-
-        $process = proc_open($command, $descriptors, $pipes, "/");
-
-        if (!is_resource($process)) {
-            return ['output' => '', 'returnValue' => false];
-        }
-
-        fclose($pipes[0]);
-
-        $stdout = stream_get_contents($pipes[1]);
-        fclose($pipes[1]);
-
-        $stderr = stream_get_contents($pipes[2]);
-        fclose($pipes[2]);
-        $return = "";
-
-        $returnValue = proc_close($process);
-        if (!empty($stdout)) {
-            $return = $stdout;
-        } elseif (!empty($stderr)) {
-            $return = $stderr;
-        }
-        return $return;
     }
 
 }

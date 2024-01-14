@@ -4,11 +4,11 @@
 
 {% set edition = craft.app.plugins.getPlugin('document-helpers').edition %}
 {% if edition == 'plus' %}
-    {% set isEnabledPlus = true %}
-    {% set isDisabledPlus = false %}
+	{% set isEnabledPlus = true %}
+	{% set isDisabledPlus = false %}
 {% else %}
-    {% set isEnabledPlus = false %}
-    {% set isDisabledPlus = true %}
+	{% set isEnabledPlus = false %}
+	{% set isDisabledPlus = true %}
 {% endif %}
 
 {% set title = 'PDF Generator' %}
@@ -25,26 +25,26 @@
 } %}
 {% block content %}
 
-    <div class="tab-contents">
+	<div class="tab-contents"> 
 
-        <div id="content-general" class="tab-content">
-            <h2>
-                Edition
-            </h2>
-            <p>
-                You are using the
-                <strong>{{ craft.app.plugins.getPlugin('document-helpers').edition|upper }}</strong>
-                plan of the PDF Generator plugin.</p>
+		<div id="content-general" class="tab-content">
+			<h2>
+				Edition
+			</h2>
+			<p>
+				You are using the
+				<strong>{{ craft.app.plugins.getPlugin('document-helpers').edition|upper }}</strong>
+				plan of the PDF Generator plugin.</p>
 
-            <h2>Welcome! General Settings</h2>
+			<h2>Welcome! General Settings</h2>
 
-            <p>The general settings section allows you to configure the default values of the plugin for generating PDFs. You can customize the options for each PDF according to your needs.</p>
+			<p>The general settings section allows you to configure the default values of the plugin for generating PDFs. You can customize the options for each PDF according to your needs.</p>
 
-            <p>For more information about the available options, please visit
-                <a href="https://github.com/cooltronicpl/Craft-document-helpers#overriding-default-options">this page</a>.</p>
+			<p>For more information about the available options, please visit
+				<a href="https://github.com/cooltronicpl/Craft-document-helpers#overriding-default-options">this page</a>.</p>
 
-            <p>You can override the default values in the Twig functions by passing a `pdfOptions` variable with the desired options.</p>
-            {{ forms.textField({
+			<p>You can override the default values in the Twig functions by passing a `pdfOptions` variable with the desired options.</p>
+			{{ forms.textField({
 label: "Header template" | t,
 id: 'header',
 name: 'header',
@@ -54,7 +54,7 @@ errors: settings.getErrors('header')
 
 }) }}
 
-            {{ forms.textField({
+			{{ forms.textField({
 label: "Footer template" | t,
 id: 'footer',
 name: 'footer',
@@ -63,10 +63,10 @@ value: settings. header|default(null),
 errors: settings.getErrors('footer')
 
 }) }}
-            {{ forms.textField({ label: "Margin top" | t, id: 'margin_top', name: 'margin_top', instructions: "This is the top margin of the PDF in millimetres. The default value is 30."|t, value: settings. margin_top|default(null), errors: settings.getErrors('margin_top') }) }}
-            {{ forms.textField({ label: "Margin bottom" | t, id: 'margin_bottom', name: 'margin_bottom', instructions: "This is the bottom margin of the PDF in millimetres. The default value is 30."|t, value: settings. margin_bottom|default(null), errors: settings.getErrors('margin_bottom') }) }}
+			{{ forms.textField({ label: "Margin top" | t, id: 'margin_top', name: 'margin_top', instructions: "This is the top margin of the PDF in millimetres. The default value is 30."|t, value: settings. margin_top|default(null), errors: settings.getErrors('margin_top') }) }}
+			{{ forms.textField({ label: "Margin bottom" | t, id: 'margin_bottom', name: 'margin_bottom', instructions: "This is the bottom margin of the PDF in millimetres. The default value is 30."|t, value: settings. margin_bottom|default(null), errors: settings.getErrors('margin_bottom') }) }}
 
-            {{ forms.textField({
+			{{ forms.textField({
 label: "Margin left" | t,
 id: 'margin_left',
 name: 'margin_left',
@@ -75,11 +75,20 @@ value: settings. margin_left|default(null),
 errors: settings.getErrors('margin_left')
 
 }) }}
-            {{ forms.textField({ label: "Margin right" | t, id: 'margin_right', name: 'margin_right', instructions: "This is the right margin of the PDF in millimetres. The default value is 15."|t, value: settings. margin_right|default(null), errors: settings.getErrors('margin_right') }) }}
-            
-            {{ forms.textField({ label: "Page numbers" | t, id: 'pageNumbers', name: 'pageNumbers', instructions: "This is the format of the page numbers that will be added in the footer of the PDF. For example, you can use '{PAGENO}/{nbpg}' to show the current page and the total number of pages."|t, value: settings. pageNumbers|default(null), errors: settings.getErrors('pageNumbers') }) }}
+			{{ forms.textField({ label: "Margin right" | t,
+            id: 'margin_right',
+            name: 'margin_right',
+            instructions: "This is the right margin of the PDF in millimetres. The default value is 15."|t,          
+            value: settings. margin_right|default(null),
+            errors: settings.getErrors('margin_right') }) }}
 
-            {{ forms.textField({
+			{{ forms.textField({ label: "Page numbers" | t,
+            id: 'pageNumbers', name: 'pageNumbers',
+            instructions: "This is the format of the page numbers that will be added in the footer of the PDF. For example, you can use '{PAGENO}/{nbpg}' to show the current page and the total number of pages."|t,
+            value: settings. pageNumbers|default(null),
+            errors: settings.getErrors('pageNumbers') }) }}
+
+			{{ forms.textField({
 label: "Title" | t,
 id: 'title',
 name: 'title',
@@ -89,7 +98,7 @@ errors: settings.getErrors('title')
 
 }) }}
 
-            {{ forms.lightswitchField({
+			{{ forms.lightswitchField({
     label: "Landscape" | t,
     id: 'landscape',
     name: 'landscape',
@@ -97,14 +106,14 @@ errors: settings.getErrors('title')
     on: settings.landscape,
 
 }) }}
-            {{ forms.lightswitchField({
+			{{ forms.lightswitchField({
     label: "Portrait" | t,
     id: 'portrait',
     name: 'portrait',
     instructions: "This option sets the orientation of the PDF to portrait. This is the default option for most documents." | t,
     on: settings.portrait,
 }) }}
-            {{ forms.textField({
+			{{ forms.textField({
     label: "Format" | t,
     id: 'format',
     name: 'format',
@@ -112,7 +121,7 @@ errors: settings.getErrors('title')
     value: settings. format|default(null),
     errors: settings.getErrors('format')
 }) }}
-            {{ forms.textField({
+			{{ forms.textField({
     label: "Start page" | t,
     id: 'startPage',
     name: 'startPage',
@@ -120,7 +129,7 @@ errors: settings.getErrors('title')
     value: settings. startPage|default(null),
     errors: settings.getErrors('startPage')
 }) }}
-            {{ forms.textField({
+			{{ forms.textField({
     label: "End page" | t,
     id: 'endPage',
     name: 'endPage',
@@ -128,7 +137,7 @@ errors: settings.getErrors('title')
     value: settings. endPage|default(null),
     errors: settings.getErrors('endPage')
 }) }}
-            {{ forms.textField({
+			{{ forms.textField({
             label: "PDF Generation Mode (Plus)" | t,
             id: 'generateMode',
             name: 'generateMode',
@@ -136,7 +145,7 @@ errors: settings.getErrors('title')
             value: settings.generateMode|default(null),
             errors: settings.getErrors('generateMode'),
         }) }}
-            {{ forms.textField({
+			{{ forms.textField({
             label: "PDF Colorspace" | t,
             id: 'colorspace',
             name: 'colorspace',
@@ -145,7 +154,7 @@ errors: settings.getErrors('title')
             errors: settings.getErrors('colorspace'),
             disabled: isDisabledPlus
         }) }}
-            {{ forms.textField({
+			{{ forms.textField({
     label: "Watermark image" | t,
     id: 'watermarkImage',
     name: 'watermarkImage',
@@ -153,7 +162,7 @@ errors: settings.getErrors('title')
     value: settings. watermarkImage|default(null),
     errors: settings.getErrors('watermarkImage')
 }) }}
-            {{ forms.textField({
+			{{ forms.textField({
     label: "Watermark text" | t,
     id: 'watermarkText',
     name: 'watermarkText',
@@ -161,9 +170,9 @@ errors: settings.getErrors('title')
     value: settings. watermarkText|default(null),
     errors: settings.getErrors('watermarkText')
 }) }}
-            {{ forms.textField({ label: "Encoding" | t, id: 'encoding', name: 'encoding', instructions: "This is the encoding of the input of your PDF. The default value is 'UTF-8'."|t, value: settings. encoding|default(null), errors: settings.getErrors('encoding') }) }}
+			{{ forms.textField({ label: "Encoding" | t, id: 'encoding', name: 'encoding', instructions: "This is the encoding of the input of your PDF. The default value is 'UTF-8'."|t, value: settings. encoding|default(null), errors: settings.getErrors('encoding') }) }}
 
-            {{ forms.lightswitchField({
+			{{ forms.lightswitchField({
 label: "No automatic page break" | t,
 id: 'no_auto_page_break',
 name: 'no_auto_page_break',
@@ -171,9 +180,9 @@ instructions: "This option disables the automatic system page breaks. You can us
 on: settings.no_auto_page_break,
 
 }) }}
-            {{ forms.textField({ label: "Temporary directory" | t,id: 'tempDir', name: 'tempDir', instructions: "This is the path of the temporary directory that will be used for generating PDFs. You can use the main /tmp directory on the server for better performance. This can be useful if you are generating multiple PDFs at once."|t, value: settings. tempDir|default(null), errors: settings.getErrors('tempDir') }) }}
+			{{ forms.textField({ label: "Temporary directory" | t,id: 'tempDir', name: 'tempDir', instructions: "This is the path of the temporary directory that will be used for generating PDFs. You can use the main /tmp directory on the server for better performance. This can be useful if you are generating multiple PDFs at once."|t, value: settings. tempDir|default(null), errors: settings.getErrors('tempDir') }) }}
 
-            {{ forms.lightswitchField({
+			{{ forms.lightswitchField({
     label: "Mirror margins" | t,
     id: 'mirrorMargins',
     name: 'mirrorMargins',
@@ -181,28 +190,28 @@ on: settings.no_auto_page_break,
     on: settings.mirrorMargins,
 
 }) }}
-            {{ forms.lightswitchField({
+			{{ forms.lightswitchField({
     label: "Automatic Table of Contents" | t,
     id: 'autoToC',
     name: 'autoToC',
     instructions: "This option creates a Table of Contents for the PDF using the H1-H6 tags in your document. The Table of Contents will be inserted at the beginning of the PDF."|t,
     on: settings.autoToC,
 }) }}
-            {{ forms.lightswitchField({
+			{{ forms.lightswitchField({
     label: "Automatic bookmarks" | t,
     id: 'autoBookmarks',
     name: 'autoBookmarks',
     instructions: "This option creates bookmarks for the PDF using the H1-H6 tags in your document. The bookmarks will be shown in the sidebar of the PDF viewer."|t,
     on: settings.autoBookmarks,
 }) }}
-            {{ forms.lightswitchField({
+			{{ forms.lightswitchField({
     label: "Provided URL Rendering Attributes" | t,
     id: 'URLTwigRender',
     name: 'URLTwigRender',
     on: settings.URLTwigRender,
     instructions: "This option enables the rendering of Twig variables like `{{custom}}` or `{{qrimg}}` in external URLs for `template`, `header` or `footer`. This can be useful for adding dynamic content to your PDFs." | t,
 }) }}
-            {{ forms.textField({
+			{{ forms.textField({
     label: "URL Mode" | t,
     id: 'URLMode',
     name: 'URLMode',
@@ -210,7 +219,7 @@ on: settings.no_auto_page_break,
     value: settings. watermarkImage|default(null),
     errors: settings.getErrors('URLMode')
 }) }}
-            {{ forms.lightswitchField({
+			{{ forms.lightswitchField({
 
             label: "Disable compression" | t,
             id: 'disableCompression',
@@ -218,7 +227,7 @@ on: settings.no_auto_page_break,
             instructions: "Turn this on to disable compression of the generated PDF file. This may increase the file size but also improve the quality."|t,
             on: settings.disableCompression,
         }) }}
-        {{ forms.lightswitchField({
+			{{ forms.lightswitchField({
 
             label: "Convert images as inline as CMYK (requires ImageMagick with Plus)",
             id: 'convertImgToCMYK',
@@ -226,7 +235,7 @@ on: settings.no_auto_page_break,
             instructions: "Turn this on to convert images in PDF to CMYK format ie. for PDF-X."|t,
             on: settings.convertImgToCMYK
         }) }}
-            {{ forms.textField({
+			{{ forms.textField({
     label: "Debug log path" | t,
     id: 'log',
     name: 'log',
@@ -234,9 +243,9 @@ on: settings.no_auto_page_break,
     value: settings. log|default(null),
     errors: settings.getErrors('log')
 }) }}
-        </div>
-        <div id="content-metadata" class="tab-content">
-            {{ forms.textField({
+		</div>
+		<div id="content-metadata" class="tab-content">
+			{{ forms.textField({
     label: "Author" | t,
     id: 'author',
     name: 'author',
@@ -244,7 +253,7 @@ on: settings.no_auto_page_break,
     value: settings. author|default(null),
     errors: settings.getErrors('author')
 }) }}
-            {{ forms.textField({
+			{{ forms.textField({
     label: "Keywords" | t,
     id: 'keywords',
     name: 'keywords',
@@ -252,7 +261,7 @@ on: settings.no_auto_page_break,
     value: settings. keywords|default(null),
     errors: settings.getErrors('keywords')
 }) }}
-            {{ forms.lightswitchField({
+			{{ forms.lightswitchField({
     label: "Disable copyrights - Remove watermark (Plus)" | t,
     id: 'disableCopyright',
     name: 'disableCopyright',
@@ -261,9 +270,9 @@ on: settings.no_auto_page_break,
     disabled: isDisabledPlus
 
 }) }}
-        </div>
-        <div id="content-asset" class="tab-content">
-            {{ forms.textField({
+		</div>
+		<div id="content-asset" class="tab-content">
+			{{ forms.textField({
     label: "Asset title" | t,
     id: 'assetTitle',
     name: 'assetTitle',
@@ -271,7 +280,7 @@ on: settings.no_auto_page_break,
     value: settings. assetTitle|default(null),
     errors: settings.getErrors('assetTitle')
 }) }}
-            {{ forms.textField({
+			{{ forms.textField({
     label: "Asset filename" | t,
     id: 'assetFilename',
     name: 'assetFilename',
@@ -279,14 +288,14 @@ on: settings.no_auto_page_break,
     value: settings. assetFilename|default(null),
     errors: settings.getErrors('assetFilename') 
 }) }}
-            {{ forms.lightswitchField({
+			{{ forms.lightswitchField({
     label: "Delete temporary file" | t,
     id: 'assetDelete',
     name: 'assetDelete',
     on: settings.assetDelete,
     instructions: "This option deletes the temporary file that is generated in the `@root` path when you use the `pdfAsset` method. This option can save disk space, but it may also increase the resource consumption. This is because the Asset and the PDF are regenerated on every load when you use the `pdfAsset` method." | t,
 }) }}
-            {{ forms.textField({
+			{{ forms.textField({
     label: "Asset site ID" | t,
     id: 'assetSiteId',
     name: 'assetSiteId',
@@ -295,22 +304,22 @@ on: settings.no_auto_page_break,
     errors: settings.getErrors('assetSiteId')
 }) }}
 
-        </div>
-        <div id="content-thumb" class="tab-content">
+		</div>
+		<div id="content-thumb" class="tab-content">
 
-            <h2>Thumbnails with configured ImageMagick</h2>
+			<h2>Thumbnails with configured ImageMagick</h2>
 
-            <p>To generate thumbnails, you need to have ImageMagick properly configured on your server (host). For more details, please visit
-                <a href="https://github.com/cooltronicpl/Craft-document-helpers#what-if-i-cannot-generate-thumbnails-with-enabled-imagemagick">this page</a>.</p>
+			<p>To generate thumbnails, you need to have ImageMagick properly configured on your server (host). For more details, please visit
+				<a href="https://github.com/cooltronicpl/Craft-document-helpers#what-if-i-cannot-generate-thumbnails-with-enabled-imagemagick">this page</a>.</p>
 
-            {{ forms.lightswitchField({
+			{{ forms.lightswitchField({
     label: "Asset thumbnail" | t,
     id: 'assetThumb',
     name: 'assetThumb',
     on: settings.assetThumb,
     instructions: "This option generates a thumbnail image of a Craft CMS image Asset using the `pdfAsset` method (requires ImageMagick). You can access the thumbnail image in the Twig template as `asset.assetThumb`." | t,
 }) }}
-            {{ forms.textField({
+			{{ forms.textField({
     label: "Asset thumbnail volume handle" | t,
     id: 'assetThumbVolumeHandle',
     name: 'assetThumbVolumeHandle',
@@ -318,14 +327,14 @@ on: settings.no_auto_page_break,
     value: settings. assetThumbVolumeHandle|default(null),
     errors: settings.getErrors('assetThumbVolumeHandle')
 }) }}
-            {{ forms.lightswitchField({
+			{{ forms.lightswitchField({
     label: "Dumb thumbnail" | t,
     id: 'dumbThumb',
     name: 'dumbThumb',
     on: settings.dumbThumb,
     instructions: "This option generates a basic thumbnail image (without an Asset) using the `pdf` method (requires ImageMagick)."|t,
 }) }}
-            {{ forms.textField({
+			{{ forms.textField({
     label: "Dumb thumbnail directory" | t,
     id: 'dumbThumbDir',
     name: 'dumbThumbDir',
@@ -333,7 +342,7 @@ on: settings.no_auto_page_break,
     value: settings. dumbThumbDir|default(null),
     errors: settings.getErrors('dumbThumbDir')
 }) }}
-           {{ forms.textField({
+			{{ forms.textField({
     label: "Dumb thumbnail filename" | t,
     id: 'dumbThumbFilename',
     name: 'dumbThumbFilename',
@@ -343,10 +352,11 @@ on: settings.no_auto_page_break,
 }) }}
 
 
-            <p>
-            </p>
+			<p>
+				Both `assetThumb` and `dumbThumb` support the following optional customizations:
+			</p>
 
-            {{ forms.textField({
+			{{ forms.textField({
     label: "Thumbnail format type" | t,
     id: 'thumbType',
     name: 'thumbType',
@@ -354,7 +364,7 @@ on: settings.no_auto_page_break,
     value: settings. thumbType|default(null),
     errors: settings.getErrors('thumbType')
 }) }}
-            {{ forms.textField({
+			{{ forms.textField({
     label: "Thumbnail width" | t,
     id: 'thumbWidth',
     name: 'thumbWidth',
@@ -362,7 +372,7 @@ on: settings.no_auto_page_break,
     value: settings. thumbWidth|default(null),
     errors: settings.getErrors('thumbWidth')
 }) }}
-            {{ forms.textField({
+			{{ forms.textField({
     label: "Thumbnail height" | t,
     id: 'thumbHeight',
     name: 'thumbHeight',
@@ -370,7 +380,7 @@ on: settings.no_auto_page_break,
     value: settings. thumbHeight|default(null),
     errors: settings.getErrors('thumbHeight')
 }) }}
-            {{ forms.textField({
+			{{ forms.textField({
     label: "Thumbnail page" | t,
     id: 'thumbPage',
     name: 'thumbPage',
@@ -378,7 +388,7 @@ on: settings.no_auto_page_break,
     value: settings. thumbPage|default(null),
     errors: settings.getErrors('thumbPage')
 }) }}
-            {{ forms.textField({
+			{{ forms.textField({
     label: "Thumbnail quality" | t,
     id: 'thumbQuality',
     name: 'thumbQuality',
@@ -386,14 +396,14 @@ on: settings.no_auto_page_break,
     value: settings. thumbQuality|default(null),
     errors: settings.getErrors('thumbQuality')
 }) }}
-            {{ forms.lightswitchField({
+			{{ forms.lightswitchField({
     label: "Thumbnail best fit" | t,
     id: 'thumbBestfit',
     name: 'thumbBestfit',
     instructions: "This option determines whether to fit the image within the given dimensions or not. If on, the image will be scaled down to fit the aspect ratio of the original image. If off, the image will be stretched or cropped to fill the given dimensions." | t,
     on: settings.thumbBestfit,
 }) }}
-            {{ forms.textField({
+			{{ forms.textField({
     label: "Thumbnail background colour" | t,
     id: 'thumbBgColor',
     name: 'thumbBgColor',
@@ -401,7 +411,7 @@ on: settings.no_auto_page_break,
     value: settings. thumbBgColor|default(null),
     errors: settings.getErrors('thumbBgColor')
 }) }}
-            {{ forms.textField({
+			{{ forms.textField({
     label: "Thumbnail trim" | t,
     id: 'thumbTrim',
     name: 'thumbTrim',
@@ -409,7 +419,7 @@ on: settings.no_auto_page_break,
     value: settings. thumbTrim|default(null),
     errors: settings.getErrors('thumbTrim')
 }) }}
-            {{ forms.textField({
+			{{ forms.textField({
     label: "Thumbnail trim frame colour" | t,
     id: 'thumbTrimFrameColor',
     name: 'thumbTrimFrameColor',
@@ -417,10 +427,10 @@ on: settings.no_auto_page_break,
     value: settings. thumbTrimFrameColor|default(null),
     errors: settings.getErrors('thumbTrimFrameColor')
 }) }}
-        </div>
-        <div id="content-protect" class="tab-content">
+		</div>
+		<div id="content-protect" class="tab-content">
 
-            {{ forms.textField({
+			{{ forms.textField({
     label: "Password" | t,
     id: 'password',
     name: 'password',
@@ -429,7 +439,7 @@ on: settings.no_auto_page_break,
     errors: settings.getErrors('password')
 }) }}
 
-            {{ forms.lightswitchField({
+			{{ forms.lightswitchField({
     label: "Protection mode (Plus)" | t,
     id: 'protection',
     name: 'protection',
@@ -438,9 +448,9 @@ on: settings.no_auto_page_break,
     disabled: isDisabledPlus
 
 }) }}
-            <p>The protection mode supports the following options:</p>
+			<p>The protection mode supports the following options:</p>
 
-            {{ forms.lightswitchField({
+			{{ forms.lightswitchField({
     label: "Allow copy (Plus)" | t,
     id: 'protectionCopy',
     name: 'protectionCopy',
@@ -448,7 +458,7 @@ on: settings.no_auto_page_break,
     on: settings.protectionCopy,
     disabled: isDisabledPlus
 }) }}
-            {{ forms.lightswitchField({
+			{{ forms.lightswitchField({
     label: "Allow print (Plus)" | t,
     id: 'protectionPrint',
     name: 'protectionPrint',
@@ -456,7 +466,7 @@ on: settings.no_auto_page_break,
     on: settings.protectionPrint,
     disabled: isDisabledPlus
 }) }}
-            {{ forms.lightswitchField({
+			{{ forms.lightswitchField({
     label: "Allow print in high resolution (Plus)" | t,
     id: 'protectionPrintHighres',
     name: 'protectionPrintHighres',
@@ -465,7 +475,7 @@ on: settings.no_auto_page_break,
     disabled: isDisabledPlus
 
 }) }}
-            {{ forms.lightswitchField({
+			{{ forms.lightswitchField({
     label: "Allow modify contents (Plus)" | t,
     id: 'protectionModify',
     name: 'protectionModify',
@@ -474,7 +484,7 @@ on: settings.no_auto_page_break,
     disabled: isDisabledPlus
 
 }) }}
-            {{ forms.lightswitchField({
+			{{ forms.lightswitchField({
     label: "Allow annotations and form fields (Plus)" | t,
     id: 'protectionAnnotForms',
     name: 'protectionAnnotForms',
@@ -483,7 +493,7 @@ on: settings.no_auto_page_break,
     disabled: isDisabledPlus
 
 }) }}
-            {{ forms.lightswitchField({
+			{{ forms.lightswitchField({
     label: "Allow extracting content (Plus)" | t,
     id: 'protectionExtract',
     name: 'protectionExtract',
@@ -492,7 +502,7 @@ on: settings.no_auto_page_break,
     disabled: isDisabledPlus
 
 }) }}
-            {{ forms.lightswitchField({
+			{{ forms.lightswitchField({
     label: "Allow assembling pages (Plus)" | t,
     id: 'protectionAssemble',
     name: 'protectionAssemble',
@@ -501,7 +511,7 @@ on: settings.no_auto_page_break,
     disabled: isDisabledPlus
 
 }) }}
-            {{ forms.lightswitchField({
+			{{ forms.lightswitchField({
     label: "Allow fill forms (Plus)" | t,
     id: 'protectionFillForms',
     name: 'protectionFillForms',
@@ -510,7 +520,7 @@ on: settings.no_auto_page_break,
     disabled: isDisabledPlus
 
 }) }}
-            {{ forms.lightswitchField({
+			{{ forms.lightswitchField({
     label: "Allow reading without password (Plus)" | t,
     id: 'protectionNoUserPassword',
     name: 'protectionNoUserPassword',
@@ -519,52 +529,67 @@ on: settings.no_auto_page_break,
     disabled: isDisabledPlus
 
 }) }}
-        </div>
-        <div id="content-optional" class="tab-content">
-            <h2>
-                Install optional packages
-            </h2>
-            <p>
-                The optional packages are additional features that you can enable or disable in the plugin settings. They provide more functionality and customization for the PDF generation process. The optional packages are:
-            </p>
-            <ul>
-                <li>
-                    <a href="https://github.com/chillerlan/php-qrcode">chillerlan/php-qrcode</a>
-                    for QR Code generation</li>
-            </li>
-            <li>
-                <a href="https://github.com/ezyang/htmlpurifier">ezyang/htmlpurifier</a>
-                for HTML (URL) purification for problems with scraped websites on some URLs.</li>
+		</div>
+		<div id="content-optional" class="tab-content">
+			<h2>
+				Install optional packages
+			</h2>
+			<p>
+				The optional packages are additional features that you can enable or disable in the plugin settings. They provide more functionality and customization for the PDF generation process. The optional packages are:
+			</p>
+			<ul>
+				<li>
+					<a href="https://github.com/chillerlan/php-qrcode">chillerlan/php-qrcode</a>
+					for QR Code generation</li>
+			</li>
+			<li>
+				<a href="https://github.com/ezyang/htmlpurifier">ezyang/htmlpurifier</a>
+				for HTML (URL) purification for problems with scraped websites on some URLs.</li>
+		</li>
+		<li>
+			<a href="https://github.com/simplehtmldom/simplehtmldom">simplehtmldom/simplehtmldom</a>
+			HTML Parser for images conversion to CMYK in HTML content or getURL in
+			<code>URLMode</code>
+			as
+			<code>simplehtml</code>.
         </li>
         <li>
-            <a href="https://github.com/simplehtmldom/simplehtmldom">simplehtmldom/simplehtmldom</a>
-            HTML Parser for images conversion to CMYK in HTML content or getURL in <code>URLMode</code> as <code>simplehtml</code>.</li>
-    </li>
+			<a href="https://github.com/Seldaek/monolog">monolog/monolog</a>
+			to save log to file with 
+			<code>log</code>
+			option.
+        </li>
 </ul>
 {% set craftVersion = craft.app.getVersion() %}
 
 {% set versions = {} %}
 
 {% if craftVersion starts with '3.' %}
-    {% set versions = {
+	{% set versions = {
         'chillerlan/php-qrcode': '3.4',
         'ezyang/htmlpurifier': '4.13',
-        'simplehtmldom/simplehtmldom': '2.0-RC'
+        'simplehtmldom/simplehtmldom': '2.0-RC',
+        'monolog/monolog': '2.9'
+
     } %}
 {% elseif craftVersion starts with '4.' %}
-    {% set versions = {
+	{% set versions = {
         'chillerlan/php-qrcode': '4.3',
         'ezyang/htmlpurifier': '4.17',
-        'simplehtmldom/simplehtmldom': '2.0-RC'
+        'simplehtmldom/simplehtmldom': '2.0-RC',
+        'monolog/monolog': '3.0'
+
     } %}
 {% elseif craftVersion starts with '5.' %}
-    {% set versions = {
+	{% set versions = {
         'chillerlan/php-qrcode': '4.3',
         'ezyang/htmlpurifier': '4.17',
-        'simplehtmldom/simplehtmldom': '2.0-RC'
+        'simplehtmldom/simplehtmldom': '2.0-RC',
+        'monolog/monolog': '3.0'
     } %}
-{% endif %}{% js at endBody %}
-    function setCookie(name, value, days) {
+{% endif %}
+{% js at endBody %}
+function setCookie(name, value, days) {
         var expires = "";
         if (days) {
             var date = new Date();
@@ -583,14 +608,14 @@ on: settings.no_auto_page_break,
     }
 {% endjs %}
 {% for package, version in versions %}
-    {% set isInstalledPackage = craft.packageManagerPDFGenerator.isInstalledPackage(package) %}
-    {% set lightswitchValue = isInstalledPackage ? '1' : '0' %}
-    {% set packageCookie = actionUrl('document-helpers/install/toggle-package/', { package: package, version: version, installed: lightswitchValue }) %}
-    {% js at endBody %}
-    eraseCookie("package-{{ package|replace({'/': '_'}) }}");
-    setCookie("package-{{ package|replace({'/': '_'}) }}", decodeHtmlEntities("{{ packageCookie }}"), 1);
-    {% endjs %}
-    {{ forms.lightswitchField({
+	{% set isInstalledPackage = craft.packageManagerPDFGenerator.isInstalledPackage(package) %}
+	{% set lightswitchValue = isInstalledPackage ? '1' : '0' %}
+	{% set packageCookie = actionUrl('document-helpers/install/toggle-package/', { package: package, version: version, installed: lightswitchValue }) %}
+	{% js at endBody %}
+	eraseCookie("package-{{ package|replace({'/': '_'}) }}");
+														    setCookie("package-{{ package|replace({'/': '_'}) }}", decodeHtmlEntities("{{ packageCookie }}"), 1);
+	{% endjs %}
+	{{ forms.lightswitchField({
         label: "Install " ~ package ~ " package" | t,
         id: 'package-' ~ package|replace({'/': '_'}),
         name: 'package-' ~ package|replace({'/': '_'}),
@@ -600,9 +625,10 @@ on: settings.no_auto_page_break,
 {% endfor %}
 
 <script>
-    var versions = {{ versions|json_encode|raw }};
+	var versions = {{ versions|json_encode|raw }};
 </script>
-
+<h2>Status of installation</h2>
+<div id="package-status"></div>
 
 {{ forms.lightswitchField({
     label: "Purify URL (input HTML)" | t,
@@ -611,8 +637,7 @@ on: settings.no_auto_page_break,
     on: settings.URLPurify,
     instructions: "This option enables purification of the HTML content from external URLs by using an external library. This can help you avoid problems with scraped websites on some URLs." | t,
 }) }}
-<h2>Status of installation</h2> 
-<div id="package-status"></div>
+
 
 {{forms.textField({
     label: "Custom PHP binary path" | t,
@@ -622,129 +647,134 @@ on: settings.no_auto_page_break,
     value: settings.phpPath|default(null),
     errors: settings.getErrors('phpPath')
 }) }}</div></div>{% endblock %}{% html at head %}<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>{% endhtml %}{% js at endBody %}$(document).ready(function () {
-                    var packages = ["chillerlan/php-qrcode", "ezyang/htmlpurifier", "simplehtmldom/simplehtmldom"];
-        var observers = {};
-        var ps = document.getElementById("settings-package-status");
-        for (let package of packages) {
-            const packageName = package;
-            let sanitizedPackageName = packageName.replace('/', '_');
-        
-            let button = document.getElementById("settings-package-" + sanitizedPackageName);
-        
-            let callback = function (mutationsList) {
-                for (let mutation of mutationsList) {
-                    if (mutation.type == "attributes") {
-                        if (mutation.attributeName == "aria-checked") {
-                            const actionUrl = getCookie("package-" + sanitizedPackageName);
-                    let lightswitchFieldPackage = document.getElementById("settings-"+"package-" + sanitizedPackageName);
-                    lightswitchFieldPackage.disabled = true;
-                    let lightswitchFieldPackageContainer = document.getElementById("settings-"+"package-" + sanitizedPackageName+"-field");
-                    let lightswitchPackageContainerHandle = document.querySelector("#settings-"+"package-" + sanitizedPackageName+"-field .lightswitch-container");
-                    lightswitchFieldPackageContainer.classList.add("disabled");
-                            $.ajax({
-                                type: 'POST',
-                                url: actionUrl,
-                                data: {
-                                    [window.Craft.csrfTokenName]: window.Craft.csrfTokenValue,
-                                },
-                                success: function (response) {
-                                    if (response.success && response.installed == true) {
-                                        $("settings-package-" + sanitizedPackageName).prop('checked', true);
-                                        Craft.cp.displayNotice(response.message);
-                                        let packageCookieUrl = '{{ actionUrl("document-helpers/install/toggle-package/") }}';
-                                        packageCookieUrl += '&package=' + packageName + '&version=' + versions[package] + '&installed=' + 1;
-                                        setCookie("package-" + sanitizedPackageName, decodeHtmlEntities(packageCookieUrl), 1);
-                                    } else if (response.success && response.installed == false) {
-                                        $('#settings-package-' + sanitizedPackageName).prop('checked', false);
-                                        Craft.cp.displayNotice(response.message);
-                                        let packageCookieUrl = '{{ actionUrl("document-helpers/install/toggle-package/") }}';
-                                        packageCookieUrl += '&package=' + packageName + '&version=' + versions[package] + '&installed=' + 0;
-                                        setCookie("package-" + sanitizedPackageName, decodeHtmlEntities(packageCookieUrl), 1);
-                                    } else if (response.success == false && response.installed == false) {
-                                        lightswitchFieldPackage.classList.add("on");
-                                        Craft.cp.displayError(response.message);
-                                        lightswitchPackageContainerHandle.style.marginLeft = '0';
-
-                                    } else if (response.success == false && response.installed == true){
-                                        lightswitchFieldPackage.classList.remove("on");
-                                        Craft.cp.displayError(response.message);
-                                        lightswitchPackageContainerHandle.style.marginLeft = '-12px';
-                                    }
-                                    else {
-                                        Craft.cp.displayError('There was an error installing the package ' + packageName + ': ' + response.message);
-                                    }
-                                    ps.innerHTML += "<p>"+response.message+"</p>";
-                                    lightswitchFieldPackage.disabled = false;
-                                    lightswitchFieldPackageContainer.classList.remove("disabled");
-                                },
-                                error: function (jqXHR, textStatus, errorThrown) {
-                                    Craft.cp.displayError('There was an error sending the request: ' + errorThrown);
-                                    lightswitchFieldPackage.disabled = false;
-                                    lightswitchFieldPackageContainer.classList.remove("disabled");
-                                }
-                            });
-                        }
-                    }
-                }
-            };
-        
-            let observer = new MutationObserver(callback);
-        
-            let options = {
-                attributes: true,
-                attributeFilter: ["aria-checked"],
-                attributeOldValue: true
-            };
-        
-            observers[package] = { button, observer, options };
-        
-            observer.observe(button, options);
-        }
-                    $('.tab-content').hide();
-                    
-                    $('.tab-content:first').show();
-                    
-                    $('.scrollable a').click(function () {
-                    
-                    var tabId = $(this).attr('id').replace('settings-tab-', '');
-                    $('.tab-content').hide();
-                    
-                    $('#settings-content-' + tabId).show();
-                    $('.sel').removeClass('sel');
-                    $(this).addClass('sel');
-                    });
-                    });
-                    var fields = [
-                    "protection",
-                    "protectionCopy",
-                    "protectionPrint",
-                    "protectionModify",
-                    "protectionAnnotForms",
-                    "protectionExtract",
-                    "protectionAssemble",
-                    "protectionFillForms",
-                    "protectionPrintHighres",
-                    "protectionNoUserPassword",
-                    "disableCopyright",
-                    "generateMode",
-                    "convertImgToCMYK"
-                    ];
-                    if ({% if isDisabledPlus %}true{% else %}false{% endif %}==true) {
-                    for (var field of fields) {
-                    var lightswitchField = document.getElementById("settings-"+field);
-                    lightswitchField.disabled = true;
-                    lightswitchField.classList.remove("on");
-                    var lightswitchFieldContainer = document.getElementById("settings-"+field+"-field");
-                    lightswitchFieldContainer.classList.add("disabled");
-                    }
-                    }
-                
-                   function getCookie(name) {
-                  var nameEQ = name + "=";
-                  var ca = document.cookie.split(";");
-                  for (var i = 0; i < ca.length; i++) {
-                    var c = ca[i].trim();
-                    if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length, c.length);
-                  }
-                  return null;
-                }{% endjs %}
+														                var packages = [
+                                                                            "chillerlan/php-qrcode",
+                                                                            "ezyang/htmlpurifier",
+                                                                            "simplehtmldom/simplehtmldom",
+                                                                            "monolog/monolog"
+                                                                        ];
+														        var observers = {};
+														        var ps = document.getElementById("settings-package-status");
+														        for (let package of packages) {
+														            const packageName = package;
+														            let sanitizedPackageName = packageName.replace('/', '_');
+														        
+														            let button = document.getElementById("settings-package-" + sanitizedPackageName);
+														        
+														            let callback = function (mutationsList) {
+														                for (let mutation of mutationsList) {
+														                    if (mutation.type == "attributes") {
+														                        if (mutation.attributeName == "aria-checked") {
+														                            const actionUrl = getCookie("package-" + sanitizedPackageName);
+														                    let lightswitchFieldPackage = document.getElementById("settings-"+"package-" + sanitizedPackageName);
+														                    lightswitchFieldPackage.disabled = true;
+														                    let lightswitchFieldPackageContainer = document.getElementById("settings-"+"package-" + sanitizedPackageName+"-field");
+														                    let lightswitchPackageContainerHandle = document.querySelector("#settings-"+"package-" + sanitizedPackageName+"-field .lightswitch-container");
+														                    lightswitchFieldPackageContainer.classList.add("disabled");
+														                            $.ajax({
+														                                type: 'POST',
+														                                url: actionUrl,
+														                                data: {
+														                                    [window.Craft.csrfTokenName]: window.Craft.csrfTokenValue,
+														                                },
+														                                success: function (response) {
+														                                    if (response.success && response.installed == true) {
+														                                        $("settings-package-" + sanitizedPackageName).prop('checked', true);
+														                                        Craft.cp.displayNotice(response.message);
+														                                        let packageCookieUrl = '{{ actionUrl("document-helpers/install/toggle-package/") }}';
+														                                        packageCookieUrl += '&package=' + packageName + '&version=' + versions[package] + '&installed=' + 1;
+														                                        setCookie("package-" + sanitizedPackageName, decodeHtmlEntities(packageCookieUrl), 1);
+														                                    } else if (response.success && response.installed == false) {
+														                                        $('#settings-package-' + sanitizedPackageName).prop('checked', false);
+														                                        Craft.cp.displayNotice(response.message);
+														                                        let packageCookieUrl = '{{ actionUrl("document-helpers/install/toggle-package/") }}';
+														                                        packageCookieUrl += '&package=' + packageName + '&version=' + versions[package] + '&installed=' + 0;
+														                                        setCookie("package-" + sanitizedPackageName, decodeHtmlEntities(packageCookieUrl), 1);
+														                                    } else if (response.success == false && response.installed == false) {
+														                                        lightswitchFieldPackage.classList.add("on");
+														                                        Craft.cp.displayError(response.message);
+														                                        lightswitchPackageContainerHandle.style.marginLeft = '0';
+														
+														                                    } else if (response.success == false && response.installed == true){
+														                                        lightswitchFieldPackage.classList.remove("on");
+														                                        Craft.cp.displayError(response.message);
+														                                        lightswitchPackageContainerHandle.style.marginLeft = '-12px';
+														                                    }
+														                                    else {
+														                                        Craft.cp.displayError('There was an error installing the package ' + packageName + ': ' + response.message);
+														                                    }
+														                                    ps.innerHTML += "<p>"+response.message+"</p>";
+														                                    lightswitchFieldPackage.disabled = false;
+														                                    lightswitchFieldPackageContainer.classList.remove("disabled");
+														                                },
+														                                error: function (jqXHR, textStatus, errorThrown) {
+														                                    Craft.cp.displayError('There was an error sending the request: ' + errorThrown);
+														                                    lightswitchFieldPackage.disabled = false;
+														                                    lightswitchFieldPackageContainer.classList.remove("disabled");
+														                                }
+														                            });
+														                        }
+														                    }
+														                }
+														            };
+														        
+														            let observer = new MutationObserver(callback);
+														        
+														            let options = {
+														                attributes: true,
+														                attributeFilter: ["aria-checked"],
+														                attributeOldValue: true
+														            };
+														        
+														            observers[package] = { button, observer, options };
+														        
+														            observer.observe(button, options);
+														        }
+														                    $('.tab-content').hide();
+														                    
+														                    $('.tab-content:first').show();
+														                    
+														                    $('.scrollable a').click(function () {
+														                    
+														                    var tabId = $(this).attr('id').replace('settings-tab-', '');
+														                    $('.tab-content').hide();
+														                    
+														                    $('#settings-content-' + tabId).show();
+														                    $('.sel').removeClass('sel');
+														                    $(this).addClass('sel');
+														                    });
+														                    });
+														                    var fields = [
+														                    "protection",
+														                    "protectionCopy",
+														                    "protectionPrint",
+														                    "protectionModify",
+														                    "protectionAnnotForms",
+														                    "protectionExtract",
+														                    "protectionAssemble",
+														                    "protectionFillForms",
+														                    "protectionPrintHighres",
+														                    "protectionNoUserPassword",
+														                    "disableCopyright",
+														                    "generateMode",
+														                    "convertImgToCMYK"
+														                    ];
+														                    if ({% if isDisabledPlus %}true{% else %}false{% endif %}==true) {
+														                    for (var field of fields) {
+														                    var lightswitchField = document.getElementById("settings-"+field);
+														                    lightswitchField.disabled = true;
+														                    lightswitchField.classList.remove("on");
+														                    var lightswitchFieldContainer = document.getElementById("settings-"+field+"-field");
+														                    lightswitchFieldContainer.classList.add("disabled");
+														                    }
+														                    }
+														                
+														                   function getCookie(name) {
+														                  var nameEQ = name + "=";
+														                  var ca = document.cookie.split(";");
+														                  for (var i = 0; i < ca.length; i++) {
+														                    var c = ca[i].trim();
+														                    if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length, c.length);
+														                  }
+														                  return null;
+														                }{% endjs %}

@@ -22,7 +22,6 @@ use craft\base\Model;
  * @since     1.3.1
  * @since     0.4.1
  */
-
 class Settings extends Model
 {
 
@@ -89,6 +88,7 @@ class Settings extends Model
     public $dumbThumbDir = null;
     public $dumbThumbFilename = null;
     public $thumbQuality = null;
+
     public function rules(): array
     {
         return [

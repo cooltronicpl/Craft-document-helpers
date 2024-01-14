@@ -12,17 +12,18 @@
  * @copyright Copyright (c) 2024 CoolTRONIC.pl sp. z o.o. by Pawel Potacki
  */
 
- namespace cooltronicpl\documenthelpers\classes;
+namespace cooltronicpl\documenthelpers\classes;
 
- use Craft;
- 
- /**
-  * @author    CoolTRONIC.pl sp. z o.o. <github@cooltronic.pl>
-  * @author    Pawel Potacki
-  * @since     1.2.2
-  * 
-  */
-class ExtendedAsset extends craft\elements\Asset {
+use craft\elements\Asset;
+
+/**
+ * @author    CoolTRONIC.pl sp. z o.o. <github@cooltronic.pl>
+ * @author    Pawel Potacki
+ * @since     1.2.2
+ *
+ */
+class ExtendedAsset extends Asset
+{
     public $assetThumb;
     private $_url;
     private $_isDraft;
@@ -35,69 +36,84 @@ class ExtendedAsset extends craft\elements\Asset {
     private $_mimeType;
     private $_path;
     private $_isFolder;
-    
+
     public function getUrl($transform = null, ?bool $immediately = null): ?string
     {
         return $this->_url ?? parent::getUrl();
     }
 
-    public function setUrl($url) {
+    public function setUrl($url)
+    {
         $this->_url = $url;
     }
 
-    public function getIsDraft(): bool {
+    public function getIsDraft(): bool
+    {
         return $this->_isDraft ?? parent::getIsDraft();
     }
 
-    public function setIsDraft($isDraft) {
+    public function setIsDraft($isDraft)
+    {
         $this->_isDraft = $isDraft;
     }
 
-    public function getIsRevision(): bool {
+    public function getIsRevision(): bool
+    {
         return $this->_isRevision ?? parent::getIsRevision();
     }
 
-    public function setIsRevision($isRevision) {
+    public function setIsRevision($isRevision)
+    {
         $this->_isRevision = $isRevision;
     }
 
-    public function getIsUnpublishedDraft(): bool {
+    public function getIsUnpublishedDraft(): bool
+    {
         return $this->_isUnpublishedDraft ?? parent::getIsUnpublishedDraft();
     }
 
-    public function setIsUnpublishedDraft($isUnpublishedDraft) {
+    public function setIsUnpublishedDraft($isUnpublishedDraft)
+    {
         $this->_isUnpublishedDraft = $isUnpublishedDraft;
     }
 
-    public function getRef(): string {
+    public function getRef(): string
+    {
         return $this->_ref ?? parent::getRef();
     }
 
-    public function setRef($ref) {
+    public function setRef($ref)
+    {
         $this->_ref = $ref;
     }
 
-    public function getStatus(): string {
+    public function getStatus(): string
+    {
         return $this->_status ?? parent::getStatus();
     }
 
-    public function setStatus($status) {
+    public function setStatus($status)
+    {
         $this->_status = $status;
     }
 
-    public function getExtension(): string {
+    public function getExtension(): string
+    {
         return $this->_extension ?? parent::getExtension();
     }
 
-    public function setExtension($extension) {
+    public function setExtension($extension)
+    {
         $this->_extension = $extension;
     }
 
-    public function getHasFocalPoint(): bool {
+    public function getHasFocalPoint(): bool
+    {
         return $this->_hasFocalPoint ?? parent::getHasFocalPoint();
     }
 
-    public function setHasFocalPoint($hasFocalPoint) {
+    public function setHasFocalPoint($hasFocalPoint)
+    {
         $this->_hasFocalPoint = $hasFocalPoint;
     }
 
@@ -106,24 +122,29 @@ class ExtendedAsset extends craft\elements\Asset {
         return $this->_mimeType ?? parent::getMimeType($transform);
     }
 
-    public function setMimeType($mimeType) {
+    public function setMimeType($mimeType)
+    {
         $this->_mimeType = $mimeType;
     }
 
-    public function getPath($filename = null): string {
+    public function getPath($filename = null): string
+    {
         return $this->_path ?? parent::getPath();
     }
 
-    public function setPath($path) {
+    public function setPath($path)
+    {
         $this->_path = $path;
     }
 
-    public function setIsFolder($isFolder) {
-        $this->_isFolder = $isFolder;
+    public function getIsFolder(): bool
+    {
+        return $this->_isFolder ?? parent::getIsFolder();
     }
 
-    public function getIsFolder(): bool {
-        return $this->_isFolder ?? parent::getIsFolder();
+    public function setIsFolder($isFolder)
+    {
+        $this->_isFolder = $isFolder;
     }
 
 }

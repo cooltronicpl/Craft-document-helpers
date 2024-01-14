@@ -14,15 +14,14 @@
 
 namespace cooltronicpl\documenthelpers\classes;
 
-use Craft;
+use craft\elements\Asset;
 
 /**
  * @author    CoolTRONIC.pl sp. z o.o. <github@cooltronic.pl>
  * @author    Pawel Potacki
  * @since     2.0.0
  */
-class ExtendedAssetv3 extends craft\elements\Asset
-
+class ExtendedAssetv3 extends Asset
 {
     public $assetThumb;
     private $_url;
@@ -77,7 +76,7 @@ class ExtendedAssetv3 extends craft\elements\Asset
         $this->_isDraft = $isDraft;
     }
 
-    public function getIsRevision():  bool
+    public function getIsRevision(): bool
     {
         return $this->_isRevision ?? false;
     }
@@ -148,7 +147,7 @@ class ExtendedAssetv3 extends craft\elements\Asset
         $this->_mimeType = $mimeType;
     }
 
-    public function getPath($filename = null) : string
+    public function getPath($filename = null): string
     {
         return $this->_path ?? parent::getPath();
     }
@@ -158,7 +157,8 @@ class ExtendedAssetv3 extends craft\elements\Asset
         $this->_path = $path;
     }
 
-    public function setScenario($t){
+    public function setScenario($t)
+    {
         return parent::setScenario($t);
     }
 

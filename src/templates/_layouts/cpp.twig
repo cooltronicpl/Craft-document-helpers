@@ -73,7 +73,7 @@
 
 
 {% js at head %}
-    window.LOCATION_HASH = document.location.hash ? decodeURIComponent(document.location.hash.substr(1)) : null;
+window.LOCATION_HASH = document.location.hash ? decodeURIComponent(document.location.hash.substr(1)) : null;
     history.replaceState(undefined, undefined, window.location.href.match(/^[^#]*/)[0]);
 {% endjs %}
 
