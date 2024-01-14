@@ -48,7 +48,7 @@
         "handle": "document-helpers",
         "hasCpSettings": true,
         "hasCpSection": false,
-        "schemaVersion": "2.3.0",
+        "schemaVersion": "2.3.1",
         "changelogUrl": "https://github.com/cooltronicpl/Craft-document-helpers/blob/master/CHANGELOG.md",
         "class": "cooltronicpl\\documenthelpers\\DocumentHelper"
     }
