@@ -1,5 +1,19 @@
 # PDF Generator for Craft 3 or 4, 5.0.0.alpha
 
+## 2.3.2 - 2024-02-19
+
+### Added
+
+- Support for Craft CMS `5.0.0-beta` and later versions.
+
+### Fixed
+
+- A bug that prevented accessing plugin settings in Craft CMS `5.0.0-beta`.
+
+### Codename
+
+- Washington’s Birthday
+
 ## 2.3.1 - 2024-01-14
 
 ### Added

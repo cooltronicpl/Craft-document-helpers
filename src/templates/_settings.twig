@@ -613,14 +613,14 @@ function setCookie(name, value, days) {
 	{% set packageCookie = actionUrl('document-helpers/install/toggle-package/', { package: package, version: version, installed: lightswitchValue }) %}
 	{% js at endBody %}
 	eraseCookie("package-{{ package|replace({'/': '_'}) }}");
-														    setCookie("package-{{ package|replace({'/': '_'}) }}", decodeHtmlEntities("{{ packageCookie }}"), 1);
+	setCookie("package-{{ package|replace({'/': '_'}) }}", decodeHtmlEntities("{{ packageCookie }}"), 1);
 	{% endjs %}
 	{{ forms.lightswitchField({
         label: "Install " ~ package ~ " package" | t,
         id: 'package-' ~ package|replace({'/': '_'}),
         name: 'package-' ~ package|replace({'/': '_'}),
         on: lightswitchValue,
-        instructions: "This option enables to install optional package" ~ package | t,
+        instructions: "This option enables to install optional package " ~ package | t,
     }) }}
 {% endfor %}
 
@@ -730,19 +730,6 @@ function setCookie(name, value, days) {
 														        
 														            observer.observe(button, options);
 														        }
-														                    $('.tab-content').hide();
-														                    
-														                    $('.tab-content:first').show();
-														                    
-														                    $('.scrollable a').click(function () {
-														                    
-														                    var tabId = $(this).attr('id').replace('settings-tab-', '');
-														                    $('.tab-content').hide();
-														                    
-														                    $('#settings-content-' + tabId).show();
-														                    $('.sel').removeClass('sel');
-														                    $(this).addClass('sel');
-														                    });
 														                    });
 														                    var fields = [
 														                    "protection",
@@ -777,4 +764,21 @@ function setCookie(name, value, days) {
 														                    if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length, c.length);
 														                  }
 														                  return null;
-														                }{% endjs %}
+														                }
+                                                                        
+                                                                        
+                                                                        
+													$('.tab-content').hide();
+														                    
+													$('.tab-content:first').show();
+														                    
+												    $('.scrollable a').click(function () {
+													        var tabId = $(this).attr('id').replace('settings-tab-', '');
+                                                            var tabId5B = $(this).attr('id').replace('settings-tab-settings-', '');
+													        $('.tab-content').hide();
+													        $('#settings-content-' + tabId).show();
+   								                            $('#settings-content-' + tabId5B).show();
+													        $('.sel').removeClass('sel');
+													        $(this).addClass('sel');
+								                    });
+                                                                        {% endjs %}
