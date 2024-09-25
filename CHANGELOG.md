@@ -1,5 +1,19 @@
 # PDF Generator for Craft 3 or 4, 5.0.0.alpha
 
+## 3.0.0 - 2024-09-25
+
+### Added
+
+- Support for Craft CMS `5.0.0` and later versions.
+
+### Fixed
+
+- A bug that prevented using dynamic Craft asset's on `5.0.0` and later.
+
+### Codename
+
+- Autumnal Equinox
+
 ## 2.3.2 - 2024-02-19
 
 ### Added

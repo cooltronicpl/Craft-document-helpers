@@ -4,7 +4,7 @@
  *
  * Class DocumentHelpersVariable
  *
- * PDF Generator plugin for Craft CMS 3 or Craft CMS 4.
+ * PDF Generator plugin for Craft CMS 3 or Craft CMS 4 or Craft CMS 5.
  *
  * @link      https://cooltronic.pl
  * @link      https://potacki.com
@@ -16,6 +16,7 @@ namespace cooltronicpl\documenthelpers\variables;
 
 use cooltronicpl\documenthelpers\classes\ExtendedAsset;
 use cooltronicpl\documenthelpers\classes\ExtendedAssetv3;
+use cooltronicpl\documenthelpers\classes\ExtendedAssetv5;
 use cooltronicpl\documenthelpers\DocumentHelper as DocumentHelpers;
 use Craft;
 use craft\elements\Asset;
@@ -186,20 +187,23 @@ class DocumentHelperVariable
         }
 
         $craftVersion = Craft::$app->getVersion();
-        if (version_compare($craftVersion, '4.0', '>=')) {
-            $extendedAsset = new ExtendedAsset();
-        } elseif (version_compare($craftVersion, '5.0', '>=')) {
+        if (version_compare($craftVersion, '5.0', '>=')) {
+            $extendedAsset = new ExtendedAssetv5();
+        } elseif (version_compare($craftVersion, '4.0', '>=')) {
             $extendedAsset = new ExtendedAsset();
         } elseif (version_compare($craftVersion, '3.0', '>=')) {
             $extendedAsset = new ExtendedAssetv3();
         }
         foreach ($asset->getAttributes() as $name => $value) {
-            $extendedAsset->$name = $value;
+            try {
+                $extendedAsset->$name = $value;
+            } catch (yii\base\InvalidCallException $e) {
+                // Ignore setting read-only properties
+            }
         }
         if (isset($settings['assetThumb'])) {
             $extendedAsset->assetThumb = $assetThumb;
         }
-
         if (isset($settings['assetDelete'])) {
             if (file_exists($tempFilename)) {
                 if (unlink($tempFilename)) {
@@ -208,7 +212,6 @@ class DocumentHelperVariable
                     Craft::error("Deletion error (unlink) of temporary PDF file on path: " . StringHelper::toString($tempFilename));
                 }
             }
-
             if (isset($settings['assetThumb'])) {
                 if (file_exists($dirTemp . DIRECTORY_SEPARATOR . $fileTempName . '.' . $assetType)) {
                     if (unlink($dirTemp . DIRECTORY_SEPARATOR . $fileTempName . '.' . $assetType)) {
