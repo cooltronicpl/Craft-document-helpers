@@ -129,7 +129,7 @@ class ExtendedAssetv5 extends Asset
         return $this->_mimeType ?? parent::getMimeType($transform);
     }
 
-    public function setMimeType($mimeType)
+    public function setMimeType(?string $mimeType): void
     {
         $this->_mimeType = $mimeType;
     }
